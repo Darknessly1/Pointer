@@ -12,45 +12,16 @@ function OvertimeCalculator() {
     });
     const [result, setResult] = useState("");
     const [workers, setWorkers] = useState([]);
-    // const [message, setMessage] = useState("");
-    const [backendStatus, setBackendStatus] = useState("Checking...");
-
-    // const [message, setMessage] = useState("");
-
-    // useEffect(() => {
-    //     fetch("http://localhost:3000/message")
-    //         .then((res) => res.json())
-    //         .then((data) => setMessage(data.message));
-    // }, []);
-
-
-    useEffect(() => {
-        fetch('http://localhost:3000/api/health')
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error("Failed to connect to backend");
-                }
-            })
-            .then((data) => {
-                setBackendStatus(data.message); // Update status on success
-            })
-            .catch((error) => {
-                setBackendStatus("Failed to connect to backend");
-                console.error("Error:", error);
-            });
-    }, []);
+    const [message, setMessage] = useState('');
 
 
     // Fetch records from the backend
     useEffect(() => {
-        fetch('http://localhost:3000/api/records')
+        fetch('http://localhost:5000/workers')
             .then((response) => response.json())
             .then((data) => setWorkers(data))
             .catch((error) => console.error('Error fetching workers:', error));
     }, []);
-    console.log(workers);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -148,17 +119,24 @@ function OvertimeCalculator() {
         const workDate = document.getElementById("workDate").value;
         const workerName = document.getElementById("workerName").value;
         const workerDetails = document.getElementById("workerDetails").value;
-
-        const totalHoursMatch = document.getElementById("result").innerHTML.match(/Total hours worked: (\d+\.\d+)/);
-        const regularHoursMatch = document.getElementById("result").innerHTML.match(/Regular hours: (\d+\.\d+)/);
-        const eveOTMatch = document.getElementById("result").innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
-        const nightOTMatch = document.getElementById("result").innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
-
-        if (!totalHoursMatch || !regularHoursMatch) {
-            alert("Please calculate the overtime before adding information.");
+    
+        // Wait until the result element is available
+        const resultElement = document.getElementById("result");
+        if (!resultElement) {
+            setMessage("Please calculate the overtime before adding information.");
             return;
         }
-
+    
+        const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
+        const regularHoursMatch = resultElement.innerHTML.match(/Regular hours: (\d+\.\d+)/);
+        const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
+        const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
+    
+        if (!totalHoursMatch || !regularHoursMatch) {
+            setMessage("Please calculate the overtime before adding information.");
+            return;
+        }
+    
         const newRecord = {
             date: workDate,
             workerName,
@@ -168,45 +146,40 @@ function OvertimeCalculator() {
             eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
             nightHours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
         };
-
+    
         try {
-            const response = await fetch('http://localhost:3000/api/records', {
+            const response = await fetch('http://localhost:5000/add-worker', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(newRecord),
             });
-
+    
             if (response.ok) {
                 const savedRecord = await response.json();
                 console.log('Record saved successfully:', savedRecord);
-
-                // Add the new record to the state
-                setWorkers((prevWorkers) => [...prevWorkers, savedRecord]);
-
-                alert('Record added successfully!');
+    
+                const updatedWorkersResponse = await fetch('http://localhost:5000/workers');
+                const updatedWorkers = await updatedWorkersResponse.json();
+    
+                setWorkers(updatedWorkers);
+                setMessage('Record added successfully!');
             } else {
                 console.error('Failed to save record:', response.statusText);
-                alert(`Failed to add the record: ${response.statusText}`);
+                setMessage(`Failed to add the record: ${response.statusText}`);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while adding the record. Please try again later.');
+            setMessage('An error occurred while adding the record. Please try again later.');
         }
     };
-
+    
 
 
     return (
         <div>
-            {/* <h1>{message}</h1> */}
             <h1>Overtime Calculator</h1>
-
-            <div>
-                <h1>Backend Connection Status</h1>
-                <p>{backendStatus}</p>
-            </div>
 
             <label htmlFor="checkIn1">First Check-In Time:</label>
             <input type="time" id="checkIn1" value={inputs.checkIn1} onChange={handleInputChange} />
@@ -234,39 +207,37 @@ function OvertimeCalculator() {
             <input type="text" id="workerDetails" value={inputs.workerDetails} onChange={handleInputChange} />
 
             <button onClick={addWorkerInfoToTable}>Add Information to Table</button>
-            {/* {message && <p className="message">{message}</p>}  */}
+            {message && <div className="message">{message}</div>}
 
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Worker Name</th>
-                            <th>Details</th>
-                            <th>Total Hours</th>
-                            <th>Regular Hours</th>
-                            <th>Evening Hours</th>
-                            <th>Night Hours</th>
+            <h2>Workers Overtime Records</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Worker Name</th>
+                        <th>Worker Details</th>
+                        <th>Total Hours</th>
+                        <th>Regular Hours</th>
+                        <th>Evening Overtime Hours</th>
+                        <th>Night Overtime Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {workers.map((worker, index) => (
+                        <tr key={index}>
+                            <td>{worker.date}</td>
+                            <td>{worker.workerName}</td>
+                            <td>{worker.workerDetails}</td>
+                            <td>{worker.totalHours}</td>
+                            <td>{worker.regularHours}</td>
+                            <td>{worker.eveningHours}</td>
+                            <td>{worker.nightHours}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {workers.map((worker) => (
-                            <tr key={worker._id}>
-                                <td>{new Date(worker.date).toLocaleDateString()}</td>
-                                <td>{worker.workerName}</td>
-                                <td>{worker.workerDetails}</td>
-                                <td>{worker.totalHours}</td>
-                                <td>{worker.regularHours}</td>
-                                <td>{worker.eveningHours}</td>
-                                <td>{worker.nightHours}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
-
 }
 
 export default OvertimeCalculator;
