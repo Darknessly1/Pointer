@@ -171,7 +171,6 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage('Record added successfully!');
-                // Fetch the updated workers data to reflect the new record in the table
                 fetchWorkers();
             } else {
                 setMessage(`Failed to add the record: ${response.statusText}`);
@@ -187,14 +186,14 @@ const Test = () => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data); // Debug the structure
-                setWorkers(data); // Update the state with the new workers list
+                console.log(data);
+                setWorkers(data);
             })
             .catch((error) => console.error('Error fetching workers:', error));
     };
 
     useEffect(() => {
-        fetchWorkers(); // Fetch the workers when the component mounts
+        fetchWorkers();
     }, []);
 
 
@@ -211,29 +210,6 @@ const Test = () => {
         setResult('');
         setMessage('');
     };
-
-    const editWorker = async (id, updatedData) => {
-        try {
-            const response = await fetch(`http://localhost:5000/edit-worker/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedData),
-            });
-
-            if (response.ok) {
-                setMessage('Worker updated successfully!');
-                fetchWorkers(); // Refresh the table
-            } else {
-                setMessage(`Failed to update worker: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('Error updating worker:', error);
-            setMessage('An error occurred while updating the worker.');
-        }
-
-        resetInputs();
-    };
-
 
     const removeWorker = async (id) => {
         try {
@@ -253,23 +229,49 @@ const Test = () => {
         }
     };
 
-    const [editInputs, setEditInputs] = useState({});
+    const handleSave = async () => {
+        const { checkIn1, checkOut1, checkIn2, checkOut2, workerName, workerDetails } = updatedData;
 
-    const openEditPopup = (worker) => {
-        setEditInputs(worker);
-        setIsEditPopupVisible(true);
-    };
+        const { regularHours, overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
+            { start: checkIn1, end: checkOut1 },
+            { start: checkIn2, end: checkOut2 },
+        ]);
 
-    const resetInputs = () => {
-        setInputs({
-            workerName: "",
-            workerDetails: "",
-            workDate: "",
-            checkIn1: "",
-            checkOut1: "",
-            checkIn2: "",
-            checkOut2: "",
-        });
+        const eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
+        const nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
+
+        const updatedWorker = {
+            workerName,
+            workerDetails,
+            date: new Date().toISOString().slice(0, 10),
+            totalHours: totalHours.toFixed(2),
+            regularHours: Math.min(regularHours, 8).toFixed(2),
+            eveningHours: (eveningOvertime / 1.25).toFixed(2),
+            nightHours: (nightOvertime / 1.5).toFixed(2),
+        };
+
+        try {
+            const response = await fetch(`http://localhost:5000/edit-worker/${selectedWorker._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedWorker),
+            });
+
+            if (response.ok) {
+                const { worker } = await response.json();
+                setWorkers((prev) =>
+                    prev.map((w) => (w._id === selectedWorker._id ? { ...worker } : w))
+                );
+                setMessage('Worker updated successfully!');
+                setIsEditPopupVisible(false);
+            } else {
+                const errorData = await response.json();
+                setMessage(`Failed to update worker: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error saving worker:', error);
+            setMessage('An error occurred while saving. Please try again later.');
+        }
     };
 
 
@@ -444,78 +446,103 @@ const Test = () => {
             </div>
 
             {isEditPopupVisible && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-md overflow-auto h-80" style={{ height: '500px' }}>
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
                         <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                editWorker(selectedWorker._id, editInputs);
-                                setIsEditPopupVisible(false);
+                                handleSave();
                             }}
                         >
-                            <div className="mb-2">
-                                <label className="block font-semibold">Worker Name:</label>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Worker Name</label>
                                 <input
                                     type="text"
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.workerName}
-                                    onChange={(e) => setEditInputs({ ...editInputs, workerName: e.target.value })}
+                                    value={updatedData.workerName}
+                                    onChange={(e) =>
+                                        setUpdatedData({ ...updatedData, workerName: e.target.value })
+                                    }
+                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    placeholder="Worker Name"
+                                    required
                                 />
                             </div>
-                            <div className="mb-2">
-                                <label className="block font-semibold">Worker Details:</label>
-                                <textarea
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.workerDetails}
-                                    onChange={(e) => setEditInputs({ ...editInputs, workerDetails: e.target.value })}
-                                ></textarea>
-                            </div>
-                            <div className="mb-2">
-                                <label className="block font-semibold">Check-In 1:</label>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Details</label>
                                 <input
-                                    type="time"
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.checkIn1}
-                                    onChange={(e) => setEditInputs({ ...editInputs, checkIn1: e.target.value })}
+                                    type="text"
+                                    value={updatedData.workerDetails}
+                                    onChange={(e) =>
+                                        setUpdatedData({ ...updatedData, workerDetails: e.target.value })
+                                    }
+                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    placeholder="Details"
+                                    required
                                 />
                             </div>
-                            <div className="mb-2">
-                                <label className="block font-semibold">Check-Out 1:</label>
-                                <input
-                                    type="time"
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.checkOut1}
-                                    onChange={(e) => setEditInputs({ ...editInputs, checkOut1: e.target.value })}
-                                />
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-in 1</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkIn1}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkIn1: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-out 1</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkOut1}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkOut1: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                        required
+                                    />
+                                </div>
                             </div>
-                            <div className="mb-2">
-                                <label className="block font-semibold">Check-In 2:</label>
-                                <input
-                                    type="time"
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.checkIn2}
-                                    onChange={(e) => setEditInputs({ ...editInputs, checkIn2: e.target.value })}
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label className="block font-semibold">Check-Out 2:</label>
-                                <input
-                                    type="time"
-                                    className="border rounded w-full p-2"
-                                    value={editInputs.checkOut2}
-                                    onChange={(e) => setEditInputs({ ...editInputs, checkOut2: e.target.value })}
-                                />
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-in 2</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkIn2}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkIn2: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-out 2</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkOut2}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkOut2: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    />
+                                </div>
                             </div>
                             <div className="flex justify-end">
                                 <button
                                     type="button"
-                                    className="bg-gray-500 text-white py-1 px-4 rounded mr-2"
                                     onClick={() => setIsEditPopupVisible(false)}
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-700"
                                 >
                                     Cancel
                                 </button>
-                                <button type="submit" className="bg-blue-500 text-white py-1 px-4 rounded">
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                >
                                     Save
                                 </button>
                             </div>
@@ -523,7 +550,6 @@ const Test = () => {
                     </div>
                 </div>
             )}
-
 
             {isDeletePopupVisible && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
