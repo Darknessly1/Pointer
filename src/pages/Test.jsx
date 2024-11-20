@@ -219,7 +219,7 @@ const Test = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData),
             });
-    
+
             if (response.ok) {
                 setMessage('Worker updated successfully!');
                 fetchWorkers(); // Refresh the table
@@ -230,15 +230,17 @@ const Test = () => {
             console.error('Error updating worker:', error);
             setMessage('An error occurred while updating the worker.');
         }
+
+        resetInputs();
     };
 
-    
+
     const removeWorker = async (id) => {
         try {
             const response = await fetch(`http://localhost:5000/remove-worker/${id}`, {
                 method: 'DELETE',
             });
-    
+
             if (response.ok) {
                 setMessage('Worker removed successfully!');
                 fetchWorkers(); // Refresh the table
@@ -250,7 +252,25 @@ const Test = () => {
             setMessage('An error occurred while removing the worker.');
         }
     };
-    
+
+    const [editInputs, setEditInputs] = useState({});
+
+    const openEditPopup = (worker) => {
+        setEditInputs(worker);
+        setIsEditPopupVisible(true);
+    };
+
+    const resetInputs = () => {
+        setInputs({
+            workerName: "",
+            workerDetails: "",
+            workDate: "",
+            checkIn1: "",
+            checkOut1: "",
+            checkIn2: "",
+            checkOut2: "",
+        });
+    };
 
 
     return (
@@ -258,78 +278,81 @@ const Test = () => {
             <h1 className='text-3xl font-bold text-center'>Overtime Calculator</h1>
 
             <div className="m-3 flex flex-col">
-                <div className="flex flex-wrap justify-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="workerName " className='mb-4 font-bold'>Worker Full Name:</label>
-                        <input
-                            type="text"
-                            id="workerName"
-                            value={inputs.workerName}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="workerDetails" className='mb-4 font-bold'>Worker Details:</label>
-                        <input
-                            type="text"
-                            id="workerDetails"
-                            value={inputs.workerDetails}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="workDate" className='mb-4 font-bold'>Work Date:</label>
-                        <input
-                            type="date"
-                            id="workDate"
-                            value={inputs.workDate}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="checkIn1" className='mb-4 font-bold'>Check-In 1:</label>
-                        <input
-                            type="time"
-                            id="checkIn1"
-                            value={inputs.checkIn1}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="checkOut1" className='mb-4 font-bold'>Check-Out 1:</label>
-                        <input
-                            type="time"
-                            id="checkOut1"
-                            value={inputs.checkOut1}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="checkIn2" className='mb-4 font-bold'>Check-In 2:</label>
-                        <input
-                            type="time"
-                            id="checkIn2"
-                            value={inputs.checkIn2}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="checkOut2" className='mb-4 font-bold'>Check-Out 2:</label>
-                        <input
-                            type="time"
-                            id="checkOut2"
-                            value={inputs.checkOut2}
-                            onChange={handleInputChange}
-                            className="border-2 border-gray-500 px-2 rounded-2xl"
-                        />
+                <div className="m-3 flex flex-col">
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="workerName" className="mb-4 font-bold">Worker Full Name:</label>
+                            <input
+                                type="text"
+                                id="workerName"
+                                value={inputs.workerName}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold">Worker Details:</label>
+                            <input
+                                type="text"
+                                id="workerDetails"
+                                value={inputs.workerDetails}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="workDate" className="mb-4 font-bold">Work Date:</label>
+                            <input
+                                type="date"
+                                id="workDate"
+                                value={inputs.workDate}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="checkIn1" className="mb-4 font-bold">Check-In 1:</label>
+                            <input
+                                type="time"
+                                id="checkIn1"
+                                value={inputs.checkIn1}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="checkOut1" className="mb-4 font-bold">Check-Out 1:</label>
+                            <input
+                                type="time"
+                                id="checkOut1"
+                                value={inputs.checkOut1}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="checkIn2" className="mb-4 font-bold">Check-In 2:</label>
+                            <input
+                                type="time"
+                                id="checkIn2"
+                                value={inputs.checkIn2}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="checkOut2" className="mb-4 font-bold">Check-Out 2:</label>
+                            <input
+                                type="time"
+                                id="checkOut2"
+                                value={inputs.checkOut2}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                            />
+                        </div>
                     </div>
                 </div>
+
                 <div className="flex justify-center gap-4 mt-4">
                     <button
                         onClick={calculateOvertimePay}
@@ -423,12 +446,12 @@ const Test = () => {
 
             {isEditPopupVisible && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-md">
+                    <div className="bg-white p-6 rounded shadow-md overflow-auto h-80" style={{ height: '500px' }}>
                         <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                editWorker(selectedWorker._id, updatedData);
+                                editWorker(selectedWorker._id, editInputs);
                                 setIsEditPopupVisible(false);
                             }}
                         >
@@ -437,28 +460,54 @@ const Test = () => {
                                 <input
                                     type="text"
                                     className="border rounded w-full p-2"
-                                    value={updatedData.workerName}
-                                    onChange={(e) => setUpdatedData({ ...updatedData, workerName: e.target.value })}
+                                    value={editInputs.workerName}
+                                    onChange={(e) => setEditInputs({ ...editInputs, workerName: e.target.value })}
                                 />
                             </div>
                             <div className="mb-2">
                                 <label className="block font-semibold">Worker Details:</label>
                                 <textarea
                                     className="border rounded w-full p-2"
-                                    value={updatedData.workerDetails}
-                                    onChange={(e) => setUpdatedData({ ...updatedData, workerDetails: e.target.value })}
+                                    value={editInputs.workerDetails}
+                                    onChange={(e) => setEditInputs({ ...editInputs, workerDetails: e.target.value })}
                                 ></textarea>
                             </div>
                             <div className="mb-2">
-                                <label className="block font-semibold">Total Hours:</label>
+                                <label className="block font-semibold">Check-In 1:</label>
                                 <input
-                                    type="number"
+                                    type="time"
                                     className="border rounded w-full p-2"
-                                    value={updatedData.totalHours}
-                                    onChange={(e) => setUpdatedData({ ...updatedData, totalHours: e.target.value })}
+                                    value={editInputs.checkIn1}
+                                    onChange={(e) => setEditInputs({ ...editInputs, checkIn1: e.target.value })}
                                 />
                             </div>
-                            {/* Add other fields as needed */}
+                            <div className="mb-2">
+                                <label className="block font-semibold">Check-Out 1:</label>
+                                <input
+                                    type="time"
+                                    className="border rounded w-full p-2"
+                                    value={editInputs.checkOut1}
+                                    onChange={(e) => setEditInputs({ ...editInputs, checkOut1: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label className="block font-semibold">Check-In 2:</label>
+                                <input
+                                    type="time"
+                                    className="border rounded w-full p-2"
+                                    value={editInputs.checkIn2}
+                                    onChange={(e) => setEditInputs({ ...editInputs, checkIn2: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label className="block font-semibold">Check-Out 2:</label>
+                                <input
+                                    type="time"
+                                    className="border rounded w-full p-2"
+                                    value={editInputs.checkOut2}
+                                    onChange={(e) => setEditInputs({ ...editInputs, checkOut2: e.target.value })}
+                                />
+                            </div>
                             <div className="flex justify-end">
                                 <button
                                     type="button"
