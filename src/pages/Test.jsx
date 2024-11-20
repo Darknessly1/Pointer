@@ -177,26 +177,6 @@ const Test = () => {
     };
 
 
-    const addWorker = async (newWorker) => {
-        try {
-            const response = await fetch('http://localhost:5000/workers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newWorker),
-            });
-
-            if (response.ok) {
-                // If the addition was successful, update the workers state directly
-                setWorkers((prevWorkers) => [...prevWorkers, newWorker]);
-            }
-        } catch (error) {
-            console.error('Error adding worker:', error);
-        }
-    };
-
-
     const fetchWorkers = () => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
@@ -212,67 +192,155 @@ const Test = () => {
     }, []);
 
 
+    const handleReset = () => {
+        setInputs({
+            checkIn1: '',
+            checkOut1: '',
+            checkIn2: '',
+            checkOut2: '',
+            workDate: '',
+            workerName: '',
+            workerDetails: '',
+        });
+        setResult('');
+        setMessage('');
+    };
+
+
     return (
         <div>
-            <h1>Overtime Calculator</h1>
+            <h1 className='text-3xl font-bold text-center'>Overtime Calculator</h1>
 
-            <label htmlFor="workerName">Worker Name:</label>
-            <input type="text" id="workerName" value={inputs.workerName} onChange={handleInputChange} />
+            <div className="m-3 flex flex-col">
+                <div className="flex flex-wrap justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="workerName" className='mb-4'>Worker Name:</label>
+                        <input
+                            type="text"
+                            id="workerName"
+                            value={inputs.workerName}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="workerDetails" className='mb-4'>Worker Details:</label>
+                        <input
+                            type="text"
+                            id="workerDetails"
+                            value={inputs.workerDetails}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="workDate" className='mb-4'>Work Date:</label>
+                        <input
+                            type="date"
+                            id="workDate"
+                            value={inputs.workDate}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="checkIn1" className='mb-4'>Check-In 1:</label>
+                        <input
+                            type="time"
+                            id="checkIn1"
+                            value={inputs.checkIn1}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="checkOut1" className='mb-4'>Check-Out 1:</label>
+                        <input
+                            type="time"
+                            id="checkOut1"
+                            value={inputs.checkOut1}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="checkIn2" className='mb-4'>Check-In 2:</label>
+                        <input
+                            type="time"
+                            id="checkIn2"
+                            value={inputs.checkIn2}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="checkOut2" className='mb-4'>Check-Out 2:</label>
+                        <input
+                            type="time"
+                            id="checkOut2"
+                            value={inputs.checkOut2}
+                            onChange={handleInputChange}
+                            className="border-2 border-gray-500 px-2 rounded-2xl"
+                        />
+                    </div>
+                </div>
+                <div className="flex justify-center gap-4 mt-4">
+                    <button
+                        onClick={calculateOvertimePay}
+                        className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                    >
+                        Calculate Overtime
+                    </button>
+                    <button
+                        onClick={addWorkerInfoToTable}
+                        className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                    >
+                        Add Information to Table
+                    </button>
+                    <button
+                        onClick={handleReset}
+                        className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
+                    >
+                        Restart
+                    </button>
+                </div>
+                {message && <p className="text-center mt-4">{message}</p>}
+            </div>
 
-            <label htmlFor="workerDetails">Worker Details:</label>
-            <input type="text" id="workerDetails" value={inputs.workerDetails} onChange={handleInputChange} />
-
-            <label htmlFor="workDate">Work Date:</label>
-            <input type="date" id="workDate" value={inputs.workDate} onChange={handleInputChange} />
-
-            <label htmlFor="checkIn1">Check-In 1:</label>
-            <input type="time" id="checkIn1" value={inputs.checkIn1} onChange={handleInputChange} />
-
-            <label htmlFor="checkOut1">Check-Out 1:</label>
-            <input type="time" id="checkOut1" value={inputs.checkOut1} onChange={handleInputChange} />
-
-            <label htmlFor="checkIn2">Check-In 2:</label>
-            <input type="time" id="checkIn2" value={inputs.checkIn2} onChange={handleInputChange} />
-
-            <label htmlFor="checkOut2">Check-Out 2:</label>
-            <input type="time" id="checkOut2" value={inputs.checkOut2} onChange={handleInputChange} />
-
-            <button onClick={calculateOvertimePay}>Calculate Overtime</button>
-            <button onClick={addWorkerInfoToTable}>Add Information to Table</button>
-            {message && <p>{message}</p>}
-
-            <div id="result">
+            <div id="result"
+                className=''
+            >
                 <pre>{result}</pre>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Worker Name</th>
-                        <th>Details</th>
-                        <th>Total Hours</th>
-                        <th>Regular Hours</th>
-                        <th>Evening Hours</th>
-                        <th>Night Hours</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(workers) && workers.map((worker) => (
-                        <tr key={worker._id}>
-                            <td>{worker.date}</td>
-                            <td>{worker.workerName}</td>
-                            <td>{worker.workerDetails}</td>
-                            <td>{worker.totalHours}</td>
-                            <td>{worker.regularHours}</td>
-                            <td>{worker.eveningHours}</td>
-                            <td>{worker.nightHours}</td>
+            <div className='flex justify-center rounded-2xl'>
+                <table className='border-2 border-black rounded-2xl'>
+                    <thead>
+                        <tr>
+                            <th className='border-2 border-black px-2'>Date</th>
+                            <th className='border-2 border-black px-2'>Worker Name</th>
+                            <th className='border-2 border-black px-2'>Details</th>
+                            <th className='border-2 border-black px-2'>Total Hours</th>
+                            <th className='border-2 border-black px-2'>Regular Hours</th>
+                            <th className='border-2 border-black px-2'>Evening Hours</th>
+                            <th className='border-2 border-black px-2'>Night Hours</th>
                         </tr>
-                    ))}
-                </tbody>
-
-
-            </table>
+                    </thead>
+                    <tbody>
+                        {Array.isArray(workers) && workers.map((worker) => (
+                            <tr key={worker._id}>
+                                <td className='border-2 border-black p-2'>{worker.date}</td>
+                                <td className='border-2 border-black p-2'>{worker.workerName}</td>
+                                <td className='border-2 border-black p-2'>{worker.workerDetails}</td>
+                                <td className='border-2 border-black p-2'>{worker.totalHours}</td>
+                                <td className='border-2 border-black p-2'>{worker.regularHours}</td>
+                                <td className='border-2 border-black p-2'>{worker.eveningHours}</td>
+                                <td className='border-2 border-black p-2'>{worker.nightHours}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
