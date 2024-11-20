@@ -436,7 +436,6 @@ const Test = () => {
                                     >
                                         Remove
                                     </button>
-
                                 </td>
                             </tr>
                         ))}
