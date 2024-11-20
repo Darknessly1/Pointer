@@ -15,10 +15,20 @@ const Test = () => {
     const [workers, setWorkers] = useState([]);
     const [message, setMessage] = useState('');
     const [result, setResult] = useState('');
+
     const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
+
+
+    // useEffect(() => {
+    //     fetch('http://localhost:5000/workers')
+    //         .then((response) => response.json())
+    //         .then((data) => setWorkers(data))
+    //         .catch((error) => console.error('Error fetching workers:', error));
+    // }, []);
+
 
     useEffect(() => {
         fetch('http://localhost:5000/workers')
@@ -209,7 +219,7 @@ const Test = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData),
             });
-
+    
             if (response.ok) {
                 setMessage('Worker updated successfully!');
                 fetchWorkers(); // Refresh the table
@@ -222,13 +232,13 @@ const Test = () => {
         }
     };
 
-
+    
     const removeWorker = async (id) => {
         try {
             const response = await fetch(`http://localhost:5000/remove-worker/${id}`, {
                 method: 'DELETE',
             });
-
+    
             if (response.ok) {
                 setMessage('Worker removed successfully!');
                 fetchWorkers(); // Refresh the table
@@ -240,6 +250,7 @@ const Test = () => {
             setMessage('An error occurred while removing the worker.');
         }
     };
+    
 
 
     return (
@@ -249,7 +260,7 @@ const Test = () => {
             <div className="m-3 flex flex-col">
                 <div className="flex flex-wrap justify-center gap-4">
                     <div className="flex items-center gap-2">
-                        <label htmlFor="workerName" className='mb-4 font-bold'>Worker Full Name:</label>
+                        <label htmlFor="workerName " className='mb-4 font-bold'>Worker Full Name:</label>
                         <input
                             type="text"
                             id="workerName"
@@ -328,7 +339,7 @@ const Test = () => {
                     </button>
                     <button
                         onClick={addWorkerInfoToTable}
-                        className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                        className="rounded-3xl bg-sky-500 hover:bg-sky-700 text-white font-bold py-1 px-2 text-sm"
                     >
                         Add Information to Table
                     </button>
@@ -347,11 +358,13 @@ const Test = () => {
             <div id="result"
                 className='flex justify-center m-2'
             >
-                <pre
-                    className='p-2 border-2 border-black rounded-2xl'
-                >
-                    {result}
-                </pre>
+                {result &&
+                    <pre
+                        className='p-2 border-2 border-black rounded-2xl'
+                    >
+                        {result}
+                    </pre>
+                }
             </div>
 
             <div className='flex justify-center rounded-2xl'>
@@ -380,7 +393,6 @@ const Test = () => {
                                 <td className='border-2 border-black p-2'>{worker.regularHours}</td>
                                 <td className='border-2 border-black p-2'>{worker.eveningHours}</td>
                                 <td className='border-2 border-black p-2'>{worker.nightHours}</td>
-                                <td className='border-2 border-black p-2'>{worker.nightHours}</td>
                                 <td className='border-2 border-black p-2'>
                                     <button
                                         className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
@@ -401,6 +413,7 @@ const Test = () => {
                                     >
                                         Remove
                                     </button>
+
                                 </td>
                             </tr>
                         ))}
@@ -442,15 +455,7 @@ const Test = () => {
                                     type="number"
                                     className="border rounded w-full p-2"
                                     value={updatedData.totalHours}
-                                    onChange={(e) => {
-                                        const newTotalHours = e.target.value;
-                                        // Validate and ensure total hours don't exceed 24
-                                        if (newTotalHours > 24) {
-                                            alert("Total hours cannot exceed 24 hours");
-                                            return;
-                                        }
-                                        setUpdatedData({ ...updatedData, totalHours: newTotalHours });
-                                    }}
+                                    onChange={(e) => setUpdatedData({ ...updatedData, totalHours: e.target.value })}
                                 />
                             </div>
                             {/* Add other fields as needed */}
@@ -470,6 +475,7 @@ const Test = () => {
                     </div>
                 </div>
             )}
+
 
             {isDeletePopupVisible && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
@@ -498,7 +504,6 @@ const Test = () => {
                     </div>
                 </div>
             )}
-
         </div>
     );
 };
