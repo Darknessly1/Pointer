@@ -15,14 +15,10 @@ const Test = () => {
     const [workers, setWorkers] = useState([]);
     const [message, setMessage] = useState('');
     const [result, setResult] = useState('');
-
-    // useEffect(() => {
-    //     fetch('http://localhost:5000/workers')
-    //         .then((response) => response.json())
-    //         .then((data) => setWorkers(data))
-    //         .catch((error) => console.error('Error fetching workers:', error));
-    // }, []);
-
+    const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
+    const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
+    const [selectedWorker, setSelectedWorker] = useState(null);
+    const [updatedData, setUpdatedData] = useState({});
 
     useEffect(() => {
         fetch('http://localhost:5000/workers')
@@ -206,6 +202,45 @@ const Test = () => {
         setMessage('');
     };
 
+    const editWorker = async (id, updatedData) => {
+        try {
+            const response = await fetch(`http://localhost:5000/edit-worker/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData),
+            });
+
+            if (response.ok) {
+                setMessage('Worker updated successfully!');
+                fetchWorkers(); // Refresh the table
+            } else {
+                setMessage(`Failed to update worker: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error updating worker:', error);
+            setMessage('An error occurred while updating the worker.');
+        }
+    };
+
+
+    const removeWorker = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:5000/remove-worker/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setMessage('Worker removed successfully!');
+                fetchWorkers(); // Refresh the table
+            } else {
+                setMessage(`Failed to remove worker: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error removing worker:', error);
+            setMessage('An error occurred while removing the worker.');
+        }
+    };
+
 
     return (
         <div>
@@ -214,7 +249,7 @@ const Test = () => {
             <div className="m-3 flex flex-col">
                 <div className="flex flex-wrap justify-center gap-4">
                     <div className="flex items-center gap-2">
-                        <label htmlFor="workerName" className='mb-4'>Worker Name:</label>
+                        <label htmlFor="workerName" className='mb-4 font-bold'>Worker Full Name:</label>
                         <input
                             type="text"
                             id="workerName"
@@ -224,7 +259,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="workerDetails" className='mb-4'>Worker Details:</label>
+                        <label htmlFor="workerDetails" className='mb-4 font-bold'>Worker Details:</label>
                         <input
                             type="text"
                             id="workerDetails"
@@ -234,7 +269,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="workDate" className='mb-4'>Work Date:</label>
+                        <label htmlFor="workDate" className='mb-4 font-bold'>Work Date:</label>
                         <input
                             type="date"
                             id="workDate"
@@ -244,7 +279,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="checkIn1" className='mb-4'>Check-In 1:</label>
+                        <label htmlFor="checkIn1" className='mb-4 font-bold'>Check-In 1:</label>
                         <input
                             type="time"
                             id="checkIn1"
@@ -254,7 +289,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="checkOut1" className='mb-4'>Check-Out 1:</label>
+                        <label htmlFor="checkOut1" className='mb-4 font-bold'>Check-Out 1:</label>
                         <input
                             type="time"
                             id="checkOut1"
@@ -264,7 +299,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="checkIn2" className='mb-4'>Check-In 2:</label>
+                        <label htmlFor="checkIn2" className='mb-4 font-bold'>Check-In 2:</label>
                         <input
                             type="time"
                             id="checkIn2"
@@ -274,7 +309,7 @@ const Test = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="checkOut2" className='mb-4'>Check-Out 2:</label>
+                        <label htmlFor="checkOut2" className='mb-4 font-bold'>Check-Out 2:</label>
                         <input
                             type="time"
                             id="checkOut2"
@@ -304,19 +339,26 @@ const Test = () => {
                         Restart
                     </button>
                 </div>
-                {message && <p className="text-center mt-4">{message}</p>}
+                <div>
+                    {message && <p className="text-center mt-4">{message}</p>}
+                </div>
             </div>
 
             <div id="result"
-                className=''
+                className='flex justify-center m-2'
             >
-                <pre>{result}</pre>
+                <pre
+                    className='p-2 border-2 border-black rounded-2xl'
+                >
+                    {result}
+                </pre>
             </div>
 
             <div className='flex justify-center rounded-2xl'>
                 <table className='border-2 border-black rounded-2xl'>
                     <thead>
                         <tr>
+                            <th className='border-2 border-black px-2'>number of employee</th>
                             <th className='border-2 border-black px-2'>Date</th>
                             <th className='border-2 border-black px-2'>Worker Name</th>
                             <th className='border-2 border-black px-2'>Details</th>
@@ -324,11 +366,13 @@ const Test = () => {
                             <th className='border-2 border-black px-2'>Regular Hours</th>
                             <th className='border-2 border-black px-2'>Evening Hours</th>
                             <th className='border-2 border-black px-2'>Night Hours</th>
+                            <th className='border-2 border-black px-2'>Edit/Remove</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.isArray(workers) && workers.map((worker) => (
+                        {Array.isArray(workers) && workers.map((worker, index) => (
                             <tr key={worker._id}>
+                                <td className='border-2 border-black p-2'>{index + 1}</td>
                                 <td className='border-2 border-black p-2'>{worker.date}</td>
                                 <td className='border-2 border-black p-2'>{worker.workerName}</td>
                                 <td className='border-2 border-black p-2'>{worker.workerDetails}</td>
@@ -336,11 +380,125 @@ const Test = () => {
                                 <td className='border-2 border-black p-2'>{worker.regularHours}</td>
                                 <td className='border-2 border-black p-2'>{worker.eveningHours}</td>
                                 <td className='border-2 border-black p-2'>{worker.nightHours}</td>
+                                <td className='border-2 border-black p-2'>{worker.nightHours}</td>
+                                <td className='border-2 border-black p-2'>
+                                    <button
+                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
+                                        onClick={() => {
+                                            setSelectedWorker(worker);
+                                            setUpdatedData(worker);
+                                            setIsEditPopupVisible(true);
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm"
+                                        onClick={() => {
+                                            setSelectedWorker(worker);
+                                            setIsDeletePopupVisible(true);
+                                        }}
+                                    >
+                                        Remove
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {isEditPopupVisible && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-md">
+                        <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                editWorker(selectedWorker._id, updatedData);
+                                setIsEditPopupVisible(false);
+                            }}
+                        >
+                            <div className="mb-2">
+                                <label className="block font-semibold">Worker Name:</label>
+                                <input
+                                    type="text"
+                                    className="border rounded w-full p-2"
+                                    value={updatedData.workerName}
+                                    onChange={(e) => setUpdatedData({ ...updatedData, workerName: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label className="block font-semibold">Worker Details:</label>
+                                <textarea
+                                    className="border rounded w-full p-2"
+                                    value={updatedData.workerDetails}
+                                    onChange={(e) => setUpdatedData({ ...updatedData, workerDetails: e.target.value })}
+                                ></textarea>
+                            </div>
+                            <div className="mb-2">
+                                <label className="block font-semibold">Total Hours:</label>
+                                <input
+                                    type="number"
+                                    className="border rounded w-full p-2"
+                                    value={updatedData.totalHours}
+                                    onChange={(e) => {
+                                        const newTotalHours = e.target.value;
+                                        // Validate and ensure total hours don't exceed 24
+                                        if (newTotalHours > 24) {
+                                            alert("Total hours cannot exceed 24 hours");
+                                            return;
+                                        }
+                                        setUpdatedData({ ...updatedData, totalHours: newTotalHours });
+                                    }}
+                                />
+                            </div>
+                            {/* Add other fields as needed */}
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    className="bg-gray-500 text-white py-1 px-4 rounded mr-2"
+                                    onClick={() => setIsEditPopupVisible(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button type="submit" className="bg-blue-500 text-white py-1 px-4 rounded">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isDeletePopupVisible && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-md">
+                        <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+                        <p className="mb-4">
+                            Are you sure you want to delete the worker: <strong>{selectedWorker.workerName}</strong>?
+                        </p>
+                        <div className="flex justify-end">
+                            <button
+                                className="bg-gray-500 text-white py-1 px-4 rounded mr-2"
+                                onClick={() => setIsDeletePopupVisible(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-red-500 text-white py-1 px-4 rounded"
+                                onClick={() => {
+                                    removeWorker(selectedWorker._id);
+                                    setIsDeletePopupVisible(false);
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
