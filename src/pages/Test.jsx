@@ -273,76 +273,76 @@ const Test = () => {
                 <div className="m-3 flex flex-col">
                     <div className="flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
                         <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor="workerName" className="mb-4 font-bold">Worker Full Name:</label>
+                            <label htmlFor="workerName" className="mb-4 font-bold mt-2">Worker Full Name:</label>
                             <input
                                 type="text"
                                 id="workerName"
                                 value={inputs.workerName}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor="workerDetails" className="mb-4 font-bold">Worker Details:</label>
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Worker Details:</label>
                             <input
                                 type="text"
                                 id="workerDetails"
                                 value={inputs.workerDetails}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor="workDate" className="mb-4 font-bold">Work Date:</label>
+                            <label htmlFor="workDate" className="mb-4 font-bold mt-2">Work Date:</label>
                             <input
                                 type="date"
                                 id="workDate"
                                 value={inputs.workDate}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
                         <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn1" className="mb-4 font-bold">Check-In 1:</label>
+                            <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
                             <input
                                 type="time"
                                 id="checkIn1"
                                 value={inputs.checkIn1}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                         <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut1" className="mb-4 font-bold">Check-Out 1:</label>
+                            <label htmlFor="checkOut1" className="mb-4 font-bold mt-2">Check-Out 1:</label>
                             <input
                                 type="time"
                                 id="checkOut1"
                                 value={inputs.checkOut1}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                         <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn2" className="mb-4 font-bold">Check-In 2:</label>
+                            <label htmlFor="checkIn2" className="mb-4 font-bold mt-2">Check-In 2:</label>
                             <input
                                 type="time"
                                 id="checkIn2"
                                 value={inputs.checkIn2}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                         <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut2" className="mb-4 font-bold">Check-Out 2:</label>
+                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">Check-Out 2:</label>
                             <input
                                 type="time"
                                 id="checkOut2"
                                 value={inputs.checkOut2}
                                 onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                     </div>
