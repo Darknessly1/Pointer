@@ -9,6 +9,8 @@ import Projects from "./pages/Dashboard/Projects";
 import Allemp from "./pages/EmpliyeeShcudles/Allemp";
 import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 const AppRoutes = () => (
     <Routes>
@@ -22,6 +24,8 @@ const AppRoutes = () => (
         <Route path="/allemp" element={<Allemp />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
     </Routes>
 );
 

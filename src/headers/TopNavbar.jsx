@@ -13,7 +13,7 @@ export default function TopNavbar() {
         <Navbar
             variant="gradient"
             color="blue-gray"
-            className="mx-auto max-w-screen-xl from-blue-gray-900 to-blue-gray-800 px-3 py-3 my-4"
+            className="mx-auto max-w-screen-xl from-blue-gray-900/30 to-blue-gray-800 px-3 py-3 my-4"
         >
             <div className="flex flex-wrap items-center justify-between gap-y-4 text-white">
                 <Typography
@@ -32,7 +32,7 @@ export default function TopNavbar() {
                             <Cog6ToothIcon className="h-4 w-4" />
                         </IconButton>
                     </Link>
-                    
+
                     <IconButton variant="text" color="white">
                         <BellIcon className="h-4 w-4" />
                     </IconButton>
@@ -42,7 +42,7 @@ export default function TopNavbar() {
                         type="search"
                         color="white"
                         label="Type here..."
-                        className="pr-20"
+                        className="pr-20 "
                         containerProps={{
                             className: "min-w-[288px]",
                         }}
@@ -54,6 +54,26 @@ export default function TopNavbar() {
                     >
                         Search
                     </Button>
+                </div>
+                <div>
+                    <button>
+                        <Link
+                            to="/login"
+                            className="bg-gradient-to-r  from-blue-gray-900 to-blue-gray-800  hover:from-blue-gray-600 hover:to-blue-gray-900/30  rounded-2xl px-4 py-2 text-white m-6 font-bold"
+                        >
+                            Login
+                        </Link>
+                    </button>
+                </div>
+                <div>
+                    <button>
+                        <Link
+                            to="/register"
+                            className="bg-gradient-to-r  from-blue-gray-900 to-blue-gray-800  hover:from-blue-gray-600 hover:to-blue-gray-900/30  rounded-2xl px-4 py-2 text-white font-bold"
+                        >
+                            Register
+                        </Link>
+                    </button>
                 </div>
             </div>
         </Navbar>
