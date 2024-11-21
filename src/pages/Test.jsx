@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// import axios from 'axios';
 
 const Test = () => {
     const [inputs, setInputs] = useState({
@@ -22,21 +21,12 @@ const Test = () => {
     const [updatedData, setUpdatedData] = useState({});
 
 
-    // useEffect(() => {
-    //     fetch('http://localhost:5000/workers')
-    //         .then((response) => response.json())
-    //         .then((data) => setWorkers(data))
-    //         .catch((error) => console.error('Error fetching workers:', error));
-    // }, []);
-
-
     useEffect(() => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data); // Debug the structure
-                // If `data` is an array of workers directly, set it directly
-                setWorkers(data); // Set workers array directly
+                // console.log(data);
+                setWorkers(data); 
             })
             .catch((error) => console.error('Error fetching workers:', error));
     }, []);
@@ -281,8 +271,8 @@ const Test = () => {
 
             <div className="m-3 flex flex-col">
                 <div className="m-3 flex flex-col">
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
+                        <div className="flex items-center gap-2 mt-2">
                             <label htmlFor="workerName" className="mb-4 font-bold">Worker Full Name:</label>
                             <input
                                 type="text"
@@ -292,7 +282,7 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mt-2">
                             <label htmlFor="workerDetails" className="mb-4 font-bold">Worker Details:</label>
                             <input
                                 type="text"
@@ -302,7 +292,7 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mt-2">
                             <label htmlFor="workDate" className="mb-4 font-bold">Work Date:</label>
                             <input
                                 type="date"
@@ -312,7 +302,10 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
+                        <div className="flex items-center gap-2  mt-2">
                             <label htmlFor="checkIn1" className="mb-4 font-bold">Check-In 1:</label>
                             <input
                                 type="time"
@@ -322,7 +315,7 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2  mt-2">
                             <label htmlFor="checkOut1" className="mb-4 font-bold">Check-Out 1:</label>
                             <input
                                 type="time"
@@ -332,7 +325,7 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2  mt-2">
                             <label htmlFor="checkIn2" className="mb-4 font-bold">Check-In 2:</label>
                             <input
                                 type="time"
@@ -342,7 +335,7 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl"
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2  mt-2">
                             <label htmlFor="checkOut2" className="mb-4 font-bold">Check-Out 2:</label>
                             <input
                                 type="time"
@@ -364,7 +357,7 @@ const Test = () => {
                     </button>
                     <button
                         onClick={addWorkerInfoToTable}
-                        className="rounded-3xl bg-sky-500 hover:bg-sky-700 text-white font-bold py-1 px-2 text-sm"
+                        className="rounded-3xl bg-light-blue-400  hover:bg-light-blue-700 text-white font-bold py-1 px-2 text-sm"
                     >
                         Add Information to Table
                     </button>
@@ -531,17 +524,17 @@ const Test = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="flex justify-end">
+                            <div className="flex justify-center">
                                 <button
                                     type="button"
                                     onClick={() => setIsEditPopupVisible(false)}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-700"
+                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                    className="mr-2 rounded-3xl bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4  text-sm"
                                 >
                                     Save
                                 </button>
@@ -560,13 +553,13 @@ const Test = () => {
                         </p>
                         <div className="flex justify-end">
                             <button
-                                className="bg-gray-500 text-white py-1 px-4 rounded mr-2"
+                                className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
                                 onClick={() => setIsDeletePopupVisible(false)}
                             >
                                 Cancel
                             </button>
                             <button
-                                className="bg-red-500 text-white py-1 px-4 rounded"
+                                className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm"
                                 onClick={() => {
                                     removeWorker(selectedWorker._id);
                                     setIsDeletePopupVisible(false);
