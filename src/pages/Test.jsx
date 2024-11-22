@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import WorkerSearch from '../components/WorkerSearch';
 
 const Test = () => {
     const [inputs, setInputs] = useState({
@@ -20,13 +21,15 @@ const Test = () => {
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredWorker, setFilteredWorker] = useState(null);
+
 
     useEffect(() => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
             .then((data) => {
-                // console.log(data);
-                setWorkers(data); 
+                setWorkers(data);
             })
             .catch((error) => console.error('Error fetching workers:', error));
     }, []);
@@ -385,57 +388,166 @@ const Test = () => {
                 }
             </div>
 
-            <div className='flex justify-center rounded-2xl'>
-                <table className='border-2 border-black rounded-2xl'>
-                    <thead>
-                        <tr>
-                            <th className='border-2 border-black px-2'>number of employee</th>
-                            <th className='border-2 border-black px-2'>Date</th>
-                            <th className='border-2 border-black px-2'>Worker Name</th>
-                            <th className='border-2 border-black px-2'>Details</th>
-                            <th className='border-2 border-black px-2'>Total Hours</th>
-                            <th className='border-2 border-black px-2'>Regular Hours</th>
-                            <th className='border-2 border-black px-2'>Evening Hours</th>
-                            <th className='border-2 border-black px-2'>Night Hours</th>
-                            <th className='border-2 border-black px-2'>Edit/Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.isArray(workers) && workers.map((worker, index) => (
-                            <tr key={worker._id}>
-                                <td className='border-2 border-black p-2'>{index + 1}</td>
-                                <td className='border-2 border-black p-2'>{worker.date}</td>
-                                <td className='border-2 border-black p-2'>{worker.workerName}</td>
-                                <td className='border-2 border-black p-2'>{worker.workerDetails}</td>
-                                <td className='border-2 border-black p-2'>{worker.totalHours}</td>
-                                <td className='border-2 border-black p-2'>{worker.regularHours}</td>
-                                <td className='border-2 border-black p-2'>{worker.eveningHours}</td>
-                                <td className='border-2 border-black p-2'>{worker.nightHours}</td>
-                                <td className='border-2 border-black p-2'>
-                                    <button
-                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
-                                        onClick={() => {
-                                            setSelectedWorker(worker);
-                                            setUpdatedData(worker);
-                                            setIsEditPopupVisible(true);
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm"
-                                        onClick={() => {
-                                            setSelectedWorker(worker);
-                                            setIsDeletePopupVisible(true);
-                                        }}
-                                    >
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className='relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-xl bg-clip-border'>
+                <div className='relative mx-4 mt-4 overflow-hidden text-gray-700 bg-white rounded-none bg-clip-border'>
+                    <div className='flex items-center justify-between gap-8 mb-8'>
+
+
+                        <div>
+                            <h5 className='block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900'>
+                                Workers List
+                            </h5>
+                            <p className='block mt-1 font-sans text-base antialiased font-normal leading-relaxed text-gray-700'>
+                                See information about all workers
+                            </p>
+                        </div>
+
+                        <WorkerSearch workers={workers} />
+
+                        <div className='flex flex-col gap-2 shrink-0 sm:flex-row'>
+                            <button className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none' type='button'>
+                                View All
+                            </button>
+                            <button className='flex select-none items-center gap-3 rounded-lg bg-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none' type='button'>
+                                Add Worker
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className='p-6 px-0 overflow-scroll'>
+                        <table className='w-full mt-4 text-left table-auto min-w-max'>
+                            <thead>
+                                <tr>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Date
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Worker Name
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Details
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Total Hours
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Regular Hours
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Evening Hours
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity -70'>
+                                            Night Hours
+                                        </p>
+                                    </th>
+                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                            Edit/Remove
+                                        </p>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Array.isArray(workers) && workers.map((worker) => (
+                                    <tr key={worker._id}>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.date}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.workerName}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.workerDetails}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.totalHours}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.regularHours}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.eveningHours}
+                                            </p>
+                                        </td>
+                                        <td className='p-4 border-b border-blue-gray-50'>
+                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                {worker.nightHours}
+                                            </p>
+                                        </td>
+                                        <td className='border-b border-blue-gray-50'>
+                                            <button
+                                                className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                onClick={() => {
+                                                    setSelectedWorker(worker);
+                                                    setUpdatedData(worker);
+                                                    setIsEditPopupVisible(true);
+                                                }}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
+                                                onClick={() => {
+                                                    setSelectedWorker(worker);
+                                                    setIsDeletePopupVisible(true);
+                                                }}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                                </svg>
+                                            </button>
+
+
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
+                        <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                            Page 1 of 10
+                        </p>
+                        <div className='flex gap-2'>
+                            <button
+                                className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
+                                type='button'>
+                                Previous
+                            </button>
+                            <button
+                                className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
+                                type='button'>
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {isEditPopupVisible && (
@@ -534,7 +646,7 @@ const Test = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="mr-2 rounded-3xl bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4  text-sm"
+                                    className="mr-2 rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
                                 >
                                     Save
                                 </button>

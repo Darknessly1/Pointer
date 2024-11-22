@@ -40,7 +40,9 @@ export default function Navbar() {
     const closeDrawer = () => setIsDrawerOpen(false);
 
     return (
-        <div className="my-5">
+        <div className="my-5 ml-7 border-2 border-black rounded-2xl" 
+            style={{marginBottom: '580px'}}
+        >
             <IconButton variant="text" size="lg" onClick={openDrawer}>
                 {isDrawerOpen ? (
                     <XMarkIcon className="h-8 w-8 stroke-2" />
