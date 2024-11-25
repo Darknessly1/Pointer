@@ -10,7 +10,19 @@ export default withMT({
     "path-to-your-node_modules/@material-tailwind/react/theme/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        custom: ['"New Century Schoolbook"', 'TeX Gyre Schola', 'serif'],
+      },
+    },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.text-shadow': {
+          textShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Custom text shadow rule
+        },
+      });
+    },
+  ],
 })

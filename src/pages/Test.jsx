@@ -21,10 +21,6 @@ const Test = () => {
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
 
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredWorker, setFilteredWorker] = useState(null);
-
-
     useEffect(() => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
@@ -179,7 +175,6 @@ const Test = () => {
         fetch('http://localhost:5000/workers')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 setWorkers(data);
             })
             .catch((error) => console.error('Error fetching workers:', error));
@@ -274,7 +269,7 @@ const Test = () => {
 
             <div className="m-3 flex flex-col">
                 <div className="m-3 flex flex-col">
-                    <div className="flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
+                    <div className="shadow-2xl focus-within:border-gray-300 flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
                         <div className="flex items-center gap-2 mt-2">
                             <label htmlFor="workerName" className="mb-4 font-bold mt-2">Worker Full Name:</label>
                             <input
@@ -371,9 +366,11 @@ const Test = () => {
                         Restart
                     </button>
                 </div>
+
                 <div>
                     {message && <p className="text-center mt-4">{message}</p>}
                 </div>
+
             </div>
 
             <div id="result"
@@ -390,9 +387,7 @@ const Test = () => {
 
             <div className='relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-xl bg-clip-border'>
                 <div className='relative mx-4 mt-4 overflow-hidden text-gray-700 bg-white rounded-none bg-clip-border'>
-                    <div className='flex items-center justify-between gap-8 mb-8'>
-
-
+                    <div className='flex items-center justify-between gap-8'>
                         <div>
                             <h5 className='block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900'>
                                 Workers List
@@ -403,15 +398,6 @@ const Test = () => {
                         </div>
 
                         <WorkerSearch workers={workers} />
-
-                        <div className='flex flex-col gap-2 shrink-0 sm:flex-row'>
-                            <button className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none' type='button'>
-                                View All
-                            </button>
-                            <button className='flex select-none items-center gap-3 rounded-lg bg-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none' type='button'>
-                                Add Worker
-                            </button>
-                        </div>
                     </div>
 
                     <div className='p-6 px-0 overflow-scroll'>
@@ -419,42 +405,42 @@ const Test = () => {
                             <thead>
                                 <tr>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
                                             Date
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Worker Name
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Details
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Total Hours
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Regular Hours
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Evening Hours
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity -70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity -70'>
                                             Night Hours
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='flex items-center justify-between gap-2 font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70'>
+                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Edit/Remove
                                         </p>
                                     </th>
@@ -462,13 +448,15 @@ const Test = () => {
                             </thead>
                             <tbody>
                                 {Array.isArray(workers) && workers.map((worker) => (
-                                    <tr key={worker._id}>
+                                    <tr key={worker._id}
+                                        className='odd:bg-white even:bg-gray-200'
+                                    >
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                                 {worker.date}
                                             </p>
                                         </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
+                                        <td className='p-4 border-b border-blue-gray-50 '>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                                 {worker.workerName}
                                             </p>
@@ -530,6 +518,7 @@ const Test = () => {
                             </tbody>
                         </table>
                     </div>
+                    {/* should be created the pagination */}
                     <div className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
                         <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                             Page 1 of 10
@@ -547,6 +536,7 @@ const Test = () => {
                             </button>
                         </div>
                     </div>
+                    
                 </div>
             </div>
 
