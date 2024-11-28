@@ -2,18 +2,24 @@ import { BrowserRouter as Router } from "react-router-dom";
 // import Navbar from "./headers/Navbar";
 import AppRoutes from "./AppRoutes";
 import TopNavbar from "./headers/TopNavbar";
+import "./index.scss"
 
 function App() {
   return (
-    <Router>
+    <div 
+      style={{zIndex: 1}}
+    >
+      <Router>
         <div className="flex flex-col flex-grow">
           <TopNavbar className="h-18" />
           <main className="flex-grow overflow-y-auto p-4">
             <AppRoutes />
           </main>
         </div>
+      </Router>
 
-    </Router>
+      
+    </div>
   );
 }
 
