@@ -13,6 +13,7 @@ export default withMT({
     extend: {
       fontFamily: {
         custom: ['"New Century Schoolbook"', 'TeX Gyre Schola', 'serif'],
+        stencil: ['"Stencil Std"', 'fantasy'],
       },
     },
   },

@@ -99,10 +99,193 @@ const Home = () => {
 
                 </div>
 
+                <div className="flex justify-center" >
+                    <a
+                        href="https://youtu.be/WuE_w_sLTSY"
+                        target="_blank"
+                        data-keyframers-credit
+                        style={{ backgroundColor: 'black' }}
+                    >
+                    </a>
 
-                
+                    <script src="https://codepen.io/shshaw/pen/QmZYMG.js"></script>
 
+                    <nav className="bar-navigation">
+                        <h1 className="flex justify-end">Hello, welcome to the navigation bar!</h1>
+                        <ul className="nav-list" style={{ '--total': 4 }}>
+                            <li
+                                className="nav-item"
+                                style={{ '--i': 0, '--color': 'var(--color-green)' }}
+                                tabIndex={1}
+                            >
+                                <h1 style={{
+                                    fontSize: '8vmin',
+                                    fontFamily: "'Libre Baskerville', serif",
+                                    // textAlign: 'right',
+                                    padding: '1vw',
+                                    mixBlendMode: 'soft-light',
+                                    color: 'white',
+                                    zIndex: 2,
+                                    left: 500,
+                                    bottom: 150
+                                }}>
+                                    Home
+                                </h1>
+                                <div>
+                                    <div
+                                        className="text-sm text-black"
+                                        style={{
+                                            right: '500px ',
+                                            zIndex: 2,
+                                            width: 600
+                                        }}
+                                    >
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </li>
+                            <li
+                                className="nav-item"
+                                style={{ '--i': 1, '--color': 'var(--color-gold)' }}
+                                tabIndex={2}
+                            >
+                                <h1 style={{
+                                    fontSize: '8vmin',
+                                    fontFamily: "'Libre Baskerville', serif",
+                                    // textAlign: 'right',
+                                    padding: '1vw',
+                                    mixBlendMode: 'soft-light',
+                                    color: 'white',
+                                    zIndex: 2,
+                                    left: 470,
+                                    bottom: 150
+                                }}>
+                                    Home
+                                </h1>
+                                <div>
+                                    <div
+                                        className="text-sm text-black"
+                                        style={{
+                                            right: '500px ',
+                                            zIndex: 2,
+                                            width: 600
+                                        }}
+                                    >
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </li>
+                            <li
+                                className="nav-item"
+                                style={{ '--i': 2, '--color': 'var(--color-purple)' }}
+                                tabIndex={3}
+                            >
+                                <h1 style={{
+                                    fontSize: '8vmin',
+                                    fontFamily: "'Libre Baskerville', serif",
+                                    // textAlign: 'right',
+                                    padding: '1vw',
+                                    mixBlendMode: 'soft-light',
+                                    color: 'white',
+                                    zIndex: 2,
+                                    left: 470,
+                                    bottom: 150
+                                }}>
+                                    Home
+                                </h1>
+                                <div>
+                                    <div
+                                        className="text-sm text-black"
+                                        style={{
+                                            right: '500px ',
+                                            zIndex: 2,
+                                            width: 600
+                                        }}
+                                    >
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </li>
+                            <li
+                                className="nav-item"
+                                style={{ '--i': 3, '--color': 'var(--color-red)' }}
+                                tabIndex={4}
+                            >
+                                <h1 style={{
+                                    fontSize: '8vmin',
+                                    fontFamily: "'Libre Baskerville', serif",
+                                    // textAlign: 'right',
+                                    padding: '1vw',
+                                    mixBlendMode: 'soft-light',
+                                    color: 'white',
+                                    zIndex: 2,
+                                    left: 470,
+                                    bottom: 150
+                                }}>
+                                    Home
+                                </h1>
+                                <div>
+                                    <div
+                                        className="text-sm text-black"
+                                        style={{
+                                            right: '500px ',
+                                            zIndex: 2,
+                                            width: 600
+                                        }}
+                                    >
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
 
+                    </nav>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '-10%',
+                            left: 600,
+                            // fontSize: '8vmin',
+                            fontFamily: "'Libre Baskerville', serif",
+                            // mixBlendMode: 'soft-light',
+                            zIndex: -2,
+                        }}
+                    >
+                        <div className="mt-10 flex items-center justify-center">
+                            <span className="absolute mx-auto py-4 flex border w-fit bg-gradient-to-r blur-xl from-gray-900 via-gray-600 to-gray-900 bg-clip-text text-6xl box-content font-extrabold text-transparent text-center select-none">
+                                Discover More Topics In Details
+                            </span>
+                            <h1
+                                className="relative font-custom top-0 w-fit h-auto py-4 justify-center flex bg-gradient-to-r items-center from-gray-900 via-gray-600 to-gray-900 bg-clip-text text-6xl font-extrabold text-transparent text-center"
+                            >
+                                Discover More Topics In Details
+                            </h1>
+                        </div>
+                        <p
+                            className="font-stencil font-bold"
+                        >
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        </p>
+                        <button className="mt-7 flex items-center gap-2">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="size-10"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                            </svg>
+                            Discover here
+                        </button>
+
+                    </div>
+                </div>
             </div>
         </>
     );

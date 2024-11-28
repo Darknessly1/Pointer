@@ -29,3 +29,155 @@
 	}
 }
 
+
+
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville&display=swap');
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	position: relative;
+}
+
+:root {
+	// --color-tan: white;	
+	--color-green: #4F735B;
+	--color-gold: #AC8B12;
+	--color-purple: #8D7576;
+	--color-red: #A63C30;
+	--color-gray: #b6b4b3;
+	--nav-item-offset: 10vw;
+	--nav-item-hover-offset: 2%;
+	--easing: cubic-bezier(.8, 0, .2, 1);
+	--duration: .6s;
+	font-family: 'Libre Baskerville', serif;
+}
+
+.bar-navigation {
+	height: 90vh;
+	width: 90vw;
+	// background-color: var(--color-tan);
+	display: grid;
+	grid-template-rows: 100%;
+	overflow: hidden;
+}
+
+
+
+.nav-list,
+.nav-item {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.nav-list {
+	grid-row: 1 / -1;
+	display: grid;
+	height: 100%;
+	counter-reset: list;
+}
+
+.nav-item {
+	--tx:
+		calc(-100% + var(--nav-item-offset));
+	display: grid;
+	grid-template-columns: 1fr 20% auto;
+	position: absolute;
+	height: 60%;
+	width: 60vw;
+	transition: transform var(--duration) var(--easing);
+	margin-left: calc(var(--i) * var(--nav-item-offset));
+
+	overflow: hidden;
+
+	transform: translateX(var(--tx));
+
+	z-index: calc(var(--total) - var(--i));
+
+	padding-right: 1vw;
+
+	&:hover:not(:focus):after {
+		transform: none;
+	}
+
+	&:focus {
+		transform: translateX(-2vw);
+		outline: none;
+
+		~.nav-item {
+			transform: none;
+		}
+	}
+
+	&:focus-within {
+		transform: translateX(-2vw);
+
+		~.nav-item {
+			transform: none;
+		}
+	}
+
+
+	&:before {
+		counter-increment: list;
+		content: counter(list) ".";
+		display: block;
+		grid-column: 3 / 4;
+		text-align: right;
+		font-size: 8vmin;
+		padding: 1vw;
+		padding-top: 10vh;
+		mix-blend-mode: soft-light;
+		z-index: 1;
+		animation: inherit;
+		animation-name: slide-up;
+
+		@keyframes slide-up {
+			from {
+				transform: translateY(130%);
+			}
+
+			to {
+				transform: translateY(0);
+			}
+		}
+	}
+
+	&:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 1vw;
+		width: 100%;
+		height: 100%;
+		background-color: var(--color);
+		transform: translateX(-1vw);
+		transition: transform var(--easing) var(--duration);
+	}
+
+	animation: slide-down 1s cubic-bezier(.5, 0, .3, 1);
+	animation-delay: calc(var(--i) * .15s);
+	animation-fill-mode: backwards;
+
+	@keyframes slide-down {
+		from {
+			transform: translateY(-100%) translateX(var(--tx));
+			pointer-events: none;
+		}
+
+		to {
+			transform: translateY(0) translateX(var(--tx));
+			pointer-events: none;
+		}
+	}
+
+	img {
+		display: block;
+		max-width: 200%;
+		mix-blend-mode: soft-light;
+	}
+
+}
