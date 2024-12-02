@@ -2,6 +2,196 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    background: linear-gradient(to right, #c8c9c2,#e4e4e4, #c2abc2);
+body {
+  background: linear-gradient(to right, #c8c9c2, #e4e4e4, #c2abc2);
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;900&display=swap');
+
+.body-s1 {
+  width: 90vw;
+  height: 90vh;
+  font-family: 'Titillium Web', sans-serif;
+  position: relative;
+  --white: #ebebeb;
+  --pink: #d6157c;
+}
+
+.container-style {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1000px;
+  height: 80%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 10px;
+  perspective: 1000px;
+}
+
+.layer {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1000px;
+  height: 80%;
+  padding: 1em;
+  position: relative;
+  z-index: 5;
+  clip-path: polygon(3% 0, 40% 0%, 40% 100%, 0% 100%);
+}
+.layer h1 {
+  position: absolute;
+  top: 50%;
+  left: -270px;
+  transform: translate(0, -50%);
+  font-size: 5rem;
+  font-weight: 900;
+  color: var(--white);
+  text-shadow: 4px 4px 16px rgba(0, 0, 0, 0.3);
+  letter-spacing: 5px;
+}
+
+.layer h1 span {
+  color: var(--pink);
+}
+
+.cta {
+  position: absolute;
+  top: 70%;
+  left: 120px;
+  transform: translate(-360px, -70%);
+  width: 160px;
+  height: 50px;
+  padding: 0.5em;
+  border: 2px solid var(--white);
+  color: var(--white);
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+.cta:hover {
+  cursor: pointer;
+  color: var(--pink);
+  background-color: var(--white);
+}
+.cta:hover > svg {
+  stroke: var(--pink);
+  stroke-width: 2;
+}
+.cta p {
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.cta svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--white);
+}
+
+.panel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0;
+  transform: translateZ(0) translateX(0) rotateY(0deg);
+  position: relative;
+}
+.panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0));
+}
+
+.front,
+.back {
+  width: 100%;
+  height: 100%;
+  background-image: url('https://www.sicontis.com/codepen/cpc-reflection/gdtography.jpg');
+  background-size: cover;
+  background-position: left top;
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.back {
+  transform: scaleX(-1) rotateY(180deg);
+}
+
+.panel:nth-child(1) .front {
+  background-position: 0 0;
+}
+.panel:nth-child(2) .front {
+  background-position: -250px 0;
+}
+.panel:nth-child(3) .front {
+  background-position: -500px 0;
+}
+.panel:nth-child(4) .front {
+  background-position: -750px 0;
+}
+
+.panel:nth-child(1) .back {
+  background-position: 250px 0;
+}
+.panel:nth-child(2) .back {
+  background-position: 500px 0;
+}
+.panel:nth-child(3) .back {
+  background-position: 750px 0;
+}
+.panel:nth-child(4) .back {
+  background-position: 1000px 0;
+}
+
+.footer-style {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 5%;
+  /* padding: 10px; */
+  display: grid;
+  place-items: center;
+  z-index: 6;
+}
+
+.replay {
+  cursor: pointer;
+  /* width: min-content; */
+  font-size: 0.8rem;
+  color: black;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 5px;
+  transform: translateY(-20px);
+  top: -100px;
+}
+
+
+
+/* test another one */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,500;1,400&family=DM+Serif+Display&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  font-family: DM Sans, sans-serif;
+}
+

@@ -3,39 +3,41 @@
 @tailwind utilities;
 
 @keyframes typing {
-    0% {
-        width: 0;
-    }
-    50% {
-        width: 22ch;
-        /* Matches the total number of characters */
-    }
-    80% {
-        width: 22ch;
-        /* Pause at full width */
-    }
-    100% {
-        width: 0;
-        /* Resets for the loop */
-    }
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 22ch;
+    /* Matches the total number of characters */
+  }
+  80% {
+    width: 22ch;
+    /* Pause at full width */
+  }
+  100% {
+    width: 0;
+    /* Resets for the loop */
+  }
 }
 
 @keyframes blink-caret {
-    50% {
-        border-color: transparent;
-    }
+  50% {
+    border-color: transparent;
+  }
 }
 
 .h1-style {
-    font: bold 300% Consolas, Monaco, monospace;
-    border-right: 0.1em solid black;
-    /* The caret */
-    width: 0;
-    /* Start at 0 width */
-    margin-bottom: 3em 1em;
-    white-space: nowrap;
-    overflow: hidden;
-    animation:
-        typing 10s steps(22, end) infinite, /* Total duration adjusted for delay */
-        blink-caret 0.5s step-end infinite;
+  font: bold 300% Consolas, Monaco, monospace;
+  border-right: 0.1em solid black;
+  /* The caret */
+  width: 0;
+  /* Start at 0 width */
+  margin-bottom: 3em 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typing 10s steps(22, end) infinite,
+    /* Total duration adjusted for delay */ blink-caret 0.5s step-end infinite;
 }
+
+
+
