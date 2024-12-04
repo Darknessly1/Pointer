@@ -14,6 +14,7 @@ const Test = () => {
 
     const [workers, setWorkers] = useState([]);
     const [message, setMessage] = useState('');
+    const [message1, setMessage1] = useState('');
     const [result, setResult] = useState('');
 
     const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
@@ -21,16 +22,12 @@ const Test = () => {
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
 
-    useEffect(() => {
-        fetch('http://localhost:5000/all-workers')
-            .then((res) => res.json())
-            .then((data) => {
-                setWorkers(data);
-            })
-            .catch((error) => console.error('Error fetching workers:', error));
-    }, []);
-
     const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setInputs({ ...inputs, [id]: value });
+    };
+
+    const handleInputChange1 = (e) => {
         const { id, value } = e.target;
         setInputs({ ...inputs, [id]: value });
     };
@@ -122,42 +119,69 @@ const Test = () => {
         setResult(resultText);
     };
 
-    const addWorkerInfoToTable = async () => {
-        const { workDate, workerName, workerDetails } = inputs;
 
-        const resultElement = document.getElementById("result");
-        if (!resultElement) {
-            setMessage("Please calculate the overtime before adding information.");
-            return;
-        }
-
-        const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
-        const regularHoursMatch = resultElement.innerHTML.match(/Regular hours: (\d+\.\d+)/);
-        const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
-        const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
-
-        if (!totalHoursMatch || !regularHoursMatch) {
-            setMessage("Please calculate the overtime before adding information.");
-            return;
-        }
+    const addWorkersBasicInformation = async () => {
+        const { workerName, workerDetails } = inputs;
 
         const newRecord = {
-            date: workDate,
-            workerName,
-            workerDetails,
-            totalHours: parseFloat(totalHoursMatch[1]),
-            regularHours: parseFloat(regularHoursMatch[1]),
-            eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
-            nightHours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
+            workerName,    
+            workerDetails, 
         };
 
         try {
-            const response = await fetch('http://localhost:5000/add-worker', {
+            const response = await fetch('http://localhost:5000/api/workers/add-worker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRecord),
             });
 
+            if (response.ok) {
+                setMessage1('Record added successfully!');
+                fetchWorkers();
+            } else {
+                const error = await response.json();
+                setMessage1(`Failed to add the record: ${error.message || response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            setMessage1('An error occurred while adding the record. Please try again later.');
+        }
+    };
+
+
+
+
+    const addWorkerInfoToTable = async () => {
+        const resultElement = document.getElementById("result");
+        if (!resultElement) {
+            setMessage("Please calculate the overtime before adding information.");
+            return;
+        }
+    
+        const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
+        const regularHoursMatch = resultElement.innerHTML.match(/Regular hours: (\d+\.\d+)/);
+        const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
+        const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
+    
+        if (!totalHoursMatch || !regularHoursMatch) {
+            setMessage("Please calculate the overtime before adding information.");
+            return;
+        }
+    
+        const newRecord = {
+            date: new Date().toLocaleDateString(), // Add current date or pass from user
+            hoursWorked: parseFloat(totalHoursMatch[1]),
+            eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
+            nighHhours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:5000/api/workers/add-record/${selectedWorker._id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newRecord),
+            });
+    
             if (response.ok) {
                 setMessage('Record added successfully!');
                 fetchWorkers();
@@ -169,21 +193,7 @@ const Test = () => {
             setMessage('An error occurred while adding the record. Please try again later.');
         }
     };
-
-
-    const fetchWorkers = () => {
-        fetch('http://localhost:5000/api/workers/all-workers')
-            .then((res) => res.json())
-            .then((data) => {
-                setWorkers(data);
-            })
-            .catch((error) => console.error('Error fetching workers:', error));
-    };
-
-    useEffect(() => {
-        fetchWorkers();
-    }, []);
-
+    
 
     const handleReset = () => {
         setInputs({
@@ -191,12 +201,17 @@ const Test = () => {
             checkOut1: '',
             checkIn2: '',
             checkOut2: '',
-            workDate: '',
-            workerName: '',
-            workerDetails: '',
         });
         setResult('');
         setMessage('');
+    };
+
+    const handleReset1 = () => {
+        setInputs({
+            workerName: '',
+            workerDetails: '',
+        });
+        setMessage1('');
     };
 
     const removeWorker = async (id) => {
@@ -207,7 +222,7 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage('Worker removed successfully!');
-                fetchWorkers(); // Refresh the table
+                fetchWorkers();
             } else {
                 setMessage(`Failed to remove worker: ${response.statusText}`);
             }
@@ -262,6 +277,19 @@ const Test = () => {
         }
     };
 
+    const fetchWorkers = () => {
+        fetch('http://localhost:5000/api/workers/all-workers')
+            .then((res) => res.json())
+            .then((data) => {
+                setWorkers(data);
+            })
+            .catch((error) => console.error('Error fetching workers:', error));
+    };
+
+    useEffect(() => {
+        fetchWorkers();
+    }, []);
+
 
     return (
         <div>
@@ -276,7 +304,7 @@ const Test = () => {
                                 type="text"
                                 id="workerName"
                                 value={inputs.workerName}
-                                onChange={handleInputChange}
+                                onChange={handleInputChange1}
                                 className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
@@ -286,81 +314,25 @@ const Test = () => {
                                 type="text"
                                 id="workerDetails"
                                 value={inputs.workerDetails}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor="workDate" className="mb-4 font-bold mt-2">Work Date:</label>
-                            <input
-                                type="date"
-                                id="workDate"
-                                value={inputs.workDate}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
-                            <input
-                                type="time"
-                                id="checkIn1"
-                                value={inputs.checkIn1}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut1" className="mb-4 font-bold mt-2">Check-Out 1:</label>
-                            <input
-                                type="time"
-                                id="checkOut1"
-                                value={inputs.checkOut1}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn2" className="mb-4 font-bold mt-2">Check-In 2:</label>
-                            <input
-                                type="time"
-                                id="checkIn2"
-                                value={inputs.checkIn2}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">Check-Out 2:</label>
-                            <input
-                                type="time"
-                                id="checkOut2"
-                                value={inputs.checkOut2}
-                                onChange={handleInputChange}
+                                onChange={handleInputChange1}
                                 className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                     </div>
                 </div>
 
+
+
                 <div className="flex justify-center gap-4 mt-4">
+
                     <button
-                        onClick={calculateOvertimePay}
-                        className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
-                    >
-                        Calculate Overtime
-                    </button>
-                    <button
-                        onClick={addWorkerInfoToTable}
+                        onClick={addWorkersBasicInformation}
                         className="rounded-3xl bg-light-blue-400  hover:bg-light-blue-700 text-white font-bold py-1 px-2 text-sm"
                     >
                         Add Information to Table
                     </button>
                     <button
-                        onClick={handleReset}
+                        onClick={handleReset1}
                         className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
                     >
                         Restart
@@ -368,21 +340,8 @@ const Test = () => {
                 </div>
 
                 <div>
-                    {message && <p className="text-center mt-4">{message}</p>}
+                    {message1 && <p className="text-center mt-4">{message1}</p>}
                 </div>
-
-            </div>
-
-            <div id="result"
-                className='flex justify-center m-2'
-            >
-                {result &&
-                    <pre
-                        className='p-2 border-2 border-black rounded-2xl'
-                    >
-                        {result}
-                    </pre>
-                }
             </div>
 
             <div className='relative flex flex-col w-full h-full text-gray-700'>
@@ -419,31 +378,11 @@ const Test = () => {
                                             department
                                         </p>
                                     </th>
-                                    {/* <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Total Hours
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Regular Hours
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Evening Hours
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity -70'>
-                                            Night Hours
-                                        </p>
-                                    </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Edit/Remove
                                         </p>
-                                    </th> */}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -456,36 +395,17 @@ const Test = () => {
                                                 {worker._id}
                                             </p>
                                         </td>
-                                        <td className='p-4 border-b border-blue-gray-50 '>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.name}
-                                            </p>
+                                        <td
+                                            className="p-4 border-b border-blue-gray-50 cursor-pointer text-blue-600 hover:underline"
+                                            onClick={() => setSelectedWorker(worker)}
+                                        >
+                                            {worker.name}
                                         </td>
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                                 {worker.department}
                                             </p>
                                         </td>
-                                        {/* <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.totalHours}
-                                            </p>
-                                        </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.regularHours}
-                                            </p>
-                                        </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.eveningHours}
-                                            </p>
-                                        </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.nightHours}
-                                            </p>
-                                        </td> */}
                                         <td className='border-b border-blue-gray-50'>
                                             <button
                                                 className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
@@ -536,9 +456,119 @@ const Test = () => {
                             </button>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
+
+            {selectedWorker && (
+                <div>
+                    <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
+                        <div className="flex items-center gap-2  mt-2">
+                            <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
+                            <input
+                                type="time"
+                                id="checkIn1"
+                                value={inputs.checkIn1}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2  mt-2">
+                            <label htmlFor="checkOut1" className="mb-4 font-bold mt-2">Check-Out 1:</label>
+                            <input
+                                type="time"
+                                id="checkOut1"
+                                value={inputs.checkOut1}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2  mt-2">
+                            <label htmlFor="checkIn2" className="mb-4 font-bold mt-2">Check-In 2:</label>
+                            <input
+                                type="time"
+                                id="checkIn2"
+                                value={inputs.checkIn2}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2  mt-2">
+                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">Check-Out 2:</label>
+                            <input
+                                type="time"
+                                id="checkOut2"
+                                value={inputs.checkOut2}
+                                onChange={handleInputChange}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center gap-4 mt-4">
+                        <button
+                            onClick={calculateOvertimePay}
+                            className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                        >
+                            Calculate Overtime
+                        </button>
+                        <button
+                            onClick={addWorkerInfoToTable}
+                            className="rounded-3xl bg-light-blue-400  hover:bg-light-blue-700 text-white font-bold py-1 px-2 text-sm"
+                        >
+                            Add Information to Table
+                        </button>
+                        <button
+                            onClick={handleReset}
+                            className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
+                        >
+                            Restart
+                        </button>
+                    </div>
+
+                    <div id="result"
+                        className='flex justify-center m-2'
+                    >
+                        {result &&
+                            <pre
+                                className='p-2 border-2 border-black rounded-2xl'
+                            >
+                                {result}
+                            </pre>
+                        }
+                    </div>
+
+                    <div>
+                        {message && <p className="text-center mt-4">{message}</p>}
+                    </div>
+
+                    <div className="mt-6 p-4 bg-gray-100 rounded">
+                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker.name}</h3>
+                        <table className="w-full text-left table-auto">
+                            <thead>
+                                <tr>
+                                    <th className="p-4 border bg-gray-200">Date</th>
+                                    <th className="p-4 border bg-gray-200">Hours</th>
+                                    <th className="p-4 border bg-gray-200">Over Night Hours</th>
+                                    <th className="p-4 border bg-gray-200">Over Evening Hours</th>
+                                    <th className="p-4 border bg-gray-200">Total OverTime Woked</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedWorker.hours_records.map((record, index) => (
+                                    <tr key={index} className="odd:bg-white even:bg-gray-50">
+                                        <td className="p-4 border">{record.date}</td>
+                                        <td className="p-4 border">{record.hours_worked}</td>
+                                        <td className="p-4 border">{record.evening_hours}</td>
+                                        <td className="p-4 border">{record.nigh_hours}</td>
+                                        <td className="p-4 border">{record.overtime_hours}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {isEditPopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
