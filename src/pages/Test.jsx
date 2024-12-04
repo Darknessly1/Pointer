@@ -22,7 +22,7 @@ const Test = () => {
     const [updatedData, setUpdatedData] = useState({});
 
     useEffect(() => {
-        fetch('http://localhost:5000/workers')
+        fetch('http://localhost:5000/all-workers')
             .then((res) => res.json())
             .then((data) => {
                 setWorkers(data);
@@ -172,7 +172,7 @@ const Test = () => {
 
 
     const fetchWorkers = () => {
-        fetch('http://localhost:5000/workers')
+        fetch('http://localhost:5000/api/workers/all-workers')
             .then((res) => res.json())
             .then((data) => {
                 setWorkers(data);
@@ -385,8 +385,8 @@ const Test = () => {
                 }
             </div>
 
-            <div className='relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-xl bg-clip-border'>
-                <div className='relative mx-4 mt-4 overflow-hidden text-gray-700 bg-white rounded-none bg-clip-border'>
+            <div className='relative flex flex-col w-full h-full text-gray-700'>
+                <div className='relative mx-4 mt-4 overflow-hidden text-gray-700  rounded-none bg-clip-border'>
                     <div className='flex items-center justify-between gap-8'>
                         <div>
                             <h5 className='block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900'>
@@ -411,15 +411,15 @@ const Test = () => {
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Worker Name
+                                            Full Name
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Details
+                                            department
                                         </p>
                                     </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                    {/* <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Total Hours
                                         </p>
@@ -443,7 +443,7 @@ const Test = () => {
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
                                             Edit/Remove
                                         </p>
-                                    </th>
+                                    </th> */}
                                 </tr>
                             </thead>
                             <tbody>
@@ -453,20 +453,20 @@ const Test = () => {
                                     >
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.date}
+                                                {worker._id}
                                             </p>
                                         </td>
                                         <td className='p-4 border-b border-blue-gray-50 '>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.workerName}
+                                                {worker.name}
                                             </p>
                                         </td>
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.workerDetails}
+                                                {worker.department}
                                             </p>
                                         </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
+                                        {/* <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                                 {worker.totalHours}
                                             </p>
@@ -485,7 +485,7 @@ const Test = () => {
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                                 {worker.nightHours}
                                             </p>
-                                        </td>
+                                        </td> */}
                                         <td className='border-b border-blue-gray-50'>
                                             <button
                                                 className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"

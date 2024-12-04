@@ -52,7 +52,6 @@ const Home = () => {
 
 
                         <div className="flex  items-center space-x-4 " >
-                            <img src="https://i.ibb.co/6FD1R8H/image-avatar.webp" alt="" className=" h-10 w-10 " />
                             <h1 className="font-bold">Greg Hooper</h1>
 
                         </div>
@@ -70,7 +69,6 @@ const Home = () => {
 
 
                         <div className="flex  items-center space-x-4 " >
-                            <img src="https://i.ibb.co/6FD1R8H/image-avatar.webp" alt="" className=" h-10 w-10 " />
                             <h1 className="font-bold">Greg Hooper</h1>
 
                         </div>
@@ -88,7 +86,6 @@ const Home = () => {
 
 
                         <div className="flex  items-center space-x-4 " >
-                            <img src="https://i.ibb.co/6FD1R8H/image-avatar.webp" alt="" className=" h-10 w-10 " />
                             <h1 className="font-bold">Greg Hooper</h1>
 
                         </div>
@@ -325,7 +322,7 @@ const Home = () => {
                                 </div>
                                 <div className="h-full md:order-first">
                                     <img
-                                        src="./test3.png" alt="#_"
+                                        src="./test5.webp" alt="#_"
                                         className=" bg-gray-200 shadow-box shadow-gray-500/30 overflow-hidden " />
                                 </div>
                             </div>
@@ -379,7 +376,7 @@ const Home = () => {
                                     </div>
                                 </div>
                                 <div className="h-full ">
-                                    <img src="./test4.png" alt="#_"
+                                    <img src="./test6.png" alt="#_"
                                         className=" bg-gray-200 shadow-box shadow-gray-500/30 overflow-hidden  w-full" />
                                 </div>
                             </div>

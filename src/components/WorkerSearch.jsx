@@ -24,7 +24,7 @@ export default function WorkerSearch() {
     };
 
     return (
-        <div className="relative bg-white min-w-sm max-w-2xl mx-auto py-5">
+        <div className="relative  min-w-sm max-w-2xl mx-auto py-5">
             <label
                 className="flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-full gap-2 shadow-2xl focus-within:border-gray-300"
                 htmlFor="search-bar"
@@ -37,7 +37,6 @@ export default function WorkerSearch() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <button
-                    // className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70"
                     className="rounded-3xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 text-sm"
                     onClick={handleSearch}
                 >
@@ -46,7 +45,6 @@ export default function WorkerSearch() {
                     </span>
                 </button>
                 <button
-                    // className="w-full md:w-auto px-6 py-3 bg-gray-300 border-gray-400 text-black fill-black active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all mt-2"
                     className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
                     onClick={() => {
                         setSearchTerm("");
