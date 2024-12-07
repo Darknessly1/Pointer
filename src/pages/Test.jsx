@@ -19,6 +19,7 @@ const Test = () => {
 
     const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
+    const [isDeletePopupVisibleRecords, setIsDeletePopupVisibleRecords] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
 
@@ -124,8 +125,8 @@ const Test = () => {
         const { workerName, workerDetails } = inputs;
 
         const newRecord = {
-            workerName,    
-            workerDetails, 
+            workerName,
+            workerDetails,
         };
 
         try {
@@ -149,27 +150,31 @@ const Test = () => {
     };
 
 
-
-
     const addWorkerInfoToTable = async () => {
         const resultElement = document.getElementById("result");
+        const dateInput = document.getElementById("date-input");
+    
         if (!resultElement) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
     
+        if (!dateInput || !dateInput.value) {
+            setMessage("Please provide a valid date.");
+            return;
+        }
+    
         const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
-        const regularHoursMatch = resultElement.innerHTML.match(/Regular hours: (\d+\.\d+)/);
         const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
         const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
     
-        if (!totalHoursMatch || !regularHoursMatch) {
+        if (!totalHoursMatch) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
     
         const newRecord = {
-            date: new Date().toLocaleDateString(), // Add current date or pass from user
+            date: new Date(dateInput.value).toISOString().split('T')[0], // Format date to 'YYYY-MM-DD'
             hoursWorked: parseFloat(totalHoursMatch[1]),
             eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
             nighHhours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
@@ -183,17 +188,25 @@ const Test = () => {
             });
     
             if (response.ok) {
-                setMessage('Record added successfully!');
-                fetchWorkers();
+                const createdRecord = await response.json(); // Backend returns the record with its _id
+                setSelectedWorker((prevWorker) => ({
+                    ...prevWorker,
+                    hours_records: [...prevWorker.hours_records, createdRecord], // Append the full record with _id
+                }));
+                setMessage("Record added successfully.");
             } else {
-                setMessage(`Failed to add the record: ${response.statusText}`);
+                const errorData = await response.json();
+                console.error("Error adding record:", errorData.message);
+                setMessage(`Failed to add record: ${errorData.message}`);
             }
         } catch (error) {
-            console.error('Error:', error);
-            setMessage('An error occurred while adding the record. Please try again later.');
+            console.error("Error:", error);
+            setMessage("An error occurred while adding the record. Please try again later.");
         }
     };
     
+
+
 
     const handleReset = () => {
         setInputs({
@@ -214,9 +227,9 @@ const Test = () => {
         setMessage1('');
     };
 
-    const removeWorker = async (id) => {
+    const removeWorker = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/remove-worker/${id}`, {
+            const response = await fetch(`http://localhost:5000/api/workers/delete-worker/${selectedWorker._id}`, {
                 method: 'DELETE',
             });
 
@@ -232,6 +245,30 @@ const Test = () => {
         }
     };
 
+    const deleteHoursRecord = async (workerId, recordId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/workers/delete-record/${workerId}/${recordId}`, {
+                method: 'DELETE',
+            });
+    
+            if (response.ok) {
+                setSelectedWorker((prevWorker) => ({
+                    ...prevWorker,
+                    hours_records: prevWorker.hours_records.filter((record) => record._id !== recordId),
+                }));
+                setMessage("Record deleted successfully.");
+            } else {
+                const errorData = await response.json();
+                console.error("Error deleting record:", errorData.message);
+                setMessage(`Failed to delete record: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setMessage("An error occurred while deleting the record. Please try again later.");
+        }
+    };
+    
+    
     const handleSave = async () => {
         const { checkIn1, checkOut1, checkIn2, checkOut2, workerName, workerDetails } = updatedData;
 
@@ -430,8 +467,6 @@ const Test = () => {
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                                                 </svg>
                                             </button>
-
-
                                         </td>
                                     </tr>
                                 ))}
@@ -503,6 +538,17 @@ const Test = () => {
                                 className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
+
+
+                        <div className="flex items-center gap-2  mt-2">
+                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">date</label>
+                            <input
+                                type="date"
+                                id="date-input"
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+
                     </div>
 
                     <div className="flex justify-center gap-4 mt-4">
@@ -548,22 +594,47 @@ const Test = () => {
                             <thead>
                                 <tr>
                                     <th className="p-4 border bg-gray-200">Date</th>
-                                    <th className="p-4 border bg-gray-200">Hours</th>
+                                    <th className="p-4 border bg-gray-200">total Hours Worked</th>
                                     <th className="p-4 border bg-gray-200">Over Night Hours</th>
                                     <th className="p-4 border bg-gray-200">Over Evening Hours</th>
                                     <th className="p-4 border bg-gray-200">Total OverTime Woked</th>
+                                    <th className="p-4 border bg-gray-200">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {selectedWorker.hours_records.map((record, index) => (
-                                    <tr key={index} className="odd:bg-white even:bg-gray-50">
-                                        <td className="p-4 border">{record.date}</td>
-                                        <td className="p-4 border">{record.hours_worked}</td>
-                                        <td className="p-4 border">{record.evening_hours}</td>
-                                        <td className="p-4 border">{record.nigh_hours}</td>
-                                        <td className="p-4 border">{record.overtime_hours}</td>
+                                {selectedWorker?.hours_records && selectedWorker.hours_records.length > 0 ? (
+                                    selectedWorker.hours_records.map((record, index) => (
+                                        <tr key={index} className="odd:bg-white even:bg-gray-50">
+                                            <td className="p-4 border">{record.date}</td>
+                                            <td className="p-4 border">{record.hours_worked}</td>
+                                            <td className="p-4 border">{record.evening_hours}</td>
+                                            <td className="p-4 border">{record.nigh_hours}</td>
+                                            <td className="p-4 border">{record.overtime_hours}</td>
+                                            <td className="p-4 border">
+                                                <button
+                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                    onClick={() => {
+                                                        setUpdatedData(record);
+                                                        setIsEditPopupVisible(true);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
+                                                    onClick={() => deleteHoursRecord(selectedWorker._id, record._id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="text-center p-4">No records found.</td>
                                     </tr>
-                                ))}
+                                )}
+
                             </tbody>
                         </table>
                     </div>
@@ -571,7 +642,7 @@ const Test = () => {
             )}
 
             {isEditPopupVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
                         <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
                         <form
@@ -703,6 +774,10 @@ const Test = () => {
                     </div>
                 </div>
             )}
+
+
+
+
         </div>
     );
 };
