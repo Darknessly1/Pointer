@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
 
@@ -7,7 +8,7 @@ const Test = () => {
         checkOut1: '',
         checkIn2: '',
         checkOut2: '',
-        workDate: '',
+        date: '',
         workerName: '',
         workerDetails: '',
     });
@@ -18,8 +19,8 @@ const Test = () => {
     const [result, setResult] = useState('');
 
     const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
+    const [isEditPopupVisibleRecords, setIsEditPopupVisibleRecords] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
-    const [isDeletePopupVisibleRecords, setIsDeletePopupVisibleRecords] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
 
@@ -120,7 +121,6 @@ const Test = () => {
         setResult(resultText);
     };
 
-
     const addWorkersBasicInformation = async () => {
         const { workerName, workerDetails } = inputs;
 
@@ -149,44 +149,43 @@ const Test = () => {
         }
     };
 
-
     const addWorkerInfoToTable = async () => {
         const resultElement = document.getElementById("result");
         const dateInput = document.getElementById("date-input");
-    
+
         if (!resultElement) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
-    
+
         if (!dateInput || !dateInput.value) {
             setMessage("Please provide a valid date.");
             return;
         }
-    
+
         const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
         const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
         const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
-    
+
         if (!totalHoursMatch) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
-    
+
         const newRecord = {
             date: new Date(dateInput.value).toISOString().split('T')[0], // Format date to 'YYYY-MM-DD'
             hoursWorked: parseFloat(totalHoursMatch[1]),
             eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
             nighHhours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
         };
-    
+
         try {
             const response = await fetch(`http://localhost:5000/api/workers/add-record/${selectedWorker._id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRecord),
             });
-    
+
             if (response.ok) {
                 const createdRecord = await response.json(); // Backend returns the record with its _id
                 setSelectedWorker((prevWorker) => ({
@@ -204,9 +203,6 @@ const Test = () => {
             setMessage("An error occurred while adding the record. Please try again later.");
         }
     };
-    
-
-
 
     const handleReset = () => {
         setInputs({
@@ -250,7 +246,7 @@ const Test = () => {
             const response = await fetch(`http://localhost:5000/api/workers/delete-record/${workerId}/${recordId}`, {
                 method: 'DELETE',
             });
-    
+
             if (response.ok) {
                 setSelectedWorker((prevWorker) => ({
                     ...prevWorker,
@@ -267,40 +263,28 @@ const Test = () => {
             setMessage("An error occurred while deleting the record. Please try again later.");
         }
     };
-    
-    
+
     const handleSave = async () => {
-        const { checkIn1, checkOut1, checkIn2, checkOut2, workerName, workerDetails } = updatedData;
-
-        const { regularHours, overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
-            { start: checkIn1, end: checkOut1 },
-            { start: checkIn2, end: checkOut2 },
-        ]);
-
-        const eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
-        const nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
-
-        const updatedWorker = {
-            workerName,
-            workerDetails,
-            date: new Date().toISOString().slice(0, 10),
-            totalHours: totalHours.toFixed(2),
-            regularHours: Math.min(regularHours, 8).toFixed(2),
-            eveningHours: (eveningOvertime / 1.25).toFixed(2),
-            nightHours: (nightOvertime / 1.5).toFixed(2),
-        };
+        const { workerName, workerDetails } = updatedData;
 
         try {
-            const response = await fetch(`http://localhost:5000/edit-worker/${selectedWorker._id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedWorker),
-            });
+            const response = await fetch(
+                `http://localhost:5000/api/workers/update-worker/${selectedWorker._id}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ workerName, workerDetails }),
+                }
+            );
 
             if (response.ok) {
                 const { worker } = await response.json();
+
+                // Update the worker in the local state
                 setWorkers((prev) =>
-                    prev.map((w) => (w._id === selectedWorker._id ? { ...worker } : w))
+                    prev.map((w) =>
+                        w._id === selectedWorker._id ? worker : w
+                    )
                 );
                 setMessage('Worker updated successfully!');
                 setIsEditPopupVisible(false);
@@ -314,6 +298,58 @@ const Test = () => {
         }
     };
 
+    const handleSaveRecords = async () => {
+        const { date, checkIn1, checkOut1, checkIn2, checkOut2 } = updatedData;
+    
+        const { overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
+            { start: checkIn1, end: checkOut1 },
+            { start: checkIn2, end: checkOut2 },
+        ]);
+    
+        // Calculate evening and night overtime
+        let eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
+        let nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
+    
+        // Adjust evening hours if total hours worked is exactly 8
+        if (totalHours === 8) {
+            eveningOvertime -= 8; // Reduce evening hours by 8
+            if (eveningOvertime < 0) eveningOvertime = 0; // Ensure no negative values
+        }
+    
+        const updatedRecord = {
+            date,
+            hours_worked: totalHours.toFixed(2),
+            evening_hours: (eveningOvertime / 1.25).toFixed(2),
+            nigh_hours: (nightOvertime / 1.5).toFixed(2),
+            overtime_hours: (eveningOvertime / 1.25) + (nightOvertime / 1.5),
+        };
+    
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/workers/update-record/${selectedWorker._id}/${updatedData._id}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedRecord),
+                }
+            );
+    
+            if (response.ok) {
+                const { updatedWorker } = await response.json();
+                setSelectedWorker(updatedWorker); // Update the selected worker with the new data
+                setMessage('Record updated successfully!');
+                setIsEditPopupVisibleRecords(false);
+            } else {
+                const errorData = await response.json();
+                console.error('Error updating record:', errorData.message);
+                setMessage(`Failed to update record: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error updating record:', error);
+            setMessage('An error occurred while saving. Please try again later.');
+        }
+    };
+    
     const fetchWorkers = () => {
         fetch('http://localhost:5000/api/workers/all-workers')
             .then((res) => res.json())
@@ -326,6 +362,22 @@ const Test = () => {
     useEffect(() => {
         fetchWorkers();
     }, []);
+
+    const handleWorkerSelection = async (workerId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/workers/worker/${workerId}`);
+            if (response.ok) {
+                const workerData = await response.json();
+                setSelectedWorker(workerData); // Update the state with fresh data
+            } else {
+                const errorData = await response.json();
+                console.error("Error fetching worker data:", errorData.error);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
 
 
     return (
@@ -434,13 +486,13 @@ const Test = () => {
                                         </td>
                                         <td
                                             className="p-4 border-b border-blue-gray-50 cursor-pointer text-blue-600 hover:underline"
-                                            onClick={() => setSelectedWorker(worker)}
+                                            onClick={() => handleWorkerSelection(worker._id)}
                                         >
-                                            {worker.name}
+                                            {worker.workerName}
                                         </td>
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.department}
+                                                {worker.workerDetails}
                                             </p>
                                         </td>
                                         <td className='border-b border-blue-gray-50'>
@@ -589,15 +641,15 @@ const Test = () => {
                     </div>
 
                     <div className="mt-6 p-4 bg-gray-100 rounded">
-                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker.name}</h3>
+                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker?.name}</h3>
                         <table className="w-full text-left table-auto">
                             <thead>
                                 <tr>
                                     <th className="p-4 border bg-gray-200">Date</th>
-                                    <th className="p-4 border bg-gray-200">total Hours Worked</th>
-                                    <th className="p-4 border bg-gray-200">Over Night Hours</th>
-                                    <th className="p-4 border bg-gray-200">Over Evening Hours</th>
-                                    <th className="p-4 border bg-gray-200">Total OverTime Woked</th>
+                                    <th className="p-4 border bg-gray-200">Total Hours Worked</th>
+                                    <th className="p-4 border bg-gray-200">Evening Hours</th>
+                                    <th className="p-4 border bg-gray-200">Night Hours</th>
+                                    <th className="p-4 border bg-gray-200">Total Overtime Worked</th>
                                     <th className="p-4 border bg-gray-200">Actions</th>
                                 </tr>
                             </thead>
@@ -615,7 +667,7 @@ const Test = () => {
                                                     className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
                                                     onClick={() => {
                                                         setUpdatedData(record);
-                                                        setIsEditPopupVisible(true);
+                                                        setIsEditPopupVisibleRecords(true);
                                                     }}
                                                 >
                                                     Edit
@@ -634,7 +686,6 @@ const Test = () => {
                                         <td colSpan="6" className="text-center p-4">No records found.</td>
                                     </tr>
                                 )}
-
                             </tbody>
                         </table>
                     </div>
@@ -665,7 +716,7 @@ const Test = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Details</label>
+                                <label className="block text-sm font-medium mb-1">Department</label>
                                 <input
                                     type="text"
                                     value={updatedData.workerDetails}
@@ -673,10 +724,40 @@ const Test = () => {
                                         setUpdatedData({ ...updatedData, workerDetails: e.target.value })
                                     }
                                     className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                    placeholder="Details"
+                                    placeholder="Department"
                                     required
                                 />
                             </div>
+                            <div className="flex justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditPopupVisible(false)}
+                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="mr-2 rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isEditPopupVisibleRecords && (
+                <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                        <h2 className="text-xl font-bold mb-4">Edit Worker Record</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSaveRecords();
+                            }}
+                        >
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Check-in 1</label>
@@ -726,18 +807,29 @@ const Test = () => {
                                         className="w-full px-3 py-2 border rounded-lg focus:outline-none"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Date</label>
+                                    <input
+                                        type="date"
+                                        value={updatedData.date}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, date: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    />
+                                </div>
                             </div>
                             <div className="flex justify-center">
                                 <button
                                     type="button"
-                                    onClick={() => setIsEditPopupVisible(false)}
+                                    onClick={() => setIsEditPopupVisibleRecords(false)}
                                     className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="mr-2 rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
+                                    className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
                                 >
                                     Save
                                 </button>
@@ -746,6 +838,7 @@ const Test = () => {
                     </div>
                 </div>
             )}
+
 
             {isDeletePopupVisible && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
@@ -774,9 +867,6 @@ const Test = () => {
                     </div>
                 </div>
             )}
-
-
-
 
         </div>
     );
