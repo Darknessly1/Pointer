@@ -23,6 +23,7 @@ const Test = () => {
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
+    const [showYear, setShowYear] = useState(false);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -124,9 +125,14 @@ const Test = () => {
     const addWorkersBasicInformation = async () => {
         const { workerName, workerDetails } = inputs;
 
+        if (!workerName || !workerDetails) {
+            setMessage1('Please provide both worker name and details.');
+            return;
+        }
+
         const newRecord = {
             workerName,
-            workerDetails,
+            workerDetails, 
         };
 
         try {
@@ -141,13 +147,14 @@ const Test = () => {
                 fetchWorkers();
             } else {
                 const error = await response.json();
-                setMessage1(`Failed to add the record: ${error.message || response.statusText}`);
+                setMessage1(`Failed to add the worker: ${error.message || response.statusText}`);
             }
         } catch (error) {
             console.error('Error:', error);
             setMessage1('An error occurred while adding the record. Please try again later.');
         }
     };
+
 
     const addWorkerInfoToTable = async () => {
         const resultElement = document.getElementById("result");
@@ -300,30 +307,28 @@ const Test = () => {
 
     const handleSaveRecords = async () => {
         const { date, checkIn1, checkOut1, checkIn2, checkOut2 } = updatedData;
-    
+
         const { overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
             { start: checkIn1, end: checkOut1 },
             { start: checkIn2, end: checkOut2 },
         ]);
-    
-        // Calculate evening and night overtime
+
         let eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
         let nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
-    
-        // Adjust evening hours if total hours worked is exactly 8
+
         if (totalHours === 8) {
-            eveningOvertime -= 8; // Reduce evening hours by 8
-            if (eveningOvertime < 0) eveningOvertime = 0; // Ensure no negative values
+            eveningOvertime -= 8; 
+            if (eveningOvertime < 0) eveningOvertime = 0; 
         }
-    
+
         const updatedRecord = {
             date,
             hours_worked: totalHours.toFixed(2),
             evening_hours: (eveningOvertime / 1.25).toFixed(2),
-            nigh_hours: (nightOvertime / 1.5).toFixed(2),
+            night_hours: (nightOvertime / 1.5).toFixed(2),
             overtime_hours: (eveningOvertime / 1.25) + (nightOvertime / 1.5),
         };
-    
+
         try {
             const response = await fetch(
                 `http://localhost:5000/api/workers/update-record/${selectedWorker._id}/${updatedData._id}`,
@@ -333,7 +338,7 @@ const Test = () => {
                     body: JSON.stringify(updatedRecord),
                 }
             );
-    
+
             if (response.ok) {
                 const { updatedWorker } = await response.json();
                 setSelectedWorker(updatedWorker); // Update the selected worker with the new data
@@ -349,7 +354,7 @@ const Test = () => {
             setMessage('An error occurred while saving. Please try again later.');
         }
     };
-    
+
     const fetchWorkers = () => {
         fetch('http://localhost:5000/api/workers/all-workers')
             .then((res) => res.json())
@@ -640,8 +645,13 @@ const Test = () => {
                         {message && <p className="text-center mt-4">{message}</p>}
                     </div>
 
+                    <button
+                        onClick={() => setShowYear(true)}
+                    >
+                        open year schudle
+                    </button>
                     <div className="mt-6 p-4 bg-gray-100 rounded">
-                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker?.name}</h3>
+                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker?.workerName}</h3>
                         <table className="w-full text-left table-auto">
                             <thead>
                                 <tr>
@@ -660,7 +670,7 @@ const Test = () => {
                                             <td className="p-4 border">{record.date}</td>
                                             <td className="p-4 border">{record.hours_worked}</td>
                                             <td className="p-4 border">{record.evening_hours}</td>
-                                            <td className="p-4 border">{record.nigh_hours}</td>
+                                            <td className="p-4 border">{record.night_hours}</td>
                                             <td className="p-4 border">{record.overtime_hours}</td>
                                             <td className="p-4 border">
                                                 <button
@@ -688,8 +698,36 @@ const Test = () => {
                                 )}
                             </tbody>
                         </table>
+
                     </div>
                 </div>
+            )}
+
+            {showYear && (
+                <>
+                    <div
+                        className='flex justify-center content-center m-10'
+                    >
+                        {selectedWorker?.hours_records && selectedWorker.hours_records.length > 0 ? (
+                            selectedWorker.hours_records.map((record, index) => (
+                                <tr key={index} className="odd:bg-white even:bg-gray-50">
+                                    <td className="p-4 border">{record.date}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="text-center p-4">No Date found, create one.</td>
+                            </tr>
+                        )}
+
+                    </div>
+                    <button
+                        className='flex justify-center content-center m-3'
+                        onClick={() => setShowYear(false)}
+                    >
+                        Close
+                    </button>
+                </>
             )}
 
             {isEditPopupVisible && (
@@ -839,7 +877,6 @@ const Test = () => {
                 </div>
             )}
 
-
             {isDeletePopupVisible && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded shadow-md">
@@ -867,6 +904,8 @@ const Test = () => {
                     </div>
                 </div>
             )}
+
+
 
         </div>
     );
