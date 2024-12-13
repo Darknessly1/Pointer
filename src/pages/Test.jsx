@@ -132,7 +132,7 @@ const Test = () => {
 
         const newRecord = {
             workerName,
-            workerDetails, 
+            workerDetails,
         };
 
         try {
@@ -143,18 +143,17 @@ const Test = () => {
             });
 
             if (response.ok) {
-                setMessage1('Record added successfully!');
-                fetchWorkers();
+                setMessage1('Worker added successfully!');
+                fetchWorkers(); // Refresh workers list
             } else {
                 const error = await response.json();
-                setMessage1(`Failed to add the worker: ${error.message || response.statusText}`);
+                setMessage1(`Failed to add worker: ${error.message || response.statusText}`);
             }
         } catch (error) {
-            console.error('Error:', error);
-            setMessage1('An error occurred while adding the record. Please try again later.');
+            console.error('Error adding worker:', error);
+            setMessage1('An error occurred while adding the worker. Please try again later.');
         }
     };
-
 
     const addWorkerInfoToTable = async () => {
         const resultElement = document.getElementById("result");
@@ -238,15 +237,17 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage('Worker removed successfully!');
-                fetchWorkers();
+                fetchWorkers(); // Refresh workers list
             } else {
-                setMessage(`Failed to remove worker: ${response.statusText}`);
+                const error = await response.json();
+                setMessage(`Failed to remove worker: ${error.message || response.statusText}`);
             }
         } catch (error) {
             console.error('Error removing worker:', error);
             setMessage('An error occurred while removing the worker.');
         }
     };
+
 
     const deleteHoursRecord = async (workerId, recordId) => {
         try {
@@ -274,6 +275,11 @@ const Test = () => {
     const handleSave = async () => {
         const { workerName, workerDetails } = updatedData;
 
+        if (!workerName || !workerDetails) {
+            setMessage('Please provide both worker name and details.');
+            return;
+        }
+
         try {
             const response = await fetch(
                 `http://localhost:5000/api/workers/update-worker/${selectedWorker._id}`,
@@ -285,23 +291,24 @@ const Test = () => {
             );
 
             if (response.ok) {
-                const { worker } = await response.json();
+                const updatedWorker = await response.json();
 
                 // Update the worker in the local state
                 setWorkers((prev) =>
-                    prev.map((w) =>
-                        w._id === selectedWorker._id ? worker : w
+                    prev.map((worker) =>
+                        worker._id === selectedWorker._id ? updatedWorker : worker
                     )
                 );
+
                 setMessage('Worker updated successfully!');
-                setIsEditPopupVisible(false);
+                setIsEditPopupVisible(false); // Close edit popup
             } else {
-                const errorData = await response.json();
-                setMessage(`Failed to update worker: ${errorData.message}`);
+                const error = await response.json();
+                setMessage(`Failed to update worker: ${error.message || response.statusText}`);
             }
         } catch (error) {
-            console.error('Error saving worker:', error);
-            setMessage('An error occurred while saving. Please try again later.');
+            console.error('Error updating worker:', error);
+            setMessage('An error occurred while updating the worker. Please try again later.');
         }
     };
 
@@ -317,8 +324,8 @@ const Test = () => {
         let nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
 
         if (totalHours === 8) {
-            eveningOvertime -= 8; 
-            if (eveningOvertime < 0) eveningOvertime = 0; 
+            eveningOvertime -= 8;
+            if (eveningOvertime < 0) eveningOvertime = 0;
         }
 
         const updatedRecord = {
@@ -373,15 +380,17 @@ const Test = () => {
             const response = await fetch(`http://localhost:5000/api/workers/worker/${workerId}`);
             if (response.ok) {
                 const workerData = await response.json();
-                setSelectedWorker(workerData); // Update the state with fresh data
+                setSelectedWorker(workerData);
+                console.log(workerData.years); // Log fetched hours records
             } else {
                 const errorData = await response.json();
-                console.error("Error fetching worker data:", errorData.error);
+                console.error("Error fetching worker data:", errorData.message);
             }
         } catch (error) {
             console.error("Error:", error);
         }
     };
+
 
 
 
@@ -650,58 +659,68 @@ const Test = () => {
                     >
                         open year schudle
                     </button>
-                    <div className="mt-6 p-4 bg-gray-100 rounded">
-                        <h3 className="text-lg font-bold mb-4">Hour Records for {selectedWorker?.workerName}</h3>
-                        <table className="w-full text-left table-auto">
-                            <thead>
-                                <tr>
-                                    <th className="p-4 border bg-gray-200">Date</th>
-                                    <th className="p-4 border bg-gray-200">Total Hours Worked</th>
-                                    <th className="p-4 border bg-gray-200">Evening Hours</th>
-                                    <th className="p-4 border bg-gray-200">Night Hours</th>
-                                    <th className="p-4 border bg-gray-200">Total Overtime Worked</th>
-                                    <th className="p-4 border bg-gray-200">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {selectedWorker?.hours_records && selectedWorker.hours_records.length > 0 ? (
-                                    selectedWorker.hours_records.map((record, index) => (
-                                        <tr key={index} className="odd:bg-white even:bg-gray-50">
-                                            <td className="p-4 border">{record.date}</td>
-                                            <td className="p-4 border">{record.hours_worked}</td>
-                                            <td className="p-4 border">{record.evening_hours}</td>
-                                            <td className="p-4 border">{record.night_hours}</td>
-                                            <td className="p-4 border">{record.overtime_hours}</td>
-                                            <td className="p-4 border">
-                                                <button
-                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                                    onClick={() => {
-                                                        setUpdatedData(record);
-                                                        setIsEditPopupVisibleRecords(true);
-                                                    }}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                                    onClick={() => deleteHoursRecord(selectedWorker._id, record._id)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="6" className="text-center p-4">No records found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
 
-                    </div>
+
+                    {selectedWorker && selectedWorker.years.map((year) => {
+                        const monthsWithData = year.months.filter(month => month.days.length > 0);
+
+                        if (monthsWithData.length > 0) {
+                            return (
+                                <div key={year.year}>
+                                    <h3 className="text-2xl font-semibold my-4">Year: {year.year}</h3>
+                                    {monthsWithData.map((month, index) => (
+                                        <div key={index}>
+                                            <h4 className="text-xl font-medium text-gray-700">Month: {month.month}</h4>
+                                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                                                <thead>
+                                                    <tr className="bg-gray-100 text-gray-700">
+                                                        <th className="px-6 py-3 text-left">Date</th>
+                                                        <th className="px-6 py-3 text-left">Hours Worked</th>
+                                                        <th className="px-6 py-3 text-left">Evening Hours</th>
+                                                        <th className="px-6 py-3 text-left">Night Hours</th>
+                                                        <th className="px-6 py-3 text-left">Overtime Hours</th>
+                                                        <th className="px-6 py-3 text-left">Actions</th> {/* Actions column for buttons */}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {month.days.map((day, dayIndex) => (
+                                                        <tr key={dayIndex} className="hover:bg-gray-50">
+                                                            <td className="px-6 py-4 border-b border-gray-200">{day.date}</td>
+                                                            <td className="px-6 py-4 border-b border-gray-200">{day.hours_worked}</td>
+                                                            <td className="px-6 py-4 border-b border-gray-200">{day.evening_hours}</td>
+                                                            <td className="px-6 py-4 border-b border-gray-200">{day.night_hours}</td>
+                                                            <td className="px-6 py-4 border-b border-gray-200">{day.overtime_hours}</td>
+                                                            <td className="p-4 border-b">
+                                                                <button
+                                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                                    onClick={() => {
+                                                                        setUpdatedData(day);
+                                                                        setIsEditPopupVisibleRecords(true);
+                                                                    }}
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                                <button
+                                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
+                                                                    onClick={() => deleteHoursRecord(selectedWorker._id, day._id)}
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        }
+                        return null;
+                    })}
                 </div>
             )}
+
 
             {showYear && (
                 <>
