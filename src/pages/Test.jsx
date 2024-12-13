@@ -248,7 +248,6 @@ const Test = () => {
         }
     };
 
-
     const deleteHoursRecord = async (workerId, recordId) => {
         try {
             const response = await fetch(`http://localhost:5000/api/workers/delete-record/${workerId}/${recordId}`, {
@@ -293,7 +292,6 @@ const Test = () => {
             if (response.ok) {
                 const updatedWorker = await response.json();
 
-                // Update the worker in the local state
                 setWorkers((prev) =>
                     prev.map((worker) =>
                         worker._id === selectedWorker._id ? updatedWorker : worker
@@ -301,7 +299,7 @@ const Test = () => {
                 );
 
                 setMessage('Worker updated successfully!');
-                setIsEditPopupVisible(false); // Close edit popup
+                setIsEditPopupVisible(false); 
             } else {
                 const error = await response.json();
                 setMessage(`Failed to update worker: ${error.message || response.statusText}`);
@@ -381,7 +379,7 @@ const Test = () => {
             if (response.ok) {
                 const workerData = await response.json();
                 setSelectedWorker(workerData);
-                console.log(workerData.years); // Log fetched hours records
+                console.log(workerData.years); 
             } else {
                 const errorData = await response.json();
                 console.error("Error fetching worker data:", errorData.message);
@@ -679,7 +677,7 @@ const Test = () => {
                                                         <th className="px-6 py-3 text-left">Evening Hours</th>
                                                         <th className="px-6 py-3 text-left">Night Hours</th>
                                                         <th className="px-6 py-3 text-left">Overtime Hours</th>
-                                                        <th className="px-6 py-3 text-left">Actions</th> {/* Actions column for buttons */}
+                                                        <th className="px-6 py-3 text-left">Actions</th> 
                                                     </tr>
                                                 </thead>
                                                 <tbody>
