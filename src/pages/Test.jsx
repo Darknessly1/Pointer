@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
 
 const Test = () => {
@@ -23,7 +23,10 @@ const Test = () => {
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [updatedData, setUpdatedData] = useState({});
-    const [showYear, setShowYear] = useState(false);
+    const [openYear, setOpenYear] = useState(null);
+    const [openMonth, setOpenMonth] = useState(null);
+    const tableContainerRef = useRef(null);
+
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -299,7 +302,7 @@ const Test = () => {
                 );
 
                 setMessage('Worker updated successfully!');
-                setIsEditPopupVisible(false); 
+                setIsEditPopupVisible(false);
             } else {
                 const error = await response.json();
                 setMessage(`Failed to update worker: ${error.message || response.statusText}`);
@@ -379,7 +382,7 @@ const Test = () => {
             if (response.ok) {
                 const workerData = await response.json();
                 setSelectedWorker(workerData);
-                console.log(workerData.years); 
+                console.log(workerData.years);
             } else {
                 const errorData = await response.json();
                 console.error("Error fetching worker data:", errorData.message);
@@ -389,6 +392,31 @@ const Test = () => {
         }
     };
 
+    const toggleYear = (year) => {
+        setOpenYear(openYear === year ? null : year);
+    };
+
+    const toggleMonth = (month) => {
+        setOpenMonth(openMonth === month ? null : month);
+    };
+
+    const closeAll = () => {
+        setOpenYear(null);
+        setOpenMonth(null);
+    };
+
+    const handleClickOutside = (event) => {
+        if (tableContainerRef.current && !tableContainerRef.current.contains(event.target)) {
+            closeAll();
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
 
 
 
@@ -652,99 +680,94 @@ const Test = () => {
                         {message && <p className="text-center mt-4">{message}</p>}
                     </div>
 
-                    <button
-                        onClick={() => setShowYear(true)}
-                    >
-                        open year schudle
-                    </button>
+                    <div className="flex justify-center items-center min-h-screen py-2">
+                        <div ref={tableContainerRef} className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden">
+                            {selectedWorker &&
+                                selectedWorker.years.map((year) => {
+                                    const monthsWithData = year.months.filter((month) => month.days.length > 0);
+                                    if (monthsWithData.length > 0) {
+                                        return (
+                                            <div key={year.year} className="border-b">
+                                                <div
+                                                    className="year-section m-3 p-4 cursor-pointer flex items-center justify-between bg-gray-200 hover:bg-gray-300"
+                                                    onClick={() => toggleYear(year.year)}
+                                                >
+                                                    <span className="font-semibold text-xl">Year: {year.year}</span>
+                                                    <span
+                                                        className={`transform transition-transform ${openYear === year.year ? 'rotate-180' : ''}`}
+                                                    >
+                                                        ▼
+                                                    </span>
+                                                </div>
 
-
-                    {selectedWorker && selectedWorker.years.map((year) => {
-                        const monthsWithData = year.months.filter(month => month.days.length > 0);
-
-                        if (monthsWithData.length > 0) {
-                            return (
-                                <div key={year.year}>
-                                    <h3 className="text-2xl font-semibold my-4">Year: {year.year}</h3>
-                                    {monthsWithData.map((month, index) => (
-                                        <div key={index}>
-                                            <h4 className="text-xl font-medium text-gray-700">Month: {month.month}</h4>
-                                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                                                <thead>
-                                                    <tr className="bg-gray-100 text-gray-700">
-                                                        <th className="px-6 py-3 text-left">Date</th>
-                                                        <th className="px-6 py-3 text-left">Hours Worked</th>
-                                                        <th className="px-6 py-3 text-left">Evening Hours</th>
-                                                        <th className="px-6 py-3 text-left">Night Hours</th>
-                                                        <th className="px-6 py-3 text-left">Overtime Hours</th>
-                                                        <th className="px-6 py-3 text-left">Actions</th> 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {month.days.map((day, dayIndex) => (
-                                                        <tr key={dayIndex} className="hover:bg-gray-50">
-                                                            <td className="px-6 py-4 border-b border-gray-200">{day.date}</td>
-                                                            <td className="px-6 py-4 border-b border-gray-200">{day.hours_worked}</td>
-                                                            <td className="px-6 py-4 border-b border-gray-200">{day.evening_hours}</td>
-                                                            <td className="px-6 py-4 border-b border-gray-200">{day.night_hours}</td>
-                                                            <td className="px-6 py-4 border-b border-gray-200">{day.overtime_hours}</td>
-                                                            <td className="p-4 border-b">
-                                                                <button
-                                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                                                    onClick={() => {
-                                                                        setUpdatedData(day);
-                                                                        setIsEditPopupVisibleRecords(true);
-                                                                    }}
+                                                {openYear === year.year && (
+                                                    monthsWithData.map((month, index) => (
+                                                        <div key={index} className="">
+                                                            <div
+                                                                className="month-section m-6 p-4 cursor-pointer flex items-center justify-between bg-gray-100 hover:bg-gray-200"
+                                                                onClick={() => toggleMonth(month.month)}
+                                                            >
+                                                                <span className="text-lg">Month: {month.month}</span>
+                                                                <span
+                                                                    className={`transform transition-transform ${openMonth === month.month ? 'rotate-180' : ''}`}
                                                                 >
-                                                                    Edit
-                                                                </button>
-                                                                <button
-                                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                                                    onClick={() => deleteHoursRecord(selectedWorker._id, day._id)}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    ))}
-                                </div>
-                            );
-                        }
-                        return null;
-                    })}
-                </div>
-            )}
+                                                                    ▼
+                                                                </span>
+                                                            </div>
 
-
-            {showYear && (
-                <>
-                    <div
-                        className='flex justify-center content-center m-10'
-                    >
-                        {selectedWorker?.hours_records && selectedWorker.hours_records.length > 0 ? (
-                            selectedWorker.hours_records.map((record, index) => (
-                                <tr key={index} className="odd:bg-white even:bg-gray-50">
-                                    <td className="p-4 border">{record.date}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" className="text-center p-4">No Date found, create one.</td>
-                            </tr>
-                        )}
-
+                                                            {openMonth === month.month && (
+                                                                <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md mt-4">
+                                                                    <thead>
+                                                                        <tr className="bg-gray-50 text-gray-700">
+                                                                            <th className="px-6 py-1 text-left">Date</th>
+                                                                            <th className="px-6 py-1 text-left">Hours Worked</th>
+                                                                            <th className="px-6 py-1 text-left">Evening Hours</th>
+                                                                            <th className="px-6 py-1 text-left">Night Hours</th>
+                                                                            <th className="px-6 py-1 text-left">Overtime Hours</th>
+                                                                            <th className="px-6 py-1 text-left">Actions</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {month.days.map((day, dayIndex) => (
+                                                                            <tr key={dayIndex} className="hover:bg-gray-50">
+                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.date}</td>
+                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.hours_worked}</td>
+                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.evening_hours}</td>
+                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.night_hours}</td>
+                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.overtime_hours}</td>
+                                                                                <td className="px-6 py-2 border-b">
+                                                                                    <button
+                                                                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                                                        onClick={() => {
+                                                                                            setUpdatedData(day);
+                                                                                            setIsEditPopupVisibleRecords(true);
+                                                                                        }}
+                                                                                    >
+                                                                                        Edit
+                                                                                    </button>
+                                                                                    <button
+                                                                                        className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
+                                                                                        onClick={() => deleteHoursRecord(selectedWorker._id, day._id)}
+                                                                                    >
+                                                                                        Delete
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                        </div>
                     </div>
-                    <button
-                        className='flex justify-center content-center m-3'
-                        onClick={() => setShowYear(false)}
-                    >
-                        Close
-                    </button>
-                </>
+                </div>
             )}
 
             {isEditPopupVisible && (
