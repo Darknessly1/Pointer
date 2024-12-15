@@ -22,10 +22,19 @@ const Test = () => {
     const [isEditPopupVisibleRecords, setIsEditPopupVisibleRecords] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
-    const [updatedData, setUpdatedData] = useState({});
+    // const [updatedData, setUpdatedData] = useState({});
+    const [updatedData, setUpdatedData] = useState({
+        checkIn1: "",
+        checkOut1: "",
+        checkIn2: "",
+        checkOut2: "",
+        year: "",  // Initialize other fields as needed
+        month: "",
+        date: ""
+    });
     const [openYear, setOpenYear] = useState(null);
     const [openMonth, setOpenMonth] = useState(null);
-    const tableContainerRef = useRef(null);
+    // const tableContainerRef = useRef(null);
 
 
     const handleInputChange = (e) => {
@@ -147,7 +156,7 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage1('Worker added successfully!');
-                fetchWorkers(); // Refresh workers list
+                fetchWorkers();
             } else {
                 const error = await response.json();
                 setMessage1(`Failed to add worker: ${error.message || response.statusText}`);
@@ -162,7 +171,7 @@ const Test = () => {
         const resultElement = document.getElementById("result");
         const dateInput = document.getElementById("date-input");
 
-        if (!resultElement) {
+        if (!resultElement || !resultElement.innerHTML) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
@@ -173,19 +182,31 @@ const Test = () => {
         }
 
         const totalHoursMatch = resultElement.innerHTML.match(/Total hours worked: (\d+\.\d+)/);
-        const eveOTMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
-        const nightOTMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
+        const eveningHoursMatch = resultElement.innerHTML.match(/Evening overtime hours: (\d+\.\d+)/);
+        const nightHoursMatch = resultElement.innerHTML.match(/Night overtime hours: (\d+\.\d+)/);
 
         if (!totalHoursMatch) {
             setMessage("Please calculate the overtime before adding information.");
             return;
         }
 
+        const hoursWorked = parseFloat(totalHoursMatch[1]);
+        const eveningHours = eveningHoursMatch ? parseFloat(eveningHoursMatch[1]) : 0;
+        const nightHours = nightHoursMatch ? parseFloat(nightHoursMatch[1]) : 0;
+        const overtimeHours = hoursWorked > 8 ? hoursWorked - 8 : 0;
+
+        const date = new Date(dateInput.value);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+
         const newRecord = {
-            date: new Date(dateInput.value).toISOString().split('T')[0], // Format date to 'YYYY-MM-DD'
-            hoursWorked: parseFloat(totalHoursMatch[1]),
-            eveningHours: eveOTMatch ? parseFloat(eveOTMatch[1]) : 0,
-            nighHhours: nightOTMatch ? parseFloat(nightOTMatch[1]) : 0,
+            year,
+            month,
+            date: dateInput.value,
+            hours_worked: hoursWorked,
+            evening_hours: eveningHours,
+            night_hours: nightHours,
+            overtime_hours: overtimeHours,
         };
 
         try {
@@ -196,20 +217,44 @@ const Test = () => {
             });
 
             if (response.ok) {
-                const createdRecord = await response.json(); // Backend returns the record with its _id
-                setSelectedWorker((prevWorker) => ({
-                    ...prevWorker,
-                    hours_records: [...prevWorker.hours_records, createdRecord], // Append the full record with _id
-                }));
+                const updatedWorker = await response.json();
+
+                // Ensure no duplicates in state update
+                const updatedYears = [...selectedWorker.years];
+                let yearIndex = updatedYears.findIndex((y) => y.year === newRecord.year);
+
+                if (yearIndex === -1) {
+                    updatedYears.push({ year: newRecord.year, months: [] });
+                    updatedYears.sort((a, b) => a.year - b.year);
+                    yearIndex = updatedYears.findIndex((y) => y.year === newRecord.year);
+                }
+
+                const yearRecord = updatedYears[yearIndex];
+                let monthIndex = yearRecord.months.findIndex((m) => m.month === newRecord.month);
+
+                if (monthIndex === -1) {
+                    yearRecord.months.push({ month: newRecord.month, days: [] });
+                    yearRecord.months.sort((a, b) => a.month - b.month);
+                    monthIndex = yearRecord.months.findIndex((m) => m.month === newRecord.month);
+                }
+
+                const monthRecord = yearRecord.months[monthIndex];
+                const existingRecord = monthRecord.days.find((day) => day.date === newRecord.date);
+
+                if (!existingRecord) {
+                    monthRecord.days.push(newRecord);
+                    monthRecord.days.sort((a, b) => new Date(a.date) - new Date(b.date));
+                }
+
+                setSelectedWorker({ ...selectedWorker, years: updatedYears });
                 setMessage("Record added successfully.");
             } else {
-                const errorData = await response.json();
-                console.error("Error adding record:", errorData.message);
-                setMessage(`Failed to add record: ${errorData.message}`);
+                const error = await response.json();
+                setMessage(`Failed to add record: ${error.message}`);
             }
         } catch (error) {
-            console.error("Error:", error);
-            setMessage("An error occurred while adding the record. Please try again later.");
+            console.error("Error adding record:", error);
+            setMessage("An error occurred. Please try again.");
         }
     };
 
@@ -240,7 +285,7 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage('Worker removed successfully!');
-                fetchWorkers(); // Refresh workers list
+                fetchWorkers();
             } else {
                 const error = await response.json();
                 setMessage(`Failed to remove worker: ${error.message || response.statusText}`);
@@ -251,17 +296,36 @@ const Test = () => {
         }
     };
 
-    const deleteHoursRecord = async (workerId, recordId) => {
+    const deleteHoursRecord = async (workerId, year, month, date) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/workers/delete-record/${workerId}/${recordId}`, {
-                method: 'DELETE',
-            });
+            const response = await fetch(
+                `http://localhost:5000/api/workers/delete-record/${workerId}/${year}/${month}/${date}`,
+                {
+                    method: 'DELETE',
+                }
+            );
 
             if (response.ok) {
-                setSelectedWorker((prevWorker) => ({
-                    ...prevWorker,
-                    hours_records: prevWorker.hours_records.filter((record) => record._id !== recordId),
-                }));
+                setSelectedWorker((prevWorker) => {
+                    // Update the records in the frontend
+                    const updatedYears = prevWorker.years.map((y) => {
+                        if (y.year === year) {
+                            const updatedMonths = y.months.map((m) => {
+                                if (m.month === month) {
+                                    return {
+                                        ...m,
+                                        days: m.days.filter((d) => d.date !== date),
+                                    };
+                                }
+                                return m;
+                            });
+                            return { ...y, months: updatedMonths };
+                        }
+                        return y;
+                    });
+                    return { ...prevWorker, years: updatedYears };
+                });
+
                 setMessage("Record deleted successfully.");
             } else {
                 const errorData = await response.json();
@@ -314,54 +378,79 @@ const Test = () => {
     };
 
     const handleSaveRecords = async () => {
-        const { date, checkIn1, checkOut1, checkIn2, checkOut2 } = updatedData;
-
+        const { checkIn1, checkOut1, checkIn2, checkOut2, date } = updatedData;
+    
+        // Extract year and month from the date
+        const [year, month, day] = date.split('-');
+    
         const { overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
             { start: checkIn1, end: checkOut1 },
             { start: checkIn2, end: checkOut2 },
         ]);
-
+    
         let eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
         let nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
-
+    
         if (totalHours === 8) {
             eveningOvertime -= 8;
             if (eveningOvertime < 0) eveningOvertime = 0;
         }
-
+    
         const updatedRecord = {
-            date,
             hours_worked: totalHours.toFixed(2),
             evening_hours: (eveningOvertime / 1.25).toFixed(2),
             night_hours: (nightOvertime / 1.5).toFixed(2),
-            overtime_hours: (eveningOvertime / 1.25) + (nightOvertime / 1.5),
+            overtime_hours: ((eveningOvertime / 1.25) + (nightOvertime / 1.5)).toFixed(2),
         };
-
+    
+        if (!year || !month || !day) {
+            setMessage("Invalid data: Year, month, or date is missing.");
+            return;
+        }
+    
         try {
             const response = await fetch(
-                `http://localhost:5000/api/workers/update-record/${selectedWorker._id}/${updatedData._id}`,
+                `http://localhost:5000/api/workers/update-hours/${selectedWorker._id}/${year}/${month}/${date}`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updatedRecord),
                 }
             );
-
+    
             if (response.ok) {
-                const { updatedWorker } = await response.json();
-                setSelectedWorker(updatedWorker); // Update the selected worker with the new data
+                const { updatedDay } = await response.json();
+                setSelectedWorker((prevWorker) => {
+                    const updatedYears = prevWorker.years.map((yearObj) => {
+                        if (yearObj.year === parseInt(year)) {
+                            const updatedMonths = yearObj.months.map((monthObj) => {
+                                if (monthObj.month === parseInt(month)) {
+                                    const updatedDays = monthObj.days.map((dayObj) =>
+                                        dayObj.date === date ? updatedDay : dayObj
+                                    );
+                                    return { ...monthObj, days: updatedDays };
+                                }
+                                return monthObj;
+                            });
+                            return { ...yearObj, months: updatedMonths };
+                        }
+                        return yearObj;
+                    });
+                    return { ...prevWorker, years: updatedYears };
+                });
+    
                 setMessage('Record updated successfully!');
                 setIsEditPopupVisibleRecords(false);
             } else {
-                const errorData = await response.json();
-                console.error('Error updating record:', errorData.message);
-                setMessage(`Failed to update record: ${errorData.message}`);
+                const error = await response.json();
+                setMessage(`Failed to update record: ${error.message || 'Unknown error'}`);
             }
         } catch (error) {
-            console.error('Error updating record:', error);
             setMessage('An error occurred while saving. Please try again later.');
         }
     };
+    
+    
 
     const fetchWorkers = () => {
         fetch('http://localhost:5000/api/workers/all-workers')
@@ -382,7 +471,6 @@ const Test = () => {
             if (response.ok) {
                 const workerData = await response.json();
                 setSelectedWorker(workerData);
-                console.log(workerData.years);
             } else {
                 const errorData = await response.json();
                 console.error("Error fetching worker data:", errorData.message);
@@ -400,23 +488,23 @@ const Test = () => {
         setOpenMonth(openMonth === month ? null : month);
     };
 
-    const closeAll = () => {
-        setOpenYear(null);
-        setOpenMonth(null);
-    };
+    // const closeAll = () => {
+    //     setOpenYear(null);
+    //     setOpenMonth(null);
+    // };
 
-    const handleClickOutside = (event) => {
-        if (tableContainerRef.current && !tableContainerRef.current.contains(event.target)) {
-            closeAll();
-        }
-    };
+    // const handleClickOutside = (event) => {
+    //     if (tableContainerRef.current && !tableContainerRef.current.contains(event.target)) {
+    //         closeAll();
+    //     }
+    // };
 
-    useEffect(() => {
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, []);
+    // useEffect(() => {
+    //     document.addEventListener('click', handleClickOutside);
+    //     return () => {
+    //         document.removeEventListener('click', handleClickOutside);
+    //     };
+    // }, []);
 
 
 
@@ -680,8 +768,8 @@ const Test = () => {
                         {message && <p className="text-center mt-4">{message}</p>}
                     </div>
 
-                    <div className="flex justify-center items-center min-h-screen py-2">
-                        <div ref={tableContainerRef} className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden">
+                    <div className="flex justify-center items-center mt-10">
+                        <div /* ref={tableContainerRef} */ className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
                             {selectedWorker &&
                                 selectedWorker.years.map((year) => {
                                     const monthsWithData = year.months.filter((month) => month.days.length > 0);
@@ -689,7 +777,7 @@ const Test = () => {
                                         return (
                                             <div key={year.year} className="border-b">
                                                 <div
-                                                    className="year-section m-3 p-4 cursor-pointer flex items-center justify-between bg-gray-200 hover:bg-gray-300"
+                                                    className="year-section  p-4 cursor-pointer flex items-center justify-between bg-gray-200 hover:bg-gray-300"
                                                     onClick={() => toggleYear(year.year)}
                                                 >
                                                     <span className="font-semibold text-xl">Year: {year.year}</span>
@@ -701,8 +789,8 @@ const Test = () => {
                                                 </div>
 
                                                 {openYear === year.year && (
-                                                    monthsWithData.map((month, index) => (
-                                                        <div key={index} className="">
+                                                    monthsWithData.map((month) => (
+                                                        <div key={`${year.year}-${month.month}`} className="">
                                                             <div
                                                                 className="month-section m-6 p-4 cursor-pointer flex items-center justify-between bg-gray-100 hover:bg-gray-200"
                                                                 onClick={() => toggleMonth(month.month)}
@@ -716,7 +804,7 @@ const Test = () => {
                                                             </div>
 
                                                             {openMonth === month.month && (
-                                                                <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md mt-4">
+                                                                <table className="min-w-full mb-3 bg-white border border-gray-200 rounded-lg shadow-md mt-4">
                                                                     <thead>
                                                                         <tr className="bg-gray-50 text-gray-700">
                                                                             <th className="px-6 py-1 text-left">Date</th>
@@ -728,8 +816,8 @@ const Test = () => {
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        {month.days.map((day, dayIndex) => (
-                                                                            <tr key={dayIndex} className="hover:bg-gray-50">
+                                                                        {month.days.map((day, dayindex) => (
+                                                                            <tr key={dayindex} className="hover:bg-gray-50">
                                                                                 <td className="px-6 py-2 border-b border-gray-200">{day.date}</td>
                                                                                 <td className="px-6 py-2 border-b border-gray-200">{day.hours_worked}</td>
                                                                                 <td className="px-6 py-2 border-b border-gray-200">{day.evening_hours}</td>
@@ -746,8 +834,8 @@ const Test = () => {
                                                                                         Edit
                                                                                     </button>
                                                                                     <button
-                                                                                        className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                                                                        onClick={() => deleteHoursRecord(selectedWorker._id, day._id)}
+                                                                                        className="rounded-3xl bg-red-600 hover:bg-red-800 text-white font-bold py-1 px-2 transition-colors duration-200"
+                                                                                        onClick={() => deleteHoursRecord(selectedWorker._id, year.year, month.month, day.date)}
                                                                                     >
                                                                                         Delete
                                                                                     </button>
@@ -841,7 +929,7 @@ const Test = () => {
                                     <label className="block text-sm font-medium mb-1">Check-in 1</label>
                                     <input
                                         type="time"
-                                        value={updatedData.checkIn1}
+                                        value={updatedData.checkIn1 || ""}
                                         onChange={(e) =>
                                             setUpdatedData({ ...updatedData, checkIn1: e.target.value })
                                         }
@@ -853,7 +941,7 @@ const Test = () => {
                                     <label className="block text-sm font-medium mb-1">Check-out 1</label>
                                     <input
                                         type="time"
-                                        value={updatedData.checkOut1}
+                                        value={updatedData.checkOut1 || ""}
                                         onChange={(e) =>
                                             setUpdatedData({ ...updatedData, checkOut1: e.target.value })
                                         }
@@ -867,7 +955,7 @@ const Test = () => {
                                     <label className="block text-sm font-medium mb-1">Check-in 2</label>
                                     <input
                                         type="time"
-                                        value={updatedData.checkIn2}
+                                        value={updatedData.checkIn2 || ""}
                                         onChange={(e) =>
                                             setUpdatedData({ ...updatedData, checkIn2: e.target.value })
                                         }
@@ -878,20 +966,9 @@ const Test = () => {
                                     <label className="block text-sm font-medium mb-1">Check-out 2</label>
                                     <input
                                         type="time"
-                                        value={updatedData.checkOut2}
+                                        value={updatedData.checkOut2 || ""}
                                         onChange={(e) =>
                                             setUpdatedData({ ...updatedData, checkOut2: e.target.value })
-                                        }
-                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Date</label>
-                                    <input
-                                        type="date"
-                                        value={updatedData.date}
-                                        onChange={(e) =>
-                                            setUpdatedData({ ...updatedData, date: e.target.value })
                                         }
                                         className="w-full px-3 py-2 border rounded-lg focus:outline-none"
                                     />
@@ -944,8 +1021,6 @@ const Test = () => {
                     </div>
                 </div>
             )}
-
-
 
         </div>
     );
