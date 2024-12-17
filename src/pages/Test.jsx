@@ -28,14 +28,24 @@ const Test = () => {
         checkOut1: "",
         checkIn2: "",
         checkOut2: "",
-        year: "",  // Initialize other fields as needed
+        year: "",
         month: "",
         date: ""
     });
     const [openYear, setOpenYear] = useState(null);
     const [openMonth, setOpenMonth] = useState(null);
-    // const tableContainerRef = useRef(null);
 
+
+
+    useEffect(() => {
+        // Set the message after a timeout of 3 seconds
+        const timeout = setTimeout(() => {
+            setMessage1();
+        }, 3000);
+
+        // Cleanup function to clear timeout when component unmounts
+        return () => clearTimeout(timeout);
+    }, []);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -134,11 +144,18 @@ const Test = () => {
         setResult(resultText);
     };
 
+    const clearMessageAfterDelay = (delay = 3000) => {
+        setTimeout(() => {
+            setMessage1('');
+        }, delay);
+    };
+
     const addWorkersBasicInformation = async () => {
         const { workerName, workerDetails } = inputs;
 
         if (!workerName || !workerDetails) {
             setMessage1('Please provide both worker name and details.');
+            clearMessageAfterDelay();
             return;
         }
 
@@ -156,14 +173,17 @@ const Test = () => {
 
             if (response.ok) {
                 setMessage1('Worker added successfully!');
+                clearMessageAfterDelay();
                 fetchWorkers();
             } else {
                 const error = await response.json();
                 setMessage1(`Failed to add worker: ${error.message || response.statusText}`);
+                clearMessageAfterDelay();
             }
         } catch (error) {
             console.error('Error adding worker:', error);
             setMessage1('An error occurred while adding the worker. Please try again later.');
+            clearMessageAfterDelay();
         }
     };
 
@@ -379,35 +399,35 @@ const Test = () => {
 
     const handleSaveRecords = async () => {
         const { checkIn1, checkOut1, checkIn2, checkOut2, date } = updatedData;
-    
+
         // Extract year and month from the date
         const [year, month, day] = date.split('-');
-    
+
         const { overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
             { start: checkIn1, end: checkOut1 },
             { start: checkIn2, end: checkOut2 },
         ]);
-    
+
         let eveningOvertime = calculateOvertime(overtimeStart, checkOut2, 17, 21, 1.25);
         let nightOvertime = calculateOvertime(overtimeStart, checkOut2, 21, 5, 1.5);
-    
+
         if (totalHours === 8) {
             eveningOvertime -= 8;
             if (eveningOvertime < 0) eveningOvertime = 0;
         }
-    
+
         const updatedRecord = {
             hours_worked: totalHours.toFixed(2),
             evening_hours: (eveningOvertime / 1.25).toFixed(2),
             night_hours: (nightOvertime / 1.5).toFixed(2),
             overtime_hours: ((eveningOvertime / 1.25) + (nightOvertime / 1.5)).toFixed(2),
         };
-    
+
         if (!year || !month || !day) {
             setMessage("Invalid data: Year, month, or date is missing.");
             return;
         }
-    
+
         try {
             const response = await fetch(
                 `http://localhost:5000/api/workers/update-hours/${selectedWorker._id}/${year}/${month}/${date}`,
@@ -417,7 +437,7 @@ const Test = () => {
                     body: JSON.stringify(updatedRecord),
                 }
             );
-    
+
             if (response.ok) {
                 const { updatedDay } = await response.json();
                 setSelectedWorker((prevWorker) => {
@@ -438,7 +458,7 @@ const Test = () => {
                     });
                     return { ...prevWorker, years: updatedYears };
                 });
-    
+
                 setMessage('Record updated successfully!');
                 setIsEditPopupVisibleRecords(false);
             } else {
@@ -449,8 +469,6 @@ const Test = () => {
             setMessage('An error occurred while saving. Please try again later.');
         }
     };
-    
-    
 
     const fetchWorkers = () => {
         fetch('http://localhost:5000/api/workers/all-workers')
@@ -487,26 +505,6 @@ const Test = () => {
     const toggleMonth = (month) => {
         setOpenMonth(openMonth === month ? null : month);
     };
-
-    // const closeAll = () => {
-    //     setOpenYear(null);
-    //     setOpenMonth(null);
-    // };
-
-    // const handleClickOutside = (event) => {
-    //     if (tableContainerRef.current && !tableContainerRef.current.contains(event.target)) {
-    //         closeAll();
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     document.addEventListener('click', handleClickOutside);
-    //     return () => {
-    //         document.removeEventListener('click', handleClickOutside);
-    //     };
-    // }, []);
-
-
 
     return (
         <div>
@@ -582,7 +580,7 @@ const Test = () => {
                                 <tr>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
-                                            Date
+                                            Number
                                         </p>
                                     </th>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
@@ -603,13 +601,13 @@ const Test = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(workers) && workers.map((worker) => (
+                                {Array.isArray(workers) && workers.map((worker, index) => (
                                     <tr key={worker._id}
                                         className='odd:bg-white even:bg-gray-200'
                                     >
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker._id}
+                                                {index + 1}
                                             </p>
                                         </td>
                                         <td
@@ -677,6 +675,11 @@ const Test = () => {
 
             {selectedWorker && (
                 <div>
+                    <h1
+                        className='text-3xl font-bold m-6 flex content-center justify-center'
+                    >
+                        Workers Records <span className='text-green-700 ml-2'> {selectedWorker.workerName}</span>
+                    </h1>
                     <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
                         <div className="flex items-center gap-2  mt-2">
                             <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
@@ -769,7 +772,8 @@ const Test = () => {
                     </div>
 
                     <div className="flex justify-center items-center mt-10">
-                        <div /* ref={tableContainerRef} */ className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
+                        <div className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
+
                             {selectedWorker &&
                                 selectedWorker.years.map((year) => {
                                     const monthsWithData = year.months.filter((month) => month.days.length > 0);

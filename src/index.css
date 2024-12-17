@@ -3,19 +3,11 @@
 @tailwind utilities;
 
 body {
-  background: linear-gradient(to right, #c8c9c2, #e4e4e4, #c2abc2);
+  background: linear-gradient(to right, #c9d486, #e4e4e4, #809fb8);
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;900&display=swap');
 
-.body-s1 {
-  width: 90vw;
-  height: 90vh;
-  font-family: 'Titillium Web', sans-serif;
-  position: relative;
-  --white: #ebebeb;
-  --pink: #d6157c;
-}
 
 .F {
   position: absolute;
@@ -170,7 +162,6 @@ body {
 
 .replay {
   cursor: pointer;
-  /* width: min-content; */
   font-size: 0.8rem;
   color: black;
   text-transform: uppercase;
@@ -181,8 +172,6 @@ body {
 }
 
 
-
-/* test another one */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,500;1,400&family=DM+Serif+Display&display=swap');
 * {
