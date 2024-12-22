@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
+import { Button } from "@material-tailwind/react";
 
 const Test = () => {
     const [inputs, setInputs] = useState({
@@ -22,7 +23,6 @@ const Test = () => {
     const [isEditPopupVisibleRecords, setIsEditPopupVisibleRecords] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
-    // const [updatedData, setUpdatedData] = useState({});
     const [updatedData, setUpdatedData] = useState({
         checkIn1: "",
         checkOut1: "",
@@ -34,8 +34,11 @@ const Test = () => {
     });
     const [openYear, setOpenYear] = useState(null);
     const [openMonth, setOpenMonth] = useState(null);
-
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(10);
+    const [open, setOpen] = useState(false);
+    const [alertType, setAlertType] = useState(""); // Track the type of alert
+    const [isSectionVisible, setIsSectionVisible] = useState(true);
 
     useEffect(() => {
         // Set the message after a timeout of 3 seconds
@@ -144,9 +147,21 @@ const Test = () => {
         setResult(resultText);
     };
 
-    const clearMessageAfterDelay = (delay = 3000) => {
+    const clearMessageAfterDelay = (message, type, delay = 5000) => {
+        setMessage1(message);
+        setAlertType(type);  // Set alert type (success, delete, update, error)
+        setOpen(true);
+
         setTimeout(() => {
             setMessage1('');
+            setAlertType('');
+            setOpen(false);
+        }, delay);
+    };
+
+    const clearMessageAfterDelay1 = (delay = 5000) => {
+        setTimeout(() => {
+            setMessage('');
         }, delay);
     };
 
@@ -154,15 +169,11 @@ const Test = () => {
         const { workerName, workerDetails } = inputs;
 
         if (!workerName || !workerDetails) {
-            setMessage1('Please provide both worker name and details.');
-            clearMessageAfterDelay();
+            clearMessageAfterDelay('Please provide both worker name and details.', 'error');
             return;
         }
 
-        const newRecord = {
-            workerName,
-            workerDetails,
-        };
+        const newRecord = { workerName, workerDetails };
 
         try {
             const response = await fetch('http://localhost:5000/api/workers/add-worker', {
@@ -172,18 +183,15 @@ const Test = () => {
             });
 
             if (response.ok) {
-                setMessage1('Worker added successfully!');
-                clearMessageAfterDelay();
+                clearMessageAfterDelay('Worker added successfully!', 'success');
                 fetchWorkers();
             } else {
                 const error = await response.json();
-                setMessage1(`Failed to add worker: ${error.message || response.statusText}`);
-                clearMessageAfterDelay();
+                clearMessageAfterDelay(`Failed to add worker: ${error.message || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Error adding worker:', error);
-            setMessage1('An error occurred while adding the worker. Please try again later.');
-            clearMessageAfterDelay();
+            clearMessageAfterDelay('An error occurred while adding the worker. Please try again later.', 'error');
         }
     };
 
@@ -193,11 +201,13 @@ const Test = () => {
 
         if (!resultElement || !resultElement.innerHTML) {
             setMessage("Please calculate the overtime before adding information.");
+            clearMessageAfterDelay1();
             return;
         }
 
         if (!dateInput || !dateInput.value) {
             setMessage("Please provide a valid date.");
+            clearMessageAfterDelay1();
             return;
         }
 
@@ -207,6 +217,7 @@ const Test = () => {
 
         if (!totalHoursMatch) {
             setMessage("Please calculate the overtime before adding information.");
+            clearMessageAfterDelay1();
             return;
         }
 
@@ -268,13 +279,16 @@ const Test = () => {
 
                 setSelectedWorker({ ...selectedWorker, years: updatedYears });
                 setMessage("Record added successfully.");
+                clearMessageAfterDelay1();
             } else {
                 const error = await response.json();
                 setMessage(`Failed to add record: ${error.message}`);
+                clearMessageAfterDelay1();
             }
         } catch (error) {
             console.error("Error adding record:", error);
             setMessage("An error occurred. Please try again.");
+            clearMessageAfterDelay1();
         }
     };
 
@@ -284,6 +298,7 @@ const Test = () => {
             checkOut1: '',
             checkIn2: '',
             checkOut2: '',
+            date: '',
         });
         setResult('');
         setMessage('');
@@ -304,15 +319,18 @@ const Test = () => {
             });
 
             if (response.ok) {
-                setMessage('Worker removed successfully!');
+                clearMessageAfterDelay('Worker removed successfully!', 'delete');
+                // clearMessageAfterDelay();
                 fetchWorkers();
             } else {
                 const error = await response.json();
-                setMessage(`Failed to remove worker: ${error.message || response.statusText}`);
+                clearMessageAfterDelay(`Failed to remove worker: ${error.message || response.statusText}`, 'error');
+                // clearMessageAfterDelay();
             }
         } catch (error) {
             console.error('Error removing worker:', error);
-            setMessage('An error occurred while removing the worker.');
+            clearMessageAfterDelay('An error occurred while removing the worker.', 'error');
+            // clearMessageAfterDelay();
         }
     };
 
@@ -347,14 +365,17 @@ const Test = () => {
                 });
 
                 setMessage("Record deleted successfully.");
+                clearMessageAfterDelay1();
             } else {
                 const errorData = await response.json();
                 console.error("Error deleting record:", errorData.message);
                 setMessage(`Failed to delete record: ${errorData.message}`);
+                clearMessageAfterDelay1();
             }
         } catch (error) {
             console.error("Error:", error);
             setMessage("An error occurred while deleting the record. Please try again later.");
+            clearMessageAfterDelay1();
         }
     };
 
@@ -362,7 +383,7 @@ const Test = () => {
         const { workerName, workerDetails } = updatedData;
 
         if (!workerName || !workerDetails) {
-            setMessage('Please provide both worker name and details.');
+            clearMessageAfterDelay('Please provide both worker name and details.', 'error');
             return;
         }
 
@@ -385,7 +406,7 @@ const Test = () => {
                     )
                 );
 
-                setMessage('Worker updated successfully!');
+                clearMessageAfterDelay('Worker updated successfully!', 'update');
                 setIsEditPopupVisible(false);
             } else {
                 const error = await response.json();
@@ -393,7 +414,7 @@ const Test = () => {
             }
         } catch (error) {
             console.error('Error updating worker:', error);
-            setMessage('An error occurred while updating the worker. Please try again later.');
+            clearMessageAfterDelay('An error occurred while updating the worker. Please try again later.', 'error');
         }
     };
 
@@ -506,13 +527,20 @@ const Test = () => {
         setOpenMonth(openMonth === month ? null : month);
     };
 
+
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    const currentWorkers = workers.slice(indexOfFirstRecord, indexOfLastRecord);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     return (
         <div>
             <h1 className='text-3xl font-bold text-center'>Overtime Calculator</h1>
 
             <div className="m-3 flex flex-col">
                 <div className="m-3 flex flex-col">
-                    <div className="shadow-2xl focus-within:border-gray-300 flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
+                    <div className="shadow-2xl  flex flex-wrap justify-center gap-4 border-2 border-black rounded-2xl ml-20 mr-20 mt-4">
                         <div className="flex items-center gap-2 mt-2">
                             <label htmlFor="workerName" className="mb-4 font-bold mt-2">Worker Full Name:</label>
                             <input
@@ -554,29 +582,49 @@ const Test = () => {
                     </button>
                 </div>
 
-                <div>
-                    {message1 && <p className="text-center mt-4">{message1}</p>}
-                </div>
+                {message1 && open && (
+                    <div
+                        className={`border-2 border-black fixed top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-xl w-fit shadow-lg z-[100] ${alertType === "success"
+                            ? "bg-green-500"
+                            : alertType === "delete"
+                                ? "bg-red-500"
+                                : alertType === "update"
+                                    ? "bg-blue-500"
+                                    : alertType === "error"
+                                        ? "bg-gray-500"
+                                        : ""
+                            }`}
+                    // style={{
+                    //     marginTop: '100px'
+                    // }}
+
+                    >
+                        <div className="flex justify-between items-center text-white">
+                            <p>{message1}</p>
+                            <Button
+                                size="sm"
+                                color="transparent"
+                                onClick={() => setOpen(false)}
+                                className="text-white bg-black/30 ml-2"
+                            >
+                                &times;
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
+            
+            <div >
+                <WorkerSearch workers={workers} />
             </div>
 
             <div className='relative flex flex-col w-full h-full text-gray-700'>
                 <div className='relative mx-4 mt-4 overflow-hidden text-gray-700  rounded-none bg-clip-border'>
-                    <div className='flex items-center justify-between gap-8'>
-                        <div>
-                            <h5 className='block font-sans text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900'>
-                                Workers List
-                            </h5>
-                            <p className='block mt-1 font-sans text-base antialiased font-normal leading-relaxed text-gray-700'>
-                                See information about all workers
-                            </p>
-                        </div>
 
-                        <WorkerSearch workers={workers} />
-                    </div>
 
-                    <div className='p-6 px-0 overflow-scroll'>
-                        <table className='w-full mt-4 text-left table-auto min-w-max'>
-                            <thead>
+                    <div className='p-6 px-0 overflow-auto '>
+                        <table className='w-full mt-4 text-left table-auto min-w-max border-2 border-black'>
+                            <thead className='border-b-2 border-black'>
                                 <tr>
                                     <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
                                         <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
@@ -601,13 +649,13 @@ const Test = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(workers) && workers.map((worker, index) => (
+                                {Array.isArray(currentWorkers) && currentWorkers.map((worker) => (
                                     <tr key={worker._id}
                                         className='odd:bg-white even:bg-gray-200'
                                     >
                                         <td className='p-4 border-b border-blue-gray-50'>
                                             <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {index + 1}
+                                                {worker._id}
                                             </p>
                                         </td>
                                         <td
@@ -652,19 +700,23 @@ const Test = () => {
                         </table>
                     </div>
                     {/* should be created the pagination */}
-                    <div className='flex items-center justify-between p-4 border-t border-blue-gray-50'>
-                        <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                            Page 1 of 10
+                    <div className="flex items-center justify-between p-4 border-b border-t border-blue-gray-50">
+                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                            Page {currentPage} of {Math.ceil(workers.length / recordsPerPage)}
                         </p>
-                        <div className='flex gap-2'>
+                        <div className="flex gap-2">
                             <button
-                                className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
-                                type='button'>
+                                className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                type="button"
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            >
                                 Previous
                             </button>
                             <button
-                                className='select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none'
-                                type='button'>
+                                className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                type="button"
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(workers.length / recordsPerPage)))}
+                            >
                                 Next
                             </button>
                         </div>
@@ -673,6 +725,7 @@ const Test = () => {
                 </div>
             </div>
 
+
             {selectedWorker && (
                 <div>
                     <h1
@@ -680,185 +733,198 @@ const Test = () => {
                     >
                         Workers Records <span className='text-green-700 ml-2'> {selectedWorker.workerName}</span>
                     </h1>
-                    <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
-                            <input
-                                type="time"
-                                id="checkIn1"
-                                value={inputs.checkIn1}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut1" className="mb-4 font-bold mt-2">Check-Out 1:</label>
-                            <input
-                                type="time"
-                                id="checkOut1"
-                                value={inputs.checkOut1}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkIn2" className="mb-4 font-bold mt-2">Check-In 2:</label>
-                            <input
-                                type="time"
-                                id="checkIn2"
-                                value={inputs.checkIn2}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">Check-Out 2:</label>
-                            <input
-                                type="time"
-                                id="checkOut2"
-                                value={inputs.checkOut2}
-                                onChange={handleInputChange}
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
 
-
-                        <div className="flex items-center gap-2  mt-2">
-                            <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">date</label>
-                            <input
-                                type="date"
-                                id="date-input"
-                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
-                            />
-                        </div>
-
-                    </div>
-
-                    <div className="flex justify-center gap-4 mt-4">
+                    <div className='flex content-center justify-center'>
                         <button
-                            onClick={calculateOvertimePay}
-                            className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                            onClick={() => setIsSectionVisible((prev) => !prev)}
+                            className="rounded-3xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2"
                         >
-                            Calculate Overtime
-                        </button>
-                        <button
-                            onClick={addWorkerInfoToTable}
-                            className="rounded-3xl bg-light-blue-400  hover:bg-light-blue-700 text-white font-bold py-1 px-2 text-sm"
-                        >
-                            Add Information to Table
-                        </button>
-                        <button
-                            onClick={handleReset}
-                            className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
-                        >
-                            Restart
+                            {isSectionVisible ? "Close Section" : "Open Section"}
                         </button>
                     </div>
+                    {isSectionVisible && (
+                        <>
+                            <div className="flex flex-wrap justify-center gap-4 mt-4 border-2 border-black rounded-2xl ml-20 mr-20">
+                                <div className="flex items-center gap-2  mt-2">
+                                    <label htmlFor="checkIn1" className="mb-4 font-bold mt-2">Check-In 1:</label>
+                                    <input
+                                        type="time"
+                                        id="checkIn1"
+                                        value={inputs.checkIn1}
+                                        onChange={handleInputChange}
+                                        className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2  mt-2">
+                                    <label htmlFor="checkOut1" className="mb-4 font-bold mt-2">Check-Out 1:</label>
+                                    <input
+                                        type="time"
+                                        id="checkOut1"
+                                        value={inputs.checkOut1}
+                                        onChange={handleInputChange}
+                                        className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2  mt-2">
+                                    <label htmlFor="checkIn2" className="mb-4 font-bold mt-2">Check-In 2:</label>
+                                    <input
+                                        type="time"
+                                        id="checkIn2"
+                                        value={inputs.checkIn2}
+                                        onChange={handleInputChange}
+                                        className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2  mt-2">
+                                    <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">Check-Out 2:</label>
+                                    <input
+                                        type="time"
+                                        id="checkOut2"
+                                        value={inputs.checkOut2}
+                                        onChange={handleInputChange}
+                                        className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                                    />
+                                </div>
 
-                    <div id="result"
-                        className='flex justify-center m-2'
-                    >
-                        {result &&
-                            <pre
-                                className='p-2 border-2 border-black rounded-2xl'
+
+                                <div className="flex items-center gap-2  mt-2">
+                                    <label htmlFor="checkOut2" className="mb-4 font-bold mt-2">date</label>
+                                    <input
+                                        type="date"
+                                        id="date-input"
+                                        className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                                    />
+                                </div>
+
+                            </div>
+
+                            <div className="flex justify-center gap-4 mt-4">
+                                <button
+                                    onClick={calculateOvertimePay}
+                                    className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 text-sm"
+                                >
+                                    Calculate Overtime
+                                </button>
+                                <button
+                                    onClick={addWorkerInfoToTable}
+                                    className="rounded-3xl bg-light-blue-400  hover:bg-light-blue-700 text-white font-bold py-1 px-2 text-sm"
+                                >
+                                    Add Information to Table
+                                </button>
+                                <button
+                                    onClick={handleReset}
+                                    className="rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
+                                >
+                                    Restart
+                                </button>
+                            </div>
+
+                            <div id="result"
+                                className='flex justify-center m-2'
                             >
-                                {result}
-                            </pre>
-                        }
-                    </div>
+                                {result &&
+                                    <pre
+                                        className='p-2 border-2 border-black rounded-2xl'
+                                    >
+                                        {result}
+                                    </pre>
+                                }
+                            </div>
 
-                    <div>
-                        {message && <p className="text-center mt-4">{message}</p>}
-                    </div>
+                            <div>
+                                {message && <p className="text-center mt-4">{message}</p>}
+                            </div>
 
-                    <div className="flex justify-center items-center mt-10">
-                        <div className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
+                            <div className="flex justify-center items-center mt-10">
+                                <div className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
 
-                            {selectedWorker &&
-                                selectedWorker.years.map((year) => {
-                                    const monthsWithData = year.months.filter((month) => month.days.length > 0);
-                                    if (monthsWithData.length > 0) {
-                                        return (
-                                            <div key={year.year} className="border-b">
-                                                <div
-                                                    className="year-section  p-4 cursor-pointer flex items-center justify-between bg-gray-200 hover:bg-gray-300"
-                                                    onClick={() => toggleYear(year.year)}
-                                                >
-                                                    <span className="font-semibold text-xl">Year: {year.year}</span>
-                                                    <span
-                                                        className={`transform transition-transform ${openYear === year.year ? 'rotate-180' : ''}`}
-                                                    >
-                                                        ▼
-                                                    </span>
-                                                </div>
-
-                                                {openYear === year.year && (
-                                                    monthsWithData.map((month) => (
-                                                        <div key={`${year.year}-${month.month}`} className="">
-                                                            <div
-                                                                className="month-section m-6 p-4 cursor-pointer flex items-center justify-between bg-gray-100 hover:bg-gray-200"
-                                                                onClick={() => toggleMonth(month.month)}
+                                    {selectedWorker &&
+                                        selectedWorker.years.map((year) => {
+                                            const monthsWithData = year.months.filter((month) => month.days.length > 0);
+                                            if (monthsWithData.length > 0) {
+                                                return (
+                                                    <div key={year.year} className="border-b">
+                                                        <div
+                                                            className="year-section  p-4 cursor-pointer flex items-center justify-between bg-gray-200 hover:bg-gray-300"
+                                                            onClick={() => toggleYear(year.year)}
+                                                        >
+                                                            <span className="font-semibold text-xl">Year: {year.year}</span>
+                                                            <span
+                                                                className={`transform transition-transform ${openYear === year.year ? 'rotate-180' : ''}`}
                                                             >
-                                                                <span className="text-lg">Month: {month.month}</span>
-                                                                <span
-                                                                    className={`transform transition-transform ${openMonth === month.month ? 'rotate-180' : ''}`}
-                                                                >
-                                                                    ▼
-                                                                </span>
-                                                            </div>
-
-                                                            {openMonth === month.month && (
-                                                                <table className="min-w-full mb-3 bg-white border border-gray-200 rounded-lg shadow-md mt-4">
-                                                                    <thead>
-                                                                        <tr className="bg-gray-50 text-gray-700">
-                                                                            <th className="px-6 py-1 text-left">Date</th>
-                                                                            <th className="px-6 py-1 text-left">Hours Worked</th>
-                                                                            <th className="px-6 py-1 text-left">Evening Hours</th>
-                                                                            <th className="px-6 py-1 text-left">Night Hours</th>
-                                                                            <th className="px-6 py-1 text-left">Overtime Hours</th>
-                                                                            <th className="px-6 py-1 text-left">Actions</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {month.days.map((day, dayindex) => (
-                                                                            <tr key={dayindex} className="hover:bg-gray-50">
-                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.date}</td>
-                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.hours_worked}</td>
-                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.evening_hours}</td>
-                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.night_hours}</td>
-                                                                                <td className="px-6 py-2 border-b border-gray-200">{day.overtime_hours}</td>
-                                                                                <td className="px-6 py-2 border-b">
-                                                                                    <button
-                                                                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                                                                        onClick={() => {
-                                                                                            setUpdatedData(day);
-                                                                                            setIsEditPopupVisibleRecords(true);
-                                                                                        }}
-                                                                                    >
-                                                                                        Edit
-                                                                                    </button>
-                                                                                    <button
-                                                                                        className="rounded-3xl bg-red-600 hover:bg-red-800 text-white font-bold py-1 px-2 transition-colors duration-200"
-                                                                                        onClick={() => deleteHoursRecord(selectedWorker._id, year.year, month.month, day.date)}
-                                                                                    >
-                                                                                        Delete
-                                                                                    </button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            )}
+                                                                ▼
+                                                            </span>
                                                         </div>
-                                                    ))
-                                                )}
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })}
-                        </div>
-                    </div>
+
+                                                        {openYear === year.year && (
+                                                            monthsWithData.map((month) => (
+                                                                <div key={`${year.year}-${month.month}`} className="">
+                                                                    <div
+                                                                        className="month-section m-6 p-4 cursor-pointer flex items-center justify-between bg-gray-100 hover:bg-gray-200"
+                                                                        onClick={() => toggleMonth(month.month)}
+                                                                    >
+                                                                        <span className="text-lg">Month: {month.month}</span>
+                                                                        <span
+                                                                            className={`transform transition-transform ${openMonth === month.month ? 'rotate-180' : ''}`}
+                                                                        >
+                                                                            ▼
+                                                                        </span>
+                                                                    </div>
+
+                                                                    {openMonth === month.month && (
+                                                                        <table className="min-w-full mb-3 bg-white border border-gray-200 rounded-lg shadow-md mt-4">
+                                                                            <thead>
+                                                                                <tr className="bg-gray-50 text-gray-700">
+                                                                                    <th className="px-6 py-1 text-left">Date</th>
+                                                                                    <th className="px-6 py-1 text-left">Hours Worked</th>
+                                                                                    <th className="px-6 py-1 text-left">Evening Hours</th>
+                                                                                    <th className="px-6 py-1 text-left">Night Hours</th>
+                                                                                    <th className="px-6 py-1 text-left">Overtime Hours</th>
+                                                                                    <th className="px-6 py-1 text-left">Actions</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {month.days.map((day, dayindex) => (
+                                                                                    <tr key={dayindex} className="hover:bg-gray-50">
+                                                                                        <td className="px-6 py-2 border-b border-gray-200">{day.date}</td>
+                                                                                        <td className="px-6 py-2 border-b border-gray-200">{day.hours_worked}</td>
+                                                                                        <td className="px-6 py-2 border-b border-gray-200">{day.evening_hours}</td>
+                                                                                        <td className="px-6 py-2 border-b border-gray-200">{day.night_hours}</td>
+                                                                                        <td className="px-6 py-2 border-b border-gray-200">{day.overtime_hours}</td>
+                                                                                        <td className="px-6 py-2 border-b">
+                                                                                            <button
+                                                                                                className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                                                                onClick={() => {
+                                                                                                    setUpdatedData(day);
+                                                                                                    setIsEditPopupVisibleRecords(true);
+                                                                                                }}
+                                                                                            >
+                                                                                                Edit
+                                                                                            </button>
+                                                                                            <button
+                                                                                                className="rounded-3xl bg-red-600 hover:bg-red-800 text-white font-bold py-1 px-2 transition-colors duration-200"
+                                                                                                onClick={() => deleteHoursRecord(selectedWorker._id, year.year, month.month, day.date)}
+                                                                                            >
+                                                                                                Delete
+                                                                                            </button>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    )}
+                                                                </div>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
 
@@ -999,7 +1065,7 @@ const Test = () => {
             )}
 
             {isDeletePopupVisible && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-[100]">
                     <div className="bg-white p-6 rounded shadow-md">
                         <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
                         <p className="mb-4">
