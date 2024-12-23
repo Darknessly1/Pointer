@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
 import { Button } from "@material-tailwind/react";
+import WorkerTable from '../components/WorkerTable';
 
 const Test = () => {
     const [inputs, setInputs] = useState({
@@ -37,8 +38,11 @@ const Test = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(10);
     const [open, setOpen] = useState(false);
-    const [alertType, setAlertType] = useState(""); // Track the type of alert
+    const [alertType, setAlertType] = useState(""); 
     const [isSectionVisible, setIsSectionVisible] = useState(true);
+    const [currentWorker, setCurrentWorker] = useState([]);
+    const [openWorkerId, setOpenWorkerId] = useState(null);
+
 
     useEffect(() => {
         // Set the message after a timeout of 3 seconds
@@ -320,7 +324,13 @@ const Test = () => {
 
             if (response.ok) {
                 clearMessageAfterDelay('Worker removed successfully!', 'delete');
-                // clearMessageAfterDelay();
+                // Remove worker from both main list and search results
+                setWorkers((prev) => prev.filter((worker) => worker._id !== selectedWorker._id));
+                setCurrentWorker((prev) => prev.filter((worker) => worker._id !== selectedWorker._id));
+                // If no search results remain, clear search results
+                if (currentWorker.length <= 1) {
+                    setCurrentWorker([]);
+                }
                 fetchWorkers();
             } else {
                 const error = await response.json();
@@ -401,6 +411,12 @@ const Test = () => {
                 const updatedWorker = await response.json();
 
                 setWorkers((prev) =>
+                    prev.map((worker) =>
+                        worker._id === selectedWorker._id ? updatedWorker : worker
+                    )
+                );
+
+                setCurrentWorker((prev) =>
                     prev.map((worker) =>
                         worker._id === selectedWorker._id ? updatedWorker : worker
                     )
@@ -510,6 +526,8 @@ const Test = () => {
             if (response.ok) {
                 const workerData = await response.json();
                 setSelectedWorker(workerData);
+                setOpenWorkerId(workerId);
+                setIsSectionVisible(false);
             } else {
                 const errorData = await response.json();
                 console.error("Error fetching worker data:", errorData.message);
@@ -533,6 +551,11 @@ const Test = () => {
     const currentWorkers = workers.slice(indexOfFirstRecord, indexOfLastRecord);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+
+    const handleSearchResult = (workers) => {
+        setCurrentWorker(workers);
+    };
 
     return (
         <div>
@@ -613,118 +636,125 @@ const Test = () => {
                     </div>
                 )}
             </div>
-            
-            <div >
-                <WorkerSearch workers={workers} />
-            </div>
 
-            <div className='relative flex flex-col w-full h-full text-gray-700'>
-                <div className='relative mx-4 mt-4 overflow-hidden text-gray-700  rounded-none bg-clip-border'>
+            <WorkerSearch onSearchResult={handleSearchResult} />
 
-
-                    <div className='p-6 px-0 overflow-auto '>
-                        <table className='w-full mt-4 text-left table-auto min-w-max border-2 border-black'>
-                            <thead className='border-b-2 border-black'>
-                                <tr>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
-                                            Number
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Full Name
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            department
-                                        </p>
-                                    </th>
-                                    <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                        <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                            Edit/Remove
-                                        </p>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Array.isArray(currentWorkers) && currentWorkers.map((worker) => (
-                                    <tr key={worker._id}
-                                        className='odd:bg-white even:bg-gray-200'
-                                    >
-                                        <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker._id}
+            {!currentWorker.length ? (
+                <div className='relative flex flex-col w-full h-full text-gray-700'>
+                    <div className='relative mx-4 mt-4 overflow-hidden text-gray-700  rounded-none bg-clip-border'>
+                        <div className='p-6 px-0 overflow-auto '>
+                            <table className='w-full mt-4 text-left table-auto min-w-max border-2 border-black'>
+                                <thead className='border-b-2 border-black'>
+                                    <tr>
+                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
+                                                Lic. Number
                                             </p>
-                                        </td>
-                                        <td
-                                            className="p-4 border-b border-blue-gray-50 cursor-pointer text-blue-600 hover:underline"
-                                            onClick={() => handleWorkerSelection(worker._id)}
-                                        >
-                                            {worker.workerName}
-                                        </td>
-                                        <td className='p-4 border-b border-blue-gray-50'>
-                                            <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                {worker.workerDetails}
+                                        </th>
+                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
+                                                Full Name
                                             </p>
-                                        </td>
-                                        <td className='border-b border-blue-gray-50'>
-                                            <button
-                                                className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                                onClick={() => {
-                                                    setSelectedWorker(worker);
-                                                    setUpdatedData(worker);
-                                                    setIsEditPopupVisible(true);
-                                                }}
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                </svg>
-                                            </button>
-                                            <button
-                                                className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                                onClick={() => {
-                                                    setSelectedWorker(worker);
-                                                    setIsDeletePopupVisible(true);
-                                                }}
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        </th>
+                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
+                                                department
+                                            </p>
+                                        </th>
+                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
+                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
+                                                Edit/Remove
+                                            </p>
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {/* should be created the pagination */}
-                    <div className="flex items-center justify-between p-4 border-b border-t border-blue-gray-50">
-                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                            Page {currentPage} of {Math.ceil(workers.length / recordsPerPage)}
-                        </p>
-                        <div className="flex gap-2">
-                            <button
-                                className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                type="button"
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                type="button"
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(workers.length / recordsPerPage)))}
-                            >
-                                Next
-                            </button>
+                                </thead>
+                                <tbody>
+                                    {Array.isArray(currentWorkers) && currentWorkers.map((worker) => (
+                                        <tr key={worker._id}
+                                            className='odd:bg-white even:bg-gray-200'
+                                        >
+                                            <td className='p-4 border-b border-blue-gray-50'>
+                                                <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                    {worker._id}
+                                                </p>
+                                            </td>
+                                            <td
+                                                className="p-4 border-b border-blue-gray-50 cursor-pointer text-blue-600 hover:underline"
+                                                onClick={() => handleWorkerSelection(worker._id)}
+                                            >
+                                                {worker.workerName}
+                                            </td>
+                                            <td className='p-4 border-b border-blue-gray-50'>
+                                                <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                                    {worker.workerDetails}
+                                                </p>
+                                            </td>
+                                            <td className='border-b border-blue-gray-50'>
+                                                <button
+                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
+                                                    onClick={() => {
+                                                        setSelectedWorker(worker);
+                                                        setUpdatedData(worker);
+                                                        setIsEditPopupVisible(true);
+                                                    }}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
+                                                    onClick={() => {
+                                                        setSelectedWorker(worker);
+                                                        setIsDeletePopupVisible(true);
+                                                    }}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
+
+                        <div className="flex items-center justify-between p-4 border-b border-t border-blue-gray-50">
+                            <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                Page {currentPage} of {Math.ceil(workers.length / recordsPerPage)}
+                            </p>
+                            <div className="flex gap-2">
+                                <button
+                                    className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                    type="button"
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    className="select-none rounded-lg border border-gray-900 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                    type="button"
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(workers.length / recordsPerPage)))}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-
                 </div>
-            </div>
+            ) : (
+                <WorkerTable
+                    workers={currentWorker}
+                    handleWorkerSelection={handleWorkerSelection}
+                    setSelectedWorker={setSelectedWorker}
+                    setUpdatedData={setUpdatedData}
+                    setIsEditPopupVisible={setIsEditPopupVisible}
+                    setIsDeletePopupVisible={setIsDeletePopupVisible}
+                />
 
+            )}
 
             {selectedWorker && (
                 <div>
@@ -734,12 +764,21 @@ const Test = () => {
                         Workers Records <span className='text-green-700 ml-2'> {selectedWorker.workerName}</span>
                     </h1>
 
-                    <div className='flex content-center justify-center'>
+                    <div className="flex content-center justify-center">
                         <button
-                            onClick={() => setIsSectionVisible((prev) => !prev)}
+                            onClick={() => {
+                                if (openWorkerId === selectedWorker._id) {
+                                    setIsSectionVisible((prev) => !prev);
+                                } else {
+                                    setOpenWorkerId(selectedWorker._id); 
+                                    setIsSectionVisible(true); 
+                                }
+                            }}
                             className="rounded-3xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2"
                         >
-                            {isSectionVisible ? "Close Section" : "Open Section"}
+                            {isSectionVisible && openWorkerId === selectedWorker._id
+                                ? "Close Section"
+                                : "Open Section"}
                         </button>
                     </div>
                     {isSectionVisible && (
@@ -837,7 +876,6 @@ const Test = () => {
 
                             <div className="flex justify-center items-center mt-10">
                                 <div className="w-full max-w-6xl rounded-lg shadow-lg overflow-hidden">
-
                                     {selectedWorker &&
                                         selectedWorker.years.map((year) => {
                                             const monthsWithData = year.months.filter((month) => month.days.length > 0);
