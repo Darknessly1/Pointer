@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
 import { Button } from "@material-tailwind/react";
 import WorkerTable from '../components/WorkerTable';
+import ProfessionOptions from '../components/ProfessionOptions';
+import MainTable from '../components/MainTable';
 
 const Test = () => {
     const [inputs, setInputs] = useState({
@@ -13,6 +15,11 @@ const Test = () => {
         date: '',
         workerName: '',
         workerDetails: '',
+        birthDate: '',
+        address: '',
+        idCard: '',
+        gender: '',
+        email: ''
     });
 
     const [workers, setWorkers] = useState([]);
@@ -38,7 +45,7 @@ const Test = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(10);
     const [open, setOpen] = useState(false);
-    const [alertType, setAlertType] = useState(""); 
+    const [alertType, setAlertType] = useState("");
     const [isSectionVisible, setIsSectionVisible] = useState(true);
     const [currentWorker, setCurrentWorker] = useState([]);
     const [openWorkerId, setOpenWorkerId] = useState(null);
@@ -170,14 +177,20 @@ const Test = () => {
     };
 
     const addWorkersBasicInformation = async () => {
-        const { workerName, workerDetails } = inputs;
+        const { workerName, workerDetails, birthDate, address, idCard, gender, email } = inputs;
 
-        if (!workerName || !workerDetails) {
+        if (!workerName || !workerDetails || !birthDate || !address || !idCard || !gender || !email) {
             clearMessageAfterDelay('Please provide both worker name and details.', 'error');
             return;
         }
 
-        const newRecord = { workerName, workerDetails };
+        const emailRegex = /^[^\s@]+@[^\s@]+\.(com|net|org|edu|gov|io|co|us|uk|ca|info|biz)$/;
+        if (!emailRegex.test(email)) {
+            clearMessageAfterDelay('Please provide a valid email address with a recognized domain.', 'error');
+            return;
+        }
+
+        const newRecord = { workerName, workerDetails, birthDate, address, idCard, gender, email };
 
         try {
             const response = await fetch('http://localhost:5000/api/workers/add-worker', {
@@ -312,6 +325,11 @@ const Test = () => {
         setInputs({
             workerName: '',
             workerDetails: '',
+            birthDate: '',
+            address: '',
+            idCard: '',
+            gender: '',
+            email: ''
         });
         setMessage1('');
     };
@@ -324,10 +342,8 @@ const Test = () => {
 
             if (response.ok) {
                 clearMessageAfterDelay('Worker removed successfully!', 'delete');
-                // Remove worker from both main list and search results
                 setWorkers((prev) => prev.filter((worker) => worker._id !== selectedWorker._id));
                 setCurrentWorker((prev) => prev.filter((worker) => worker._id !== selectedWorker._id));
-                // If no search results remain, clear search results
                 if (currentWorker.length <= 1) {
                     setCurrentWorker([]);
                 }
@@ -335,12 +351,10 @@ const Test = () => {
             } else {
                 const error = await response.json();
                 clearMessageAfterDelay(`Failed to remove worker: ${error.message || response.statusText}`, 'error');
-                // clearMessageAfterDelay();
             }
         } catch (error) {
             console.error('Error removing worker:', error);
             clearMessageAfterDelay('An error occurred while removing the worker.', 'error');
-            // clearMessageAfterDelay();
         }
     };
 
@@ -390,10 +404,16 @@ const Test = () => {
     };
 
     const handleSave = async () => {
-        const { workerName, workerDetails } = updatedData;
+        const { workerName, workerDetails, birthDate, address, idCard, gender, email } = updatedData;
 
-        if (!workerName || !workerDetails) {
-            clearMessageAfterDelay('Please provide both worker name and details.', 'error');
+        if (!workerName || !workerDetails || !birthDate || !address || !idCard || !gender || !email) {
+            clearMessageAfterDelay('Please provide all required fields.', 'error');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.(com|net|org|edu|gov|io|co|us|uk|ca|info|biz)$/;
+        if (!emailRegex.test(email)) {
+            clearMessageAfterDelay('Please provide a valid email address with a recognized domain.', 'error');
             return;
         }
 
@@ -403,7 +423,7 @@ const Test = () => {
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ workerName, workerDetails }),
+                    body: JSON.stringify({ workerName, workerDetails, birthDate, address, idCard, gender, email }),
                 }
             );
 
@@ -437,7 +457,6 @@ const Test = () => {
     const handleSaveRecords = async () => {
         const { checkIn1, checkOut1, checkIn2, checkOut2, date } = updatedData;
 
-        // Extract year and month from the date
         const [year, month, day] = date.split('-');
 
         const { overtimeStart, totalHours } = calculateRegularAndOvertimeHours([
@@ -461,7 +480,7 @@ const Test = () => {
         };
 
         if (!year || !month || !day) {
-            setMessage("Invalid data: Year, month, or date is missing.");
+            clearMessageAfterDelay("Invalid data: Year, month, or date is missing.");
             return;
         }
 
@@ -496,14 +515,14 @@ const Test = () => {
                     return { ...prevWorker, years: updatedYears };
                 });
 
-                setMessage('Record updated successfully!');
+                clearMessageAfterDelay('Record updated successfully!');
                 setIsEditPopupVisibleRecords(false);
             } else {
                 const error = await response.json();
-                setMessage(`Failed to update record: ${error.message || 'Unknown error'}`);
+                clearMessageAfterDelay(`Failed to update record: ${error.message || 'Unknown error'}`);
             }
         } catch (error) {
-            setMessage('An error occurred while saving. Please try again later.');
+            clearMessageAfterDelay('An error occurred while saving. Please try again later.');
         }
     };
 
@@ -575,19 +594,68 @@ const Test = () => {
                             />
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Worker Details:</label>
-                            <input
-                                type="text"
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Profession:</label>
+                            <select
                                 id="workerDetails"
                                 value={inputs.workerDetails}
+                                onChange={handleInputChange1}
+                                className="border-2 border-gray-500 px-2 py-1 rounded-2xl mb-2"
+                            >
+                                <ProfessionOptions />
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Birth Date:</label>
+                            <input
+                                type="date"
+                                id="birthDate"
+                                value={inputs.birthDate}
+                                onChange={handleInputChange1}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Address:</label>
+                            <input
+                                type="text"
+                                id="address"
+                                value={inputs.address}
+                                onChange={handleInputChange1}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Card ID:</label>
+                            <input
+                                type="text"
+                                id="idCard"
+                                value={inputs.idCard}
+                                onChange={handleInputChange1}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Gender:</label>
+                            <input
+                                type="text"
+                                id="gender"
+                                value={inputs.gender}
+                                onChange={handleInputChange1}
+                                className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor="workerDetails" className="mb-4 font-bold mt-2">Email:</label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={inputs.email}
                                 onChange={handleInputChange1}
                                 className="border-2 border-gray-500 px-2 rounded-2xl mb-2"
                             />
                         </div>
                     </div>
                 </div>
-
-
 
                 <div className="flex justify-center gap-4 mt-4">
 
@@ -605,6 +673,8 @@ const Test = () => {
                     </button>
                 </div>
 
+
+
                 {message1 && open && (
                     <div
                         className={`border-2 border-black fixed top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-xl w-fit shadow-lg z-[100] ${alertType === "success"
@@ -617,10 +687,6 @@ const Test = () => {
                                         ? "bg-gray-500"
                                         : ""
                             }`}
-                    // style={{
-                    //     marginTop: '100px'
-                    // }}
-
                     >
                         <div className="flex justify-between items-center text-white">
                             <p>{message1}</p>
@@ -642,84 +708,14 @@ const Test = () => {
             {!currentWorker.length ? (
                 <div className='relative flex flex-col w-full h-full text-gray-700'>
                     <div className='relative mx-4 mt-4 overflow-hidden text-gray-700  rounded-none bg-clip-border'>
-                        <div className='p-6 px-0 overflow-auto '>
-                            <table className='w-full mt-4 text-left table-auto min-w-max border-2 border-black'>
-                                <thead className='border-b-2 border-black'>
-                                    <tr>
-                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased leading-none text-blue-gray-900 opacity-70'>
-                                                Lic. Number
-                                            </p>
-                                        </th>
-                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                                Full Name
-                                            </p>
-                                        </th>
-                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                                department
-                                            </p>
-                                        </th>
-                                        <th className='p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50'>
-                                            <p className='font-bold flex items-center justify-between gap-2 font-sans text-sm antialiased` leading-none text-blue-gray-900 opacity-70'>
-                                                Edit/Remove
-                                            </p>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {Array.isArray(currentWorkers) && currentWorkers.map((worker) => (
-                                        <tr key={worker._id}
-                                            className='odd:bg-white even:bg-gray-200'
-                                        >
-                                            <td className='p-4 border-b border-blue-gray-50'>
-                                                <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                    {worker._id}
-                                                </p>
-                                            </td>
-                                            <td
-                                                className="p-4 border-b border-blue-gray-50 cursor-pointer text-blue-600 hover:underline"
-                                                onClick={() => handleWorkerSelection(worker._id)}
-                                            >
-                                                {worker.workerName}
-                                            </td>
-                                            <td className='p-4 border-b border-blue-gray-50'>
-                                                <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
-                                                    {worker.workerDetails}
-                                                </p>
-                                            </td>
-                                            <td className='border-b border-blue-gray-50'>
-                                                <button
-                                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                                    onClick={() => {
-                                                        setSelectedWorker(worker);
-                                                        setUpdatedData(worker);
-                                                        setIsEditPopupVisible(true);
-                                                    }}
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                                    onClick={() => {
-                                                        setSelectedWorker(worker);
-                                                        setIsDeletePopupVisible(true);
-                                                    }}
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
+                        <MainTable
+                            currentWorkers={currentWorkers}
+                            handleWorkerSelection={handleWorkerSelection}
+                            setSelectedWorker={setSelectedWorker}
+                            setUpdatedData={setSelectedWorker}
+                            setIsEditPopupVisible={setIsEditPopupVisible}
+                            setIsDeletePopupVisible={setIsDeletePopupVisible}
+                        />
                         <div className="flex items-center justify-between p-4 border-b border-t border-blue-gray-50">
                             <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
                                 Page {currentPage} of {Math.ceil(workers.length / recordsPerPage)}
@@ -770,8 +766,8 @@ const Test = () => {
                                 if (openWorkerId === selectedWorker._id) {
                                     setIsSectionVisible((prev) => !prev);
                                 } else {
-                                    setOpenWorkerId(selectedWorker._id); 
-                                    setIsSectionVisible(true); 
+                                    setOpenWorkerId(selectedWorker._id);
+                                    setIsSectionVisible(true);
                                 }
                             }}
                             className="rounded-3xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2"
@@ -968,7 +964,7 @@ const Test = () => {
 
             {isEditPopupVisible && (
                 <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                    <div className="bg-white/80 rounded-3xl shadow-lg p-6 w-full max-w-5xl border-2 border-black">
                         <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
                         <form
                             onSubmit={(e) => {
@@ -976,32 +972,102 @@ const Test = () => {
                                 handleSave();
                             }}
                         >
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Worker Name</label>
-                                <input
-                                    type="text"
-                                    value={updatedData.workerName}
-                                    onChange={(e) =>
-                                        setUpdatedData({ ...updatedData, workerName: e.target.value })
-                                    }
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                    placeholder="Worker Name"
-                                    required
-                                />
+                            {/* Inputs arranged in rows */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="mb-4">
+                                    <label className="font-bold block text-lg mb-1">Worker Name:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.workerName}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, workerName: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none "
+                                        placeholder="Worker Name"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Profession:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.workerDetails}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, workerDetails: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Department"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Birth Date:</label>
+                                    <input
+                                        type="date"
+                                        value={updatedData.birthDate}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, birthDate: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Birth Date"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Address:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.address}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, address: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Address"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Card ID:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.idCard}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, idCard: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Card ID"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Gender:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.gender}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, gender: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Gender"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Email:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.email}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, email: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Email"
+                                        required
+                                    />
+                                </div>
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Department</label>
-                                <input
-                                    type="text"
-                                    value={updatedData.workerDetails}
-                                    onChange={(e) =>
-                                        setUpdatedData({ ...updatedData, workerDetails: e.target.value })
-                                    }
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                    placeholder="Department"
-                                    required
-                                />
-                            </div>
+
+                            {/* Action buttons */}
                             <div className="flex justify-center">
                                 <button
                                     type="button"

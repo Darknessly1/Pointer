@@ -11,7 +11,7 @@ const WorkerTable = ({ workers, handleWorkerSelection, setSelectedWorker, setUpd
                     <table className="w-full mt-4 text-left table-auto min-w-max border-2 border-black">
                         <thead className="border-b-2 border-black">
                             <tr>
-                                {["Number", "Full Name", "Department", "Edit/Remove"].map((header) => (
+                                {["Number", "Full Name", "Profession", "Birth Date", "Address", "Card ID", "Gender", "Edit/Remove"].map((header) => (
                                     <th
                                         key={header}
                                         className="p-4 transition-colors cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 hover:bg-blue-gray-50"
@@ -40,6 +40,26 @@ const WorkerTable = ({ workers, handleWorkerSelection, setSelectedWorker, setUpd
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
                                             {worker.workerDetails}
+                                        </p>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                            {worker.birthDate}
+                                        </p>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                            {worker.address}
+                                        </p>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                            {worker.idCard}
+                                        </p>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <p className="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                            {worker.gender}
                                         </p>
                                     </td>
                                     <td className="border-b border-blue-gray-50">
