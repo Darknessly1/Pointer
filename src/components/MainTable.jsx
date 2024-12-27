@@ -37,7 +37,7 @@ const MainTable = ({
                                     {worker.workerName}
                                 </td>
                                 <td className="p-4 border-b border-blue-gray-50">
-                                    <p className='block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
+                                    <p className='border-1 border-black rounded-2xl bg-blue-gray-100 w-fit px-2 block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900'>
                                         {worker.workerDetails}
                                     </p>
                                 </td>
@@ -64,7 +64,8 @@ const MainTable = ({
                                 <td className="border-b border-blue-gray-50">
                                     <button
                                         className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2"
-                                        onClick={() => {
+                                        onClick={(event) => {
+                                            event.stopPropagation(); 
                                             setSelectedWorker(worker);
                                             setUpdatedData(worker);
                                             setIsEditPopupVisible(true);
@@ -74,7 +75,8 @@ const MainTable = ({
                                     </button>
                                     <button
                                         className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2"
-                                        onClick={() => {
+                                        onClick={(event) => {
+                                            event.stopPropagation();
                                             setSelectedWorker(worker);
                                             setIsDeletePopupVisible(true);
                                         }}
