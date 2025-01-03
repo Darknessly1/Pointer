@@ -14,7 +14,7 @@ export default function Login() {
             rememberMe: formData.rememberMe, 
         };
 
-        console.log("Logging in with:", credentials);
+        console.log("Logging in with:", { email: credentials.email, password: "****", rememberMe: credentials.rememberMe });
         try {
             const response = await login(credentials);
             console.log("Login successful:", response.data);
