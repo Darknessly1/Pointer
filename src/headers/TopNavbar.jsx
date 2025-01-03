@@ -188,7 +188,7 @@ export default function TopNavbar() {
                                                     <ListItemPrefix>
                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                                     </ListItemPrefix>
-                                                    Test
+                                                    List/Adding/Info of Employees
                                                 </ListItem>
                                             </Link>
                                             <Link to="/pages/reporting" className="flex items-center">
@@ -204,13 +204,15 @@ export default function TopNavbar() {
                                                     <ListItemPrefix>
                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                                     </ListItemPrefix>
-                                                    Projects
+                                                    Current Projects
                                                 </ListItem>
                                             </Link>
                                         </List>
                                     </AccordionBody>
                                 </Accordion>
 
+
+                                {/* This part Should be visible to both the employee and the Admin/Manager  */}
                                 <Accordion
                                     open={open === 2}
                                     icon={
@@ -230,7 +232,7 @@ export default function TopNavbar() {
                                                 <ShoppingBagIcon className="h-5 w-5" />
                                             </ListItemPrefix>
                                             <Typography color="blue-gray" className="mr-auto font-normal">
-                                                Employee Schedules
+                                                Employee Space
                                             </Typography>
                                         </AccordionHeader>
                                     </ListItem>
@@ -241,7 +243,7 @@ export default function TopNavbar() {
                                                     <ListItemPrefix>
                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                                     </ListItemPrefix>
-                                                    Schedules Table
+                                                    Schedule
                                                 </ListItem>
                                             </Link>
                                             <Link to="/allemp">
@@ -249,7 +251,7 @@ export default function TopNavbar() {
                                                     <ListItemPrefix>
                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                                     </ListItemPrefix>
-                                                    List Of All Employee
+                                                    Teams Discussion
                                                 </ListItem>
                                             </Link>
                                         </List>

@@ -1,7 +1,7 @@
 function Allemp() {
     return (
         <div>
-            <h1>All Employee Page</h1>
+            <h1></h1>
         </div>
     );
 }
