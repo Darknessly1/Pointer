@@ -15,11 +15,6 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: 'http://localhost:5173' }));     
 
-// Connect to MongoDB
-// mongoose
-//     .connect('mongodb://localhost:27017/workersTest')
-//     .then(() => console.log('MongoDB Connected'))
-//     .catch((err) => console.error(err));
 
 // Routes
 app.use('/api/workers', workerRoutes);
