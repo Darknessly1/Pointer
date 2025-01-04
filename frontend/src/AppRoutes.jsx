@@ -9,8 +9,8 @@ import Projects from "./pages/Dashboard/Projects";
 import Allemp from "./pages/EmpliyeeShcudles/Allemp";
 import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/SignUp";
 
 const AppRoutes = () => (
     <Routes>
