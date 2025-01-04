@@ -56,6 +56,7 @@ const Test = () => {
     const [currentWorker, setCurrentWorker] = useState([]);
     const [openWorkerId, setOpenWorkerId] = useState(null);
     const [isSectionOpen, setIsSectionOpen] = useState(false);
+    const [isWorkerInfoInputOpen, setIsWorkerInfoInputOpen] = useState(false);
 
 
     useEffect(() => {
@@ -589,126 +590,6 @@ const Test = () => {
             <h1 className='text-3xl font-bold text-center'>Overtime Calculator</h1>
 
             <div className="m-3 flex flex-col">
-                <div className="m-3 flex flex-col items-center">
-                    <div className="bg-white/70 border-2 border-black shadow-xl p-6 rounded-2xl w-full max-w-4xl">
-                        <Card color="transparent" shadow={false}>
-                            <Typography variant="h4" color="blue-gray" className="text-center mb-4">
-                                Worker Information
-                            </Typography>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Worker Full Name
-                                    </Typography>
-                                    <Input
-                                        type="text"
-                                        id="workerName"
-                                        value={inputs.workerName}
-                                        onChange={handleInputChange1}
-                                        placeholder="Full Name"
-                                        size="lg"
-                                    />
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Profession
-                                    </Typography>
-                                    <select
-                                        id="workerDetails"
-                                        value={inputs.workerDetails}
-                                        onChange={handleInputChange1}
-                                        className="border-2 border-gray-500 px-2 py-2 rounded-2xl w-full"
-                                    >
-                                        <ProfessionOptions />
-                                    </select>
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Birth Date
-                                    </Typography>
-                                    <Input
-                                        type="date"
-                                        id="birthDate"
-                                        value={inputs.birthDate}
-                                        onChange={handleInputChange1}
-                                        size="lg"
-                                    />
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Full Address
-                                    </Typography>
-                                    <Input
-                                        type="text"
-                                        id="address"
-                                        value={inputs.address}
-                                        onChange={handleInputChange1}
-                                        placeholder="Address"
-                                        size="lg"
-                                    />
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Card ID
-                                    </Typography>
-                                    <Input
-                                        type="text"
-                                        id="idCard"
-                                        value={inputs.idCard}
-                                        onChange={handleInputChange1}
-                                        placeholder="Card ID"
-                                        size="lg"
-                                    />
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Gender
-                                    </Typography>
-                                    <select
-                                        id="gender"
-                                        value={inputs.gender}
-                                        onChange={handleInputChange1}
-                                        className="border-2 border-gray-500 px-2 py-2 rounded-2xl w-full"
-                                    >
-                                        <option value="" disabled>
-                                            Select a Gender
-                                        </option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <Typography variant="h6" color="blue-gray">
-                                        Email
-                                    </Typography>
-                                    <Input
-                                        type="email"
-                                        id="email"
-                                        value={inputs.email}
-                                        onChange={handleInputChange1}
-                                        placeholder="Email"
-                                        size="lg"
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex justify-center gap-4 mt-6">
-                                <Button onClick={addWorkersBasicInformation} className="w-full sm:w-auto">
-                                    Add Information to Table
-                                </Button>
-                                <Button
-                                    onClick={handleReset1}
-                                    color="gray"
-                                    className="w-full sm:w-auto"
-                                >
-                                    Restart
-                                </Button>
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-
-
-
                 {message1 && open && (
                     <div
                         className={`border-2 border-black fixed top-4 left-1/2 transform -translate-x-1/2 p-2 rounded-xl w-fit shadow-lg z-[100] ${alertType === "success"
@@ -738,7 +619,26 @@ const Test = () => {
             </div>
 
             <div className='flex content-center justify-center'>
-                <WorkerSearch onSearchResult={handleSearchResult} />
+                <div>
+                    <WorkerSearch onSearchResult={handleSearchResult} />
+                </div>
+                <div
+                    className='flex content-center justify-center py-8'
+                    style={{
+                        marginLeft: "200px"
+
+                    }}>
+                    <button
+                        onClick={() => setIsWorkerInfoInputOpen(true)}
+                        className='text-lg border-2 border-gray-600 rounded-3xl px-2 py-1 mr-0 hover:border-black '
+                    >
+                        Add Worker Information
+                    </button>
+                </div>
+            </div>
+
+            <div>
+
             </div>
 
             {!currentWorker.length ? (
@@ -790,7 +690,6 @@ const Test = () => {
 
             {isSectionOpen && selectedWorker && (
                 <div>
-
                     <div className='flex justify-center content-center m-6'>
                         <button
                             onClick={() => setIsSectionOpen(false)}
@@ -1032,251 +931,373 @@ const Test = () => {
                     )
                     }
                 </div >
-            )
-            }
+            )}
 
-
-            {
-                isEditPopupVisible && updatedData && (
-                    <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white/80 rounded-3xl shadow-lg p-6 w-full max-w-5xl border-2 border-black">
-                            <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSave();
-                                }}
-                            >
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="mb-4">
-                                        <label className="font-bold block text-lg mb-1">Worker Name:</label>
-                                        <input
-                                            type="text"
-                                            value={updatedData.workerName}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, workerName: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none "
-                                            placeholder="Worker Name"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Profession:</label>
-                                        <select
-                                            type="text"
-                                            value={updatedData.workerDetails}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, workerDetails: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Department"
-                                            required
-                                        >
-                                            <ProfessionOptions />
-                                        </select>
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Birth Date:</label>
-                                        <input
-                                            type="date"
-                                            value={updatedData.birthDate}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, birthDate: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Birth Date"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Address:</label>
-                                        <input
-                                            type="text"
-                                            value={updatedData.address}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, address: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Address"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Card ID:</label>
-                                        <input
-                                            type="text"
-                                            value={updatedData.idCard}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, idCard: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Card ID"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Gender:</label>
-                                        <input
-                                            type="text"
-                                            value={updatedData.gender}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, gender: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Gender"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-lg font-bold mb-1">Email:</label>
-                                        <input
-                                            type="text"
-                                            value={updatedData.email}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, email: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
-                                            placeholder="Email"
-                                            required
-                                        />
-                                    </div>
+            {isEditPopupVisible && updatedData && (
+                <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white/80 rounded-3xl shadow-lg p-6 w-full max-w-5xl border-2 border-black">
+                        <h2 className="text-xl font-bold mb-4">Edit Worker</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSave();
+                            }}
+                        >
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="mb-4">
+                                    <label className="font-bold block text-lg mb-1">Worker Name:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.workerName}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, workerName: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none "
+                                        placeholder="Worker Name"
+                                        required
+                                    />
                                 </div>
-
-                                {/* Action buttons */}
-                                <div className="flex justify-center">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsEditPopupVisible(false)}
-                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Profession:</label>
+                                    <select
+                                        type="text"
+                                        value={updatedData.workerDetails}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, workerDetails: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Department"
+                                        required
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="mr-2 rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
-                                    >
-                                        Save
-                                    </button>
+                                        <ProfessionOptions />
+                                    </select>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                )
-            }
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Birth Date:</label>
+                                    <input
+                                        type="date"
+                                        value={updatedData.birthDate}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, birthDate: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Birth Date"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Address:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.address}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, address: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Address"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Card ID:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.idCard}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, idCard: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Card ID"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Gender:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.gender}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, gender: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Gender"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-lg font-bold mb-1">Email:</label>
+                                    <input
+                                        type="text"
+                                        value={updatedData.email}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, email: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-black rounded-lg focus:outline-none"
+                                        placeholder="Email"
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-            {
-                isEditPopupVisibleRecords && (
-                    <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-                            <h2 className="text-xl font-bold mb-4">Edit Worker Record</h2>
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSaveRecords();
-                                }}
-                            >
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Check-in 1</label>
-                                        <input
-                                            type="time"
-                                            value={updatedData.checkIn1 || ""}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, checkIn1: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Check-out 1</label>
-                                        <input
-                                            type="time"
-                                            value={updatedData.checkOut1 || ""}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, checkOut1: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Check-in 2</label>
-                                        <input
-                                            type="time"
-                                            value={updatedData.checkIn2 || ""}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, checkIn2: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Check-out 2</label>
-                                        <input
-                                            type="time"
-                                            value={updatedData.checkOut2 || ""}
-                                            onChange={(e) =>
-                                                setUpdatedData({ ...updatedData, checkOut2: e.target.value })
-                                            }
-                                            className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex justify-center">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsEditPopupVisibleRecords(false)}
-                                        className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )
-            }
-
-            {
-                isDeletePopupVisible && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-[100]">
-                        <div className="bg-white p-6 rounded shadow-md">
-                            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-                            <p className="mb-4">
-                                Are you sure you want to delete the worker: <strong>{selectedWorker.workerName}</strong>?
-                            </p>
-                            <div className="flex justify-end">
+                            {/* Action buttons */}
+                            <div className="flex justify-center">
                                 <button
-                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
-                                    onClick={() => setIsDeletePopupVisible(false)}
+                                    type="button"
+                                    onClick={() => setIsEditPopupVisible(false)}
+                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm"
-                                    onClick={() => {
-                                        removeWorker(selectedWorker._id);
-                                        setIsDeletePopupVisible(false);
-                                    }}
+                                    type="submit"
+                                    className="mr-2 rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
                                 >
-                                    Delete
+                                    Save
                                 </button>
                             </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isEditPopupVisibleRecords && (
+                <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                        <h2 className="text-xl font-bold mb-4">Edit Worker Record</h2>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSaveRecords();
+                            }}
+                        >
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-in 1</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkIn1 || ""}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkIn1: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-out 1</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkOut1 || ""}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkOut1: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-in 2</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkIn2 || ""}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkIn2: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Check-out 2</label>
+                                    <input
+                                        type="time"
+                                        value={updatedData.checkOut2 || ""}
+                                        onChange={(e) =>
+                                            setUpdatedData({ ...updatedData, checkOut2: e.target.value })
+                                        }
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditPopupVisibleRecords(false)}
+                                    className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 text-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="rounded-3xl bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 text-sm"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isDeletePopupVisible && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-[100]">
+                    <div className="bg-white p-6 rounded shadow-md">
+                        <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+                        <p className="mb-4">
+                            Are you sure you want to delete the worker: <strong>{selectedWorker.workerName}</strong>?
+                        </p>
+                        <div className="flex justify-end">
+                            <button
+                                className="mr-2 rounded-3xl bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 text-sm"
+                                onClick={() => setIsDeletePopupVisible(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="rounded-3xl bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm"
+                                onClick={() => {
+                                    removeWorker(selectedWorker._id);
+                                    setIsDeletePopupVisible(false);
+                                }}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            )}
 
+            {isWorkerInfoInputOpen && (
+                <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white/80 rounded-3xl shadow-lg p-6 w-full max-w-5xl border-2 border-black">
+                        <Card color="transparent" shadow={false}>
+                            <Typography variant="h4" color="blue-gray" className="text-center mb-4">
+                                Worker Information
+                            </Typography>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Worker Full Name
+                                    </Typography>
+                                    <Input
+                                        type="text"
+                                        id="workerName"
+                                        value={inputs.workerName}
+                                        onChange={handleInputChange1}
+                                        placeholder="Full Name"
+                                        size="lg"
+                                    />
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Profession
+                                    </Typography>
+                                    <select
+                                        id="workerDetails"
+                                        value={inputs.workerDetails}
+                                        onChange={handleInputChange1}
+                                        className="border-2 border-gray-500 px-2 py-2 rounded-2xl w-full"
+                                    >
+                                        <ProfessionOptions />
+                                    </select>
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Birth Date
+                                    </Typography>
+                                    <Input
+                                        type="date"
+                                        id="birthDate"
+                                        value={inputs.birthDate}
+                                        onChange={handleInputChange1}
+                                        size="lg"
+                                    />
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Full Address
+                                    </Typography>
+                                    <Input
+                                        type="text"
+                                        id="address"
+                                        value={inputs.address}
+                                        onChange={handleInputChange1}
+                                        placeholder="Address"
+                                        size="lg"
+                                    />
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Card ID
+                                    </Typography>
+                                    <Input
+                                        type="text"
+                                        id="idCard"
+                                        value={inputs.idCard}
+                                        onChange={handleInputChange1}
+                                        placeholder="Card ID"
+                                        size="lg"
+                                    />
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Gender
+                                    </Typography>
+                                    <select
+                                        id="gender"
+                                        value={inputs.gender}
+                                        onChange={handleInputChange1}
+                                        className="border-2 border-gray-500 px-2 py-2 rounded-2xl w-full"
+                                    >
+                                        <option value="" disabled>
+                                            Select a Gender
+                                        </option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <Typography variant="h6" color="blue-gray">
+                                        Email
+                                    </Typography>
+                                    <Input
+                                        type="email"
+                                        id="email"
+                                        value={inputs.email}
+                                        onChange={handleInputChange1}
+                                        placeholder="Email"
+                                        size="lg"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-center gap-4 mt-6">
+                                <Button onClick={() => {
+                                    addWorkersBasicInformation()
+                                    setIsWorkerInfoInputOpen(false)
+                                }}
+                                    className="w-full sm:w-auto">
+                                    Add Information to Table
+                                </Button>
+                                <Button
+                                    onClick={handleReset1}
+                                    color="gray"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Restart
+                                </Button>
+                                <Button
+                                    onClick={() => setIsWorkerInfoInputOpen(false)}
+                                    color="gray"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Close
+                                </Button>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

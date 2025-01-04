@@ -7,8 +7,6 @@ import {
 import { BellIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 
-import React from "react";
-
 import {
     List,
     ListItem,
@@ -37,12 +35,16 @@ import {
 
 import { useAuthContext } from "../context/AuthContext";
 
+import { useEffect, useRef, useState } from "react";
+
 export default function TopNavbar() {
 
-    const [open, setOpen] = React.useState(0);
-    const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+    const [open, setOpen] = useState(0);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const closeDrawer = () => setIsDrawerOpen(false);
     const { authUser, logout } = useAuthContext();
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
 
     const handleOpen = (value) => {
@@ -53,7 +55,7 @@ export default function TopNavbar() {
         setIsDrawerOpen(!isDrawerOpen);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (isDrawerOpen) {
             setTimeout(() => {
                 const backdrop = document.querySelector(".absolute.inset-0");
@@ -64,6 +66,19 @@ export default function TopNavbar() {
             }, 50);
         }
     }, [isDrawerOpen]);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+        };
+    }, []);
 
 
     return (
@@ -87,30 +102,46 @@ export default function TopNavbar() {
                             )}
                         </div>
                         <div className="flex items-center justify-center gap-y-4 text-white" style={{ marginRight: '320px' }}>
-                            <Typography as="a" href="#" variant="h6" className="mr-4 ml-2 cursor-pointer py-1.5 text-3xl" style={{ marginRight: '100px' }}>
+                            <Typography
+                                className="mr-4 ml-2 cursor-pointer py-1.5 text-3xl font-bold whitespace-nowrap"
+                            >
                                 <Link to="/">ShiftTrack</Link>
+                            </Typography>
+
+                            <Typography
+                                className="mr-4 ml-2 cursor-pointer py-1.5 text-xl font-bold whitespace-nowrap"
+                            >
+                                <Link to="/guide">Guide</Link>
+                            </Typography>
+
+                            <Typography
+                                className="mr-4 ml-2 cursor-pointer py-1.5 text-xl font-bold whitespace-nowrap"
+                            >
+                                <Link to="/contactus">Contact Us</Link>
+                            </Typography>
+
+                            <Typography
+                                className="mr-4 ml-2 cursor-pointer py-1.5 text-xl font-bold whitespace-nowrap"
+                                style={{ marginRight: '100px' }}
+                            >
+                                <Link to="/aboutus">About Us</Link>
                             </Typography>
 
                             {authUser && (
                                 <div className="ml-auto flex gap-1 md:mr-4">
-                                    <Link to="/settings">
-                                        <IconButton variant="text" color="white">
-                                            <Cog6ToothIcon className="h-4 w-4" />
-                                        </IconButton>
-                                    </Link>
                                     <IconButton variant="text" color="white">
                                         <BellIcon className="h-4 w-4" />
                                     </IconButton>
                                 </div>
                             )}
 
-                            <div className="flex">
+                            <div className="flex items-center">
                                 {!authUser ? (
                                     <>
                                         <button>
                                             <Link
                                                 to="/login"
-                                                className="bg-gradient-to-r from-blue-gray-900 to-blue-gray-800 hover:from-blue-gray-600 hover:to-blue-gray-900/30 rounded-2xl px-4 py-2 text-white m-6 font-bold"
+                                                className="bg-gradient-to-r from-blue-gray-900 to-blue-gray-800 hover:from-blue-gray-600 hover:to-blue-gray-900/30 rounded-2xl px-4 py-1 text-white m-6 font-bold"
                                             >
                                                 Login
                                             </Link>
@@ -118,25 +149,57 @@ export default function TopNavbar() {
                                         <button>
                                             <Link
                                                 to="/register"
-                                                className="bg-gradient-to-r from-blue-gray-900 to-blue-gray-800 hover:from-blue-gray-600 hover:to-blue-gray-900/30 rounded-2xl px-4 py-2 text-white font-bold"
+                                                className="bg-gradient-to-r from-blue-gray-900 to-blue-gray-800 hover:from-blue-gray-600 hover:to-blue-gray-900/30 rounded-2xl px-4 py-1 text-white font-bold"
                                             >
                                                 Register
                                             </Link>
                                         </button>
                                     </>
                                 ) : (
-                                    <button
-                                        onClick={logout}
-                                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-700 hover:to-red-800 rounded-2xl px-4 py-2 text-white font-bold"
-                                    >
-                                        Logout
-                                    </button>
+                                    <div className="relative inline-block text-left" ref={dropdownRef}>
+                                        <p
+                                            className="text-xl font-bold m-1 ml-7 mr-7 rounded-xl bg-blue-gray-500 px-5 cursor-pointer"
+                                            onClick={() => setDropdownOpen((prev) => !prev)}
+                                        >
+                                            {authUser.fullName}
+                                        </p>
+                                        {dropdownOpen && (
+                                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
+                                                <ul className="py-1 text-gray-700">
+                                                    <li>
+                                                        <Link
+                                                            to="/profile"
+                                                            className="block px-4 py-2 hover:bg-gray-100"
+                                                        >
+                                                            Profile
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link
+                                                            to="/settings"
+                                                            className="block px-4 py-2 hover:bg-gray-100"
+                                                        >
+                                                            Settings
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <button
+                                                            onClick={logout}
+                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                                        >
+                                                            Logout
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
                 </Navbar>
-            </div>
+            </div >
             {authUser && (
                 <div>
                     {isDrawerOpen && (
@@ -306,7 +369,8 @@ export default function TopNavbar() {
                         </div>
                     )}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
