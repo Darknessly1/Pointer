@@ -11,6 +11,9 @@ import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/SignUp";
+import { Aboutus } from "./pages/Aboutus";
+import Contactus from "./pages/Contactus";
+
 
 const AppRoutes = () => (
     <Routes>
@@ -26,6 +29,8 @@ const AppRoutes = () => (
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/aboutus" element={<Aboutus />} />
+        <Route path="/contactus" element={<Contactus />} />
     </Routes>
 );
 

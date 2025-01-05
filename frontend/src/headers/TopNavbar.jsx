@@ -23,7 +23,6 @@ import {
     ShoppingBagIcon,
     UserCircleIcon,
     InboxIcon,
-    PowerIcon,
 } from "@heroicons/react/24/solid";
 
 import {
@@ -352,15 +351,6 @@ export default function TopNavbar() {
                                                     <Cog6ToothIcon className="h-5 w-5" />
                                                 </ListItemPrefix>
                                                 Settings
-                                            </ListItem>
-                                        </Link>
-
-                                        <Link to="/logout">
-                                            <ListItem>
-                                                <ListItemPrefix>
-                                                    <PowerIcon className="h-5 w-5" />
-                                                </ListItemPrefix>
-                                                Log Out
                                             </ListItem>
                                         </Link>
                                     </List>

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import WorkerSearch from '../components/WorkerSearch';
 import WorkerTable from '../components/WorkerTable';
 import ProfessionOptions from '../components/ProfessionOptions';
@@ -32,7 +32,6 @@ const Test = () => {
     const [message, setMessage] = useState('');
     const [message1, setMessage1] = useState('');
     const [result, setResult] = useState('');
-
     const [isEditPopupVisible, setIsEditPopupVisible] = useState(false);
     const [isEditPopupVisibleRecords, setIsEditPopupVisibleRecords] = useState(false);
     const [isDeletePopupVisible, setIsDeletePopupVisible] = useState(false);
@@ -573,13 +572,11 @@ const Test = () => {
         setOpenMonth(openMonth === month ? null : month);
     };
 
-
     const indexOfLastRecord = currentPage * recordsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
     const currentWorkers = workers.slice(indexOfFirstRecord, indexOfLastRecord);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
 
     const handleSearchResult = (workers) => {
         setCurrentWorker(workers);
@@ -622,6 +619,9 @@ const Test = () => {
                 <div>
                     <WorkerSearch onSearchResult={handleSearchResult} />
                 </div>
+                <div className='border-r-4 border-black'
+                    style={{marginLeft: "200px"}}
+                ></div>
                 <div
                     className='flex content-center justify-center py-8'
                     style={{
@@ -630,7 +630,7 @@ const Test = () => {
                     }}>
                     <button
                         onClick={() => setIsWorkerInfoInputOpen(true)}
-                        className='text-lg border-2 border-gray-600 rounded-3xl px-2 py-1 mr-0 hover:border-black '
+                        className='text-lg border-2 border-gray-600 rounded-3xl px-2 py-1 mr-0 hover:border-black font-bold '
                     >
                         Add Worker Information
                     </button>
