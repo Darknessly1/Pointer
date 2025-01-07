@@ -182,7 +182,7 @@ const Test = () => {
             setMessage('');
         }, delay);
     };
-
+ 
     const addWorkersBasicInformation = async () => {
         const { workerName, workerDetails, birthDate, address, idCard, gender, email } = inputs;
 
@@ -619,9 +619,7 @@ const Test = () => {
                 <div>
                     <WorkerSearch onSearchResult={handleSearchResult} />
                 </div>
-                <div className='border-r-4 border-black'
-                    style={{marginLeft: "200px"}}
-                ></div>
+                <div className='border-r-4 border-black' style={{marginLeft: "200px"}} ></div>
                 <div
                     className='flex content-center justify-center py-8'
                     style={{

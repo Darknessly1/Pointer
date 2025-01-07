@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 
 import workerRoutes from './routes/workerTest.js';
 import authRouter from './routes/auth.router.js';
+import scheduleRouter from './routes/schedule.router.js';
+
 import cors from 'cors';
 import  connectToMongoDB  from './db/connectToMongoDB.js';
 
@@ -20,6 +22,7 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/workers', workerRoutes);
+app.use('/api/schedule', scheduleRouter);
 
 
 // console.log("MongoDB URL:", process.env.MONGO_DB_URL); 

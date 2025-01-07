@@ -11,7 +11,6 @@ router.get('/worker/:id', fetchingWorker);
 // Fetch all workers
 router.get('/all-workers', fetchingWorkers);
 
-
 /* Adding Workers */
 
 router.post('/add-worker', addingWorker);
