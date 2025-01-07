@@ -25,10 +25,13 @@ export const addSchedule = async (req, res) => {
 
 export const updateSchedule = async (req, res) => {
     const { title, dateStart, dateEnd } = req.body;
+    if (typeof title !== 'string' || typeof dateStart !== 'string' || typeof dateEnd !== 'string') {
+        return res.status(400).json({ message: "Invalid input data" });
+    }
     try {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
-            { title, dateStart, dateEnd },
+            { $set: { title, dateStart, dateEnd } },
             { new: true }
         );
         res.status(200).json(updatedTask);
