@@ -13,7 +13,7 @@ router.get("/showSchedule", showSchedule);
 
 router.post("/addSchedule", addSchedule);
 
-router.put("/updateSchedule/:id", updateSchedule);
+router.put("/updateSchedule/:id", limiter, updateSchedule);
 
 router.delete("/deleteSchedule/:id", limiter, deleteSchedule);
 
