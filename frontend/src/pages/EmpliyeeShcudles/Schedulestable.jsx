@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import Calendar from './Calendar';
 
 const Schedulestable = () => {
+
     const [tasks, setTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState(null);
     const [inputs, setInputs] = useState({
         title: '',
-        date: ''
+        dateStart: '',
+        dateEnd: ''
     });
 
     const handleInputChange = (e) => {
@@ -15,12 +17,12 @@ const Schedulestable = () => {
     };
 
     const addTask = async () => {
-        const { title, date } = inputs;
-        if (!title || !date) {
+        const { title, dateStart, dateEnd } = inputs;
+        if (!title || !dateStart || !dateEnd) {
             alert("Title and Date are required");
             return;
         }
-        const newTask = { title, date };
+        const newTask = { title, dateStart, dateEnd };
         try {
             const res = await fetch("http://localhost:5000/api/schedule/addSchedule", {
                 method: 'POST',
@@ -30,6 +32,7 @@ const Schedulestable = () => {
 
             if (res.ok) {
                 console.log("Task added successfully");
+                setInputs({ title: '', dateStart: '', dateEnd: '' });
                 fetchTasks();
             } else {
                 const error = await res.json();
@@ -41,26 +44,29 @@ const Schedulestable = () => {
     };
 
     const updateTask = async () => {
-        const { id, title, date } = selectedTask;
         try {
+            const { id, title, dateStart, dateEnd } = selectedTask;
+            
+            console.log("Updating Task:", { id, title, dateStart, dateEnd });
+    
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, date }),
+                body: JSON.stringify({ title, dateStart, dateEnd }),
             });
-
+    
             if (res.ok) {
-                console.log("Task updated successfully");
+                console.log("Task updated successfully:", await res.json());
                 await fetchTasks();
                 setSelectedTask(null);
             } else {
-                const error = await res.json();
-                console.error(error);
+                console.error("Error updating task:", await res.json());
             }
         } catch (error) {
             console.error('Error updating task:', error);
         }
     };
+    
 
     const removeTask = async (taskId) => {
         console.log("Deleting task with ID:", taskId);
@@ -89,7 +95,8 @@ const Schedulestable = () => {
             setTasks(data.map((task) => ({
                 id: task._id,
                 title: task.title,
-                date: new Date(task.date).toISOString().split('T')[0], // Format the date
+                start: task.dateStart,
+                end: task.dateEnd
             })));
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -100,27 +107,47 @@ const Schedulestable = () => {
         fetchTasks();
     }, []);
 
-    const handleEventClick = (event) => {
-        const { id, title, date } = event;
-        const formattedDate = date ? date.split('T')[0] : ''; 
+    const handleEventClick = (clickInfo) => {
+        const { id, title, start, end } = clickInfo;
         setSelectedTask({
             id,
             title,
-            date: formattedDate
+            dateStart: start,
+            dateEnd: end,
         });
     };
 
+    const handleEventDrop = async ({ id, title, newDateStart, newDateEnd }) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, dateStart: newDateStart, dateEnd: newDateEnd }),
+            });
+
+            if (res.ok) {
+                console.log(`Task ${id} successfully updated to ${newDateStart}`);
+                await fetchTasks();
+            } else {
+                const error = await res.json();
+                console.error("Error updating task:", error);
+            }
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
 
     const handleModalClose = () => {
         setSelectedTask(null);
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
             <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Dynamic Schedule System</h1>
             <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-semibold mb-2">Event Name</label>
+                    <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
                     <input
                         id="title"
                         type="text"
@@ -131,11 +158,21 @@ const Schedulestable = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-semibold mb-2">Event Date</label>
+                    <label className="block text-gray-700 font-semibold mb-2">Task Start </label>
                     <input
-                        id="date"
+                        id="dateStart"
                         type="date"
-                        value={inputs.date}
+                        value={inputs.dateStart}
+                        onChange={handleInputChange}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-semibold mb-2">Task End </label>
+                    <input
+                        id="dateEnd"
+                        type="date"
+                        value={inputs.dateEnd}
                         onChange={handleInputChange}
                         className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -144,11 +181,16 @@ const Schedulestable = () => {
                     onClick={addTask}
                     className="w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 transition"
                 >
-                    Add Event
+                    Add Task
                 </button>
             </div>
+
             <div className="mt-8 w-full max-w-4xl">
-                <Calendar events={tasks} onEventClick={handleEventClick} />
+                <Calendar
+                    events={tasks}
+                    onEventClick={(info) => handleEventClick(info)}
+                    onEventDrop={handleEventDrop}
+                />
             </div>
 
             {selectedTask && (
@@ -156,7 +198,7 @@ const Schedulestable = () => {
                     <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">Edit Task</h2>
                         <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Event Name</label>
+                            <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
                             <input
                                 type="text"
                                 value={selectedTask.title}
@@ -165,11 +207,20 @@ const Schedulestable = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Event Date</label>
+                            <label className="block text-gray-700 font-semibold mb-2">Task Start</label>
                             <input
                                 type="date"
-                                value={selectedTask.date}
-                                onChange={(e) => setSelectedTask({ ...selectedTask, date: e.target.value })}
+                                value={selectedTask.dateStart}
+                                onChange={(e) => setSelectedTask({ ...selectedTask, dateStart: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-semibold mb-2">Task End</label>
+                            <input
+                                type="date"
+                                value={selectedTask.dateEnd}
+                                onChange={(e) => setSelectedTask({ ...selectedTask, dateEnd: e.target.value })}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>

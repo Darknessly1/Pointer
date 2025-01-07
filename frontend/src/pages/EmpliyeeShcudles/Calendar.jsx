@@ -3,10 +3,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-const Calendar = ({ events, onEventClick }) => {
+const Calendar = ({ events, onEventClick, onEventDrop }) => {
     const handleEventClick = (clickInfo) => {
-        const { id, title, start } = clickInfo.event;
-        onEventClick({ id, title, start: start.toISOString().slice(0, 10) });
+        const { id, title, start, end} = clickInfo.event;
+        onEventClick({ id, title, start: start.toLocaleDateString('en-CA'), end: end.toLocaleDateString('en-CA') });
+    };
+
+    const handleEventDrop = (eventDropInfo) => {
+        const { id, title, start, end } = eventDropInfo.event;
+        onEventDrop({ id, title, newDateStart: start.toLocaleDateString('en-CA'),  newDateEnd: end.toLocaleDateString('en-CA') });
     };
 
     return (
@@ -15,7 +20,9 @@ const Calendar = ({ events, onEventClick }) => {
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 events={events}
+                editable={true} // Enable drag-and-drop
                 eventClick={handleEventClick}
+                eventDrop={handleEventDrop} // Handle drop events
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',

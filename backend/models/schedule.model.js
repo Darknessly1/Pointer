@@ -5,8 +5,12 @@ const scheduleSchema = new mongoose.Schema({
         type: String,
         required: true
     }, 
-    date: {
+    dateStart: {
         type: String, 
+        required: true
+    }, 
+    dateEnd: {
+        type: String,
         required: true
     }
 })
