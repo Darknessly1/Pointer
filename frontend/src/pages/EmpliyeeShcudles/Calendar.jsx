@@ -20,9 +20,9 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 events={events}
-                editable={true} // Enable drag-and-drop
+                editable={true}
                 eventClick={handleEventClick}
-                eventDrop={handleEventDrop} // Handle drop events
+                eventDrop={handleEventDrop}
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',

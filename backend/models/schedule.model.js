@@ -12,7 +12,13 @@ const scheduleSchema = new mongoose.Schema({
     dateEnd: {
         type: String,
         required: true
-    }
+    }, 
+    priority: {
+        type: String,
+        required: true,
+        enum: ["high", "normal", "low"],
+    },
+    
 })
 
 const Schedule = mongoose.model("Schedule", scheduleSchema);

@@ -12,30 +12,34 @@ export const showSchedule = async (req, res) => {
 
 
 export const addSchedule = async (req, res) => {
-    const { title, dateStart, dateEnd } = req.body;
+    const { title, dateStart, dateEnd, priority } = req.body;
     try {
-        const newTask = new Schedule({ title, dateStart, dateEnd });
+        const newTask = new Schedule({ title, dateStart, dateEnd, priority });
         await newTask.save();
         res.status(200).json(newTask);
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: error.message });
+        }
         res.status(500).json({ message: error.message });
     }
-}
-
+};
 
 export const updateSchedule = async (req, res) => {
-    const { title, dateStart, dateEnd } = req.body;
+    const { title, dateStart, dateEnd, priority } = req.body;
     try {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
-            { title, dateStart, dateEnd },
-            { new: true }
+            { title, dateStart, dateEnd, priority },
+            { new: true, runValidators: true } 
         );
         res.status(200).json(updatedTask);
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: error.message });
+        }
         res.status(500).json({ message: error.message });
     }
-
 };
 
 
