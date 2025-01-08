@@ -26,12 +26,12 @@ export const addSchedule = async (req, res) => {
 };
 
 export const updateSchedule = async (req, res) => {
-    const { title, dateStart, dateEnd, priority } = req.body;
+    const { title, dateStart, dateEnd } = req.body;
     try {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
-            { title, dateStart, dateEnd, priority },
-            { new: true, runValidators: true } 
+            { title, dateStart, dateEnd },
+            { new: true }
         );
         res.status(200).json(updatedTask);
     } catch (error) {
