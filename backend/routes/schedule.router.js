@@ -5,8 +5,8 @@ import { showSchedule, addSchedule, updateSchedule, deleteSchedule } from "../co
 const router = express.Router();
 
 const limiter = RateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // max 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 100,
 });
 
 router.get("/showSchedule", showSchedule);
