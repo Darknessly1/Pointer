@@ -28,12 +28,12 @@ export const updateSchedule = async (req, res) => {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
             { title, dateStart, dateEnd, priority },
-            { new: true } // Return the updated document
+            { new: true } 
         );
         if (!updatedTask) {
             return res.status(404).json({ message: "Task not found" });
         }
-        res.status(200).json(updatedTask); // Send back the updated task
+        res.status(200).json(updatedTask);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

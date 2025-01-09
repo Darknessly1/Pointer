@@ -19,11 +19,10 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
             title: info.event.title,
             dateStart: info.event.start.toISOString(),
             dateEnd: info.event.end?.toISOString() || null,
-            priority: info.event.extendedProps.priority, // Ensure all necessary fields are passed
+            priority: info.event.extendedProps.priority,
         };
 
         try {
-            // Update backend
             const response = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${info.event.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -36,7 +35,6 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
 
             const updatedTask = await response.json();
 
-            // Update local state
             onEventDrop((prevEvents) =>
                 prevEvents.map((event) =>
                     event.id === updatedTask._id ? updatedTask : event
@@ -44,21 +42,9 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
             );
         } catch (error) {
             console.error("Error updating event:", error);
-            info.revert(); // Revert changes on error
+            info.revert();
         }
     };
-
-
-    // const handleEventDrop = (eventDropInfo) => {
-    //     console.log("Event Drop Info:", eventDropInfo); 
-    //     const { id, title, start, end } = eventDropInfo.event;
-    //     onEventDrop({
-    //         id,
-    //         title,
-    //         newDateStart: start ? start.toISOString() : null,
-    //         newDateEnd: end ? end.toISOString() : null,       
-    //     });
-    // };
 
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 z-0">
@@ -66,9 +52,9 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 events={events}
-                editable={true} // Make sure this is true
+                editable={true} 
                 eventClick={handleEventClick}
-                eventDrop={handleEventDrop} // Ensure this is correctly set
+                eventDrop={handleEventDrop} 
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',
@@ -76,7 +62,7 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
                 }}
                 height="auto"
                 contentHeight="auto"
-                timeZone="local" // Ensure dates respect local timezone
+                timeZone="local"
             />
         </div>
     );

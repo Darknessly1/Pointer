@@ -139,7 +139,6 @@ const Schedulestable = () => {
     };
 
     const handleEventDrop = async (eventDropInfo) => {
-        // Ensure eventDropInfo.event exists
         if (!eventDropInfo.event) {
             console.error("Event is undefined");
             return;
@@ -149,7 +148,6 @@ const Schedulestable = () => {
         const start = eventDropInfo.event.start;
         const end = eventDropInfo.event.end;
     
-        // Check for valid start and end dates
         if (!start || !end) {
             console.error("Invalid start or end date:", { start, end });
             return;
@@ -159,7 +157,6 @@ const Schedulestable = () => {
         const newDateEnd = end.toISOString();
     
         try {
-            // Update task on the backend
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -171,10 +168,9 @@ const Schedulestable = () => {
             });
     
             if (res.ok) {
-                // Parse updated task from the response
+               
                 const updatedTask = await res.json();
     
-                // Update tasks in local state
                 setTasks((prevTasks) =>
                     prevTasks.map((task) =>
                         task.id === id
