@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Calendar from './Calendar';
 
 const Schedulestable = () => {
-
     const [tasks, setTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState(null);
     const [openAddTaskSection, setOpenAddTaskSection] = useState(false);
@@ -28,7 +27,6 @@ const Schedulestable = () => {
 
         const startDate = new Date(dateStart);
         const endDate = new Date(dateEnd);
-
         endDate.setHours(23, 59, 59, 999);
 
         if (endDate < startDate) {
@@ -64,7 +62,6 @@ const Schedulestable = () => {
 
             const startDate = new Date(dateStart);
             const endDate = new Date(dateEnd);
-
             endDate.setHours(23, 59, 59, 999);
 
             if (endDate < startDate) {
@@ -73,8 +70,6 @@ const Schedulestable = () => {
             }
 
             const updatedTask = { title, dateStart: startDate.toISOString(), dateEnd: endDate.toISOString(), priority };
-
-            console.log("Updating Task:", updatedTask);
 
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
@@ -94,9 +89,7 @@ const Schedulestable = () => {
         }
     };
 
-
     const removeTask = async (taskId) => {
-        console.log("Deleting task with ID:", taskId);
         try {
             const response = await fetch(`http://localhost:5000/api/schedule/deleteSchedule/${taskId}`, {
                 method: 'DELETE',
@@ -119,32 +112,13 @@ const Schedulestable = () => {
         try {
             const res = await fetch('http://localhost:5000/api/schedule/showSchedule');
             const data = await res.json();
-            setTasks(data.map((task) => {
-                let backgroundColor = '';
-
-                switch (task.priority) {
-                    case 'high':
-                        backgroundColor = 'red'; // Red for high priority
-                        break;
-                    case 'normal':
-                        backgroundColor = 'gray'; // Yellow for normal priority
-                        break;
-                    case 'low':
-                        backgroundColor = 'green'; // Green for low priority
-                        break;
-                    default:
-                        backgroundColor = 'blue'; // Default color
-                        break;
-                }
-
-                return {
-                    id: task._id,
-                    title: task.title,
-                    start: task.dateStart,
-                    end: task.dateEnd,
-                    backgroundColor: backgroundColor,
-                };
-            }));
+            setTasks(data.map((task) => ({
+                id: task._id,
+                title: task.title,
+                start: task.dateStart,
+                end: task.dateEnd,
+                backgroundColor: task.priority === 'high' ? 'red' : task.priority === 'normal' ? 'gray' : 'green',
+            })));
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
@@ -164,25 +138,59 @@ const Schedulestable = () => {
         });
     };
 
-    const handleEventDrop = async ({ id, title, newDateStart, newDateEnd }) => {
+    const handleEventDrop = async (eventDropInfo) => {
+        // Ensure eventDropInfo.event exists
+        if (!eventDropInfo.event) {
+            console.error("Event is undefined");
+            return;
+        }
+    
+        const { id, title } = eventDropInfo.event;
+        const start = eventDropInfo.event.start;
+        const end = eventDropInfo.event.end;
+    
+        // Check for valid start and end dates
+        if (!start || !end) {
+            console.error("Invalid start or end date:", { start, end });
+            return;
+        }
+    
+        const newDateStart = start.toISOString();
+        const newDateEnd = end.toISOString();
+    
         try {
+            // Update task on the backend
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, dateStart: newDateStart, dateEnd: newDateEnd }),
+                body: JSON.stringify({
+                    title,
+                    dateStart: newDateStart,
+                    dateEnd: newDateEnd,
+                }),
             });
-
+    
             if (res.ok) {
-                console.log(`Task ${id} successfully updated to ${newDateStart}`);
-                await fetchTasks();
+                // Parse updated task from the response
+                const updatedTask = await res.json();
+    
+                // Update tasks in local state
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === id
+                            ? { ...task, start: updatedTask.dateStart, end: updatedTask.dateEnd }
+                            : task
+                    )
+                );
             } else {
                 const error = await res.json();
                 console.error("Error updating task:", error);
             }
         } catch (error) {
-            console.error('Error updating task:', error);
+            console.error("Error during event drop:", error);
         }
     };
+    
 
     const handleModalClose = () => {
         setSelectedTask(null);
@@ -199,7 +207,6 @@ const Schedulestable = () => {
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent to-purple-700 opacity-30 blur-md rounded-lg"></span>
                 <span className="relative z-10">Add Task</span>
             </button>
-
 
             {openAddTaskSection && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
@@ -254,7 +261,7 @@ const Schedulestable = () => {
                                 addTask();
                                 setOpenAddTaskSection(false);
                             }}
-                            className="w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                            className="w-full bg-blue-500 text-white font-semibold px-4 py- 2 rounded-lg hover:bg-blue-600 transition"
                         >
                             Add Task
                         </button>
@@ -269,12 +276,10 @@ const Schedulestable = () => {
                 </div>
             )}
 
-
-
             <div className="mt-8 w-full ">
                 <Calendar
                     events={tasks}
-                    onEventClick={(info) => handleEventClick(info)}
+                    onEventClick={handleEventClick}
                     onEventDrop={handleEventDrop}
                 />
             </div>

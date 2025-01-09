@@ -18,12 +18,9 @@ export const addSchedule = async (req, res) => {
         await newTask.save();
         res.status(200).json(newTask);
     } catch (error) {
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message });
-        }
         res.status(500).json({ message: error.message });
     }
-};
+}
 
 export const updateSchedule = async (req, res) => {
     const { title, dateStart, dateEnd, priority } = req.body;
@@ -31,13 +28,13 @@ export const updateSchedule = async (req, res) => {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
             { title, dateStart, dateEnd, priority },
-            { new: true }
+            { new: true } // Return the updated document
         );
-        res.status(200).json(updatedTask);
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message });
+        if (!updatedTask) {
+            return res.status(404).json({ message: "Task not found" });
         }
+        res.status(200).json(updatedTask); // Send back the updated task
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
