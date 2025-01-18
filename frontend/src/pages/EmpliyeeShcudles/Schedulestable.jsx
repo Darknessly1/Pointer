@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Calendar from './Calendar';
+import { AuthContext } from '../../context/AuthContext';
 
 const Schedulestable = () => {
     const [tasks, setTasks] = useState([]);
+    const { authUser } = useContext(AuthContext);
     const [selectedTask, setSelectedTask] = useState(null);
     const [openAddTaskSection, setOpenAddTaskSection] = useState(false);
     const [inputs, setInputs] = useState({
@@ -20,6 +22,11 @@ const Schedulestable = () => {
     const addTask = async () => {
         const { title, dateStart, dateEnd, priority } = inputs;
 
+        if (!authUser) {
+            console.error("authUser  is missing");
+            return;
+        }
+
         if (!title || !dateStart || !dateEnd) {
             alert("Title and Dates are required");
             return;
@@ -34,12 +41,20 @@ const Schedulestable = () => {
             return;
         }
 
-        const newTask = { title, dateStart: startDate.toISOString(), dateEnd: endDate.toISOString(), priority };
+        const newTask = {
+            title,
+            dateStart: startDate.toISOString(),
+            dateEnd: endDate.toISOString(),
+            priority,
+        };
 
         try {
             const res = await fetch("http://localhost:5000/api/schedule/addSchedule", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${authUser.token}`,
+                },
                 body: JSON.stringify(newTask),
             });
 
@@ -49,10 +64,10 @@ const Schedulestable = () => {
                 fetchTasks();
             } else {
                 const error = await res.json();
-                console.error(error);
+                console.error("Error adding task:", error);
             }
         } catch (error) {
-            console.error("Something went wrong", error);
+            console.error("Error adding task:", error.message);
         }
     };
 
@@ -109,24 +124,45 @@ const Schedulestable = () => {
     };
 
     const fetchTasks = async () => {
+        if (!authUser  || !authUser .token) {
+            console.error("authUser  or token is missing");
+            return;
+        }
+    
         try {
-            const res = await fetch('http://localhost:5000/api/schedule/showSchedule');
+            const res = await fetch('http://localhost:5000/api/schedule/showSchedule', {
+                headers: {
+                    Authorization: `Bearer ${authUser .token}`,
+                },
+            });
+    
+            if (!res.ok) {
+                throw new Error("Failed to fetch tasks");
+            }
+    
             const data = await res.json();
-            setTasks(data.map((task) => ({
+            console.log("Fetched tasks:", data); 
+    
+            const formattedTasks = data.map((task) => ({
                 id: task._id,
                 title: task.title,
-                start: task.dateStart,
+                start: task.dateStart, 
                 end: task.dateEnd,
-                backgroundColor: task.priority === 'high' ? 'red' : task.priority === 'normal' ? 'gray' : 'green',
-            })));
+                extendedProps: {
+                    priority: task.priority, 
+                },
+            }));
+    
+            setTasks(formattedTasks);
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
     };
 
     useEffect(() => {
+        console.log('authUser  context:', authUser.fullName);
         fetchTasks();
-    }, []);
+    }, [authUser]);
 
     const handleEventClick = (clickInfo) => {
         const { id, title, start, end } = clickInfo;
@@ -143,19 +179,19 @@ const Schedulestable = () => {
             console.error("Event is undefined");
             return;
         }
-    
+
         const { id, title } = eventDropInfo.event;
         const start = eventDropInfo.event.start;
         const end = eventDropInfo.event.end;
-    
+
         if (!start || !end) {
             console.error("Invalid start or end date:", { start, end });
             return;
         }
-    
+
         const newDateStart = start.toISOString();
         const newDateEnd = end.toISOString();
-    
+
         try {
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
@@ -166,11 +202,11 @@ const Schedulestable = () => {
                     dateEnd: newDateEnd,
                 }),
             });
-    
+
             if (res.ok) {
-               
+
                 const updatedTask = await res.json();
-    
+
                 setTasks((prevTasks) =>
                     prevTasks.map((task) =>
                         task.id === id
@@ -186,7 +222,6 @@ const Schedulestable = () => {
             console.error("Error during event drop:", error);
         }
     };
-    
 
     const handleModalClose = () => {
         setSelectedTask(null);

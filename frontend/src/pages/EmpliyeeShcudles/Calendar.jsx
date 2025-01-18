@@ -21,20 +21,20 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
             dateEnd: info.event.end?.toISOString() || null,
             priority: info.event.extendedProps.priority,
         };
-
+    
         try {
             const response = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${info.event.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedEvent),
             });
-
+    
             if (!response.ok) {
                 throw new Error("Failed to update schedule");
             }
-
+    
             const updatedTask = await response.json();
-
+    
             onEventDrop((prevEvents) =>
                 prevEvents.map((event) =>
                     event.id === updatedTask._id ? updatedTask : event
@@ -66,6 +66,7 @@ const Calendar = ({ events, onEventClick, onEventDrop }) => {
             />
         </div>
     );
+    
 };
 
 export default Calendar;

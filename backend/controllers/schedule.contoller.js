@@ -2,25 +2,42 @@ import Schedule from "../models/schedule.model.js"
 
 export const showSchedule = async (req, res) => {
     try {
-        const schedules = await Schedule.find();
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: "User  not authenticated" });
+        }
+
+        const schedules = await Schedule.find({ user: req.user.id }); // Fetch tasks for the authenticated user
         res.status(200).json(schedules);
     } catch (error) {
-        console.error("Error fetching schudles: ", error.message);
-        res.status(500).json({ message: "Failed to fetch Events" });
+        console.error("Error fetching schedules:", error.message);
+        res.status(500).json({ message: "Failed to fetch schedules" });
     }
-}
-
+};
 
 export const addSchedule = async (req, res) => {
-    const { title, dateStart, dateEnd, priority } = req.body;
     try {
-        const newTask = new Schedule({ title, dateStart, dateEnd, priority });
+        console.log("User  ID from request:", req.user.id);
+        const { title, dateStart, dateEnd, priority } = req.body;
+
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ message: "User  not authenticated" });
+        }
+
+        const newTask = new Schedule({
+            title,
+            dateStart,
+            dateEnd,
+            priority,
+            user: req.user.id,
+        });
+
         await newTask.save();
-        res.status(200).json(newTask);
+        res.status(201).json(newTask);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("Error adding schedule:", error.message);
+        res.status(500).json({ message: "Failed to add schedule" });
     }
-}
+};
 
 export const updateSchedule = async (req, res) => {
     const { title, dateStart, dateEnd, priority } = req.body;
@@ -60,3 +77,39 @@ export const deleteSchedule = async (req, res) => {
     }
 };
 
+
+export const showScheduleGroupedByUser = async (req, res) => {
+    try {
+        const groupedTasks = await Schedule.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $unwind: "$userDetails" 
+            },
+            {
+                $group: {
+                    _id: "$userDetails._id",
+                    fullName: { $first: "$userDetails.fullName" },
+                    tasks: {
+                        $push: {
+                            title: "$title",
+                            dateStart: "$dateStart",
+                            dateEnd: "$dateEnd",
+                            priority: "$priority"
+                        }
+                    }
+                }
+            }
+        ]);
+
+        res.status(200).json(groupedTasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
