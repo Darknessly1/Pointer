@@ -1,6 +1,6 @@
 import express from "express";
 import RateLimit from "express-rate-limit";
-import { showSchedule, addSchedule, updateSchedule, deleteSchedule, showScheduleGroupedByUser } from "../controllers/schedule.contoller.js";
+import { showSchedule, addSchedule, updateSchedule, deleteSchedule } from "../controllers/schedule.contoller.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 
 const router = express.Router();
@@ -10,9 +10,7 @@ const limiter = RateLimit({
   max: 100,
 });
 
-router.get("/showSchedule", showSchedule);
-
-router.get("/showScheduleGroupedByUser", showScheduleGroupedByUser);
+router.get("/showSchedule", authenticateUser, showSchedule);
 
 router.post("/addSchedule", authenticateUser, addSchedule);
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import Calendar from './Calendar';
 import { AuthContext } from '../../context/AuthContext';
+import Addtasks from '../../components/Addtasks';
 
 const Schedulestable = () => {
     const [tasks, setTasks] = useState([]);
@@ -11,7 +12,7 @@ const Schedulestable = () => {
         title: '',
         dateStart: '',
         dateEnd: '',
-        priority: 'normal'
+        priority: ''
     });
 
     const handleInputChange = (e) => {
@@ -21,6 +22,12 @@ const Schedulestable = () => {
 
     const addTask = async () => {
         const { title, dateStart, dateEnd, priority } = inputs;
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.error("Token is missing or invalid");
+            return;
+        }
 
         if (!authUser) {
             console.error("authUser  is missing");
@@ -46,6 +53,7 @@ const Schedulestable = () => {
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
             priority,
+            backgroundColor: getBackgroundColor(priority),
         };
 
         try {
@@ -53,14 +61,13 @@ const Schedulestable = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${authUser.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(newTask),
             });
 
             if (res.ok) {
-                console.log("Task added successfully");
-                setInputs({ title: '', dateStart: '', dateEnd: '' });
+                setInputs({ title: '', dateStart: '', dateEnd: '', priority: '' });
                 fetchTasks();
             } else {
                 const error = await res.json();
@@ -93,7 +100,6 @@ const Schedulestable = () => {
             });
 
             if (res.ok) {
-                console.log("Task updated successfully:", await res.json());
                 await fetchTasks();
                 setSelectedTask(null);
             } else {
@@ -124,35 +130,33 @@ const Schedulestable = () => {
     };
 
     const fetchTasks = async () => {
-        if (!authUser  || !authUser .token) {
+        if (!authUser || !authUser.token) {
             console.error("authUser  or token is missing");
             return;
         }
-    
+
         try {
             const res = await fetch('http://localhost:5000/api/schedule/showSchedule', {
                 headers: {
-                    Authorization: `Bearer ${authUser .token}`,
+                    Authorization: `Bearer ${authUser.token}`,
                 },
             });
-    
+
             if (!res.ok) {
                 throw new Error("Failed to fetch tasks");
             }
-    
+
             const data = await res.json();
-            console.log("Fetched tasks:", data); 
-    
+
             const formattedTasks = data.map((task) => ({
                 id: task._id,
                 title: task.title,
-                start: task.dateStart, 
+                start: task.dateStart,
                 end: task.dateEnd,
-                extendedProps: {
-                    priority: task.priority, 
-                },
+                priority: task.priority,
+                backgroundColor: getBackgroundColor(task.priority),
             }));
-    
+
             setTasks(formattedTasks);
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -160,18 +164,31 @@ const Schedulestable = () => {
     };
 
     useEffect(() => {
-        console.log('authUser  context:', authUser.fullName);
         fetchTasks();
     }, [authUser]);
 
     const handleEventClick = (clickInfo) => {
-        const { id, title, start, end } = clickInfo;
+        const { id, title, start, end, priority } = clickInfo;
         setSelectedTask({
             id,
             title,
             dateStart: start,
             dateEnd: end,
+            priority
         });
+    };
+
+    const getBackgroundColor = (priority) => {
+        switch (priority) {
+            case 'high':
+                return 'red'; 
+            case 'normal':
+                return 'blue';
+            case 'low':
+                return 'green'; 
+            default:
+                return 'gray';
+        }
     };
 
     const handleEventDrop = async (eventDropInfo) => {
@@ -231,87 +248,26 @@ const Schedulestable = () => {
         <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
             <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Dynamic Schedule System</h1>
 
-            <button
-                onClick={() => setOpenAddTaskSection(true)}
-                className="relative px-6 py-3 font-bold text-white transition-all duration-300 ease-in-out bg-gradient-to-r from-blue-gray-400 to-gray-700 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl backdrop-blur-md hover:backdrop-blur-lg"
-            >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent to-purple-700 opacity-30 blur-md rounded-lg"></span>
-                <span className="relative z-10">Add Task</span>
-            </button>
-
-            {openAddTaskSection && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl bg-white shadow-lg rounded-3xl p-6">
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
-                            <input
-                                id="title"
-                                type="text"
-                                placeholder="Enter Event Title"
-                                value={inputs.title}
-                                onChange={handleInputChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Task Start</label>
-                            <input
-                                id="dateStart"
-                                type="date"
-                                value={inputs.dateStart}
-                                onChange={handleInputChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Task End</label>
-                            <input
-                                id="dateEnd"
-                                type="date"
-                                value={inputs.dateEnd}
-                                onChange={handleInputChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2">Priority</label>
-                            <select
-                                id="priority"
-                                value={inputs.priority}
-                                onChange={handleInputChange}
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">--</option>
-                                <option value="high">High</option>
-                                <option value="normal">Normal</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-                        <button
-                            onClick={() => {
-                                addTask();
-                                setOpenAddTaskSection(false);
-                            }}
-                            className="w-full bg-blue-500 text-white font-semibold px-4 py- 2 rounded-lg hover:bg-blue-600 transition"
-                        >
-                            Add Task
-                        </button>
-
-                        <button
-                            onClick={() => setOpenAddTaskSection(false)}
-                            className="w-full bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-400 transition mt-2"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
+            <Addtasks
+                setOpenAddTaskSection={setOpenAddTaskSection}
+                openAddTaskSection={openAddTaskSection}
+                inputs={inputs}
+                handleInputChange={handleInputChange}
+                addTask={addTask}
+            />
 
             <div className="mt-8 w-full ">
                 <Calendar
                     events={tasks}
                     onEventClick={handleEventClick}
                     onEventDrop={handleEventDrop}
+                    userId={authUser.id}
+                    setInputs={setInputs}
+                    setOpenAddTaskSection={setOpenAddTaskSection}
+                    openAddTaskSection={openAddTaskSection}
+                    inputs={inputs}
+                    handleInputChange={handleInputChange}
+                    addTask={addTask}
                 />
             </div>
 

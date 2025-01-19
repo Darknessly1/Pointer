@@ -26,8 +26,9 @@ const useLogin = () => {
                 throw new Error(data.error || "Invalid username or password.");
             }
 
-            // Update context state
             contextLogin(data);
+            localStorage.setItem('authToken', data.token);
+
 
             toast.success("Login successful!");
             navigate("/");
