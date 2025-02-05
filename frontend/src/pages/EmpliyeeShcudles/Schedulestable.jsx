@@ -12,6 +12,8 @@ const Schedulestable = () => {
         title: '',
         dateStart: '',
         dateEnd: '',
+        timeStart: '',
+        timeEnd: '',
         priority: ''
     });
 
@@ -21,7 +23,7 @@ const Schedulestable = () => {
     };
 
     const addTask = async () => {
-        const { title, dateStart, dateEnd, priority } = inputs;
+        const { title, dateStart, dateEnd, priority, timeStart, timeEnd } = inputs;
 
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -52,6 +54,8 @@ const Schedulestable = () => {
             title,
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
+            timeStart,
+            timeEnd,
             priority,
             backgroundColor: getBackgroundColor(priority),
         };
@@ -67,7 +71,7 @@ const Schedulestable = () => {
             });
 
             if (res.ok) {
-                setInputs({ title: '', dateStart: '', dateEnd: '', priority: '' });
+                setInputs({ title: '', dateStart: '', dateEnd: '', priority: '', timeStart: '', timeEnd: '' });
                 fetchTasks();
             } else {
                 const error = await res.json();
@@ -80,18 +84,26 @@ const Schedulestable = () => {
 
     const updateTask = async () => {
         try {
-            const { id, title, dateStart, dateEnd, priority } = selectedTask;
+            const { id, title, dateStart, dateEnd, priority, timeStart, timeEnd } = selectedTask;
 
-            const startDate = new Date(dateStart);
-            const endDate = new Date(dateEnd);
-            endDate.setHours(23, 59, 59, 999);
+            const startDateTime = new Date(`${dateStart}T${timeStart}`);
+            const endDateTime = new Date(`${dateEnd}T${timeEnd}`);
 
-            if (endDate < startDate) {
-                alert("End date cannot be earlier than start date.");
+            endDateTime.setHours(23, 59, 59, 999);
+
+            if (endDateTime < startDateTime) {
+                alert("End date/time cannot be earlier than start date/time.");
                 return;
             }
 
-            const updatedTask = { title, dateStart: startDate.toISOString(), dateEnd: endDate.toISOString(), priority };
+            const updatedTask = {
+                title,
+                dateStart: startDateTime.toISOString(),
+                dateEnd: endDateTime.toISOString(),
+                timeStart,
+                timeEnd,
+                priority
+            };
 
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
@@ -153,6 +165,8 @@ const Schedulestable = () => {
                 title: task.title,
                 start: task.dateStart,
                 end: task.dateEnd,
+                timeStart: task.timeStart,
+                timeEnd: task.timeEnd,
                 priority: task.priority,
                 backgroundColor: getBackgroundColor(task.priority),
             }));
@@ -168,12 +182,14 @@ const Schedulestable = () => {
     }, [authUser]);
 
     const handleEventClick = (clickInfo) => {
-        const { id, title, start, end, priority } = clickInfo;
+        const { id, title, start, end, timeStart, timeEnd, priority } = clickInfo;
         setSelectedTask({
             id,
             title,
             dateStart: start,
             dateEnd: end,
+            timeStart,
+            timeEnd,
             priority
         });
     };
@@ -181,11 +197,11 @@ const Schedulestable = () => {
     const getBackgroundColor = (priority) => {
         switch (priority) {
             case 'high':
-                return 'red'; 
+                return 'red';
             case 'normal':
                 return 'blue';
             case 'low':
-                return 'green'; 
+                return 'green';
             default:
                 return 'gray';
         }
@@ -299,6 +315,24 @@ const Schedulestable = () => {
                                 type="date"
                                 value={selectedTask.dateEnd}
                                 onChange={(e) => setSelectedTask({ ...selectedTask, dateEnd: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-semibold mb-2">Task Start Time</label>
+                            <input
+                                type="time"
+                                value={selectedTask.timeStart}
+                                onChange={(e) => setSelectedTask({ ...selectedTask, timeStart: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-semibold mb-2">Task End Time</label>
+                            <input
+                                type="time"
+                                value={selectedTask.timeEnd}
+                                onChange={(e) => setSelectedTask({ ...selectedTask, timeEnd: e.target.value })}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>

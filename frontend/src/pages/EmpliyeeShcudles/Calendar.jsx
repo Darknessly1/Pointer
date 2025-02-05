@@ -2,6 +2,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
 
 const Calendar = ({ 
     events, 
@@ -70,25 +71,44 @@ const Calendar = ({
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 z-0">
             <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+                initialView="timeGridWeek"
                 events={events}
                 editable={true}
                 selectable={true}
+                selectMirror={true} 
+                eventResizableFromStart={true}
                 select={handleDateSelect}
                 eventClick={handleEventClick}
                 eventDrop={handleEventDrop}
+                timeZone="UTC"
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay | listDay,listWeek,listMonth', 
                 }}
                 height="auto"
                 contentHeight="auto"
-                timeZone="local"
-                // eventRender={(info) => {
-                //     info.el.style.backgroundColor = info.event.extendedProps.backgroundColor; 
-                // }}
+                dayMaxEventRows={true}
+                slotDuration="01:00:00"
+                slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                nowIndicator={true}
+                weekNumbers={true}
+                dayHeaderFormat={{ weekday: 'long' }}
+                displayEventTime={true}
+                eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
+                allDaySlot={false}
+                businessHours={{
+                    startTime: '00:00', 
+                    endTime: '24:00', 
+                }}
+                views={{
+                    listDay: { buttonText: 'List Day', listDayFormat: { weekday: "long", month: "short", day: "numeric" } },
+                    listWeek: { buttonText: 'List Week' },
+                    listMonth: { buttonText: 'List Month' },
+                    timeGridWeek: { buttonText: 'Week' },
+                    timeGridDay: { buttonText: 'Day' }
+                }}
             />
         </div>
     );

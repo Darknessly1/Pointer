@@ -1,5 +1,5 @@
 
-const Addtasks = ({setOpenAddTaskSection, openAddTaskSection, inputs, handleInputChange, addTask }) => {
+const Addtasks = ({ setOpenAddTaskSection, openAddTaskSection, inputs, handleInputChange, addTask }) => {
     return (
         <div>
             <button
@@ -40,6 +40,26 @@ const Addtasks = ({setOpenAddTaskSection, openAddTaskSection, inputs, handleInpu
                                 id="dateEnd"
                                 type="date"
                                 value={inputs.dateEnd}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-semibold mb-2">Start Time</label>
+                            <input
+                                type="time"
+                                id="timeStart"
+                                value={inputs.timeStart}
+                                onChange={handleInputChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-semibold mb-2">End Time</label>
+                            <input
+                                type="time"
+                                id="timeEnd"
+                                value={inputs.timeEnd}
                                 onChange={handleInputChange}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />

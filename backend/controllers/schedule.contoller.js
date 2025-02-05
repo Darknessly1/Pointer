@@ -20,12 +20,14 @@ export const addSchedule = async (req, res) => {
             return res.status(401).json({ message: "User  not authenticated" });
         }
 
-        const { title, dateStart, dateEnd, priority } = req.body;
+        const { title, dateStart, dateEnd, timeStart, timeEnd, priority } = req.body;
 
         const newTask = new Schedule({
             title,
             dateStart,
             dateEnd,
+            timeStart, 
+            timeEnd, 
             priority,
             user: req.user.id,
         });
@@ -39,11 +41,11 @@ export const addSchedule = async (req, res) => {
 };
 
 export const updateSchedule = async (req, res) => {
-    const { title, dateStart, dateEnd, priority } = req.body;
+    const { title, dateStart, dateEnd, timeStart, timeEnd, priority } = req.body;
     try {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
-            { title, dateStart, dateEnd, priority },
+            { title, dateStart, dateEnd, timeStart, timeEnd, priority, },
             { new: true } 
         );
         if (!updatedTask) {
