@@ -1,9 +1,16 @@
 
-const Addtasks = ({ setOpenAddTaskSection, openAddTaskSection, inputs, handleInputChange, addTask }) => {
+const Addtasks = ({ 
+    setOpenAddTaskSection, 
+    openAddTaskSection, 
+    inputs,
+    handleInputChange, 
+    addTask,
+    handleOpenAddTaskSection
+}) => {
     return (
         <div>
             <button
-                onClick={() => setOpenAddTaskSection(true)}
+                onClick={handleOpenAddTaskSection}
                 className="relative px-6 py-3 font-bold text-white transition-all duration-300 ease-in-out bg-gradient-to-r from-blue-gray-400 to-gray-700 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl backdrop-blur-md hover:backdrop-blur-lg"
             >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent to-purple-700 opacity-30 blur-md rounded-lg"></span>

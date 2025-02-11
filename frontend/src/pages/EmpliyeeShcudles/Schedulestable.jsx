@@ -54,8 +54,8 @@ const Schedulestable = () => {
             title,
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
-            timeStart,
-            timeEnd,
+            timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
+            timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
             priority,
             backgroundColor: getBackgroundColor(priority),
         };
@@ -85,40 +85,41 @@ const Schedulestable = () => {
     const updateTask = async () => {
         try {
             const { id, title, dateStart, dateEnd, priority, timeStart, timeEnd } = selectedTask;
-
-            const startDateTime = new Date(`${dateStart}T${timeStart}`);
-            const endDateTime = new Date(`${dateEnd}T${timeEnd}`);
-
+    
+            const startDateTime = new Date(`${dateStart}T${timeStart}:00`);
+            const endDateTime = new Date(`${dateEnd}T${timeEnd}:00`);
+    
             endDateTime.setHours(23, 59, 59, 999);
-
+    
             if (endDateTime < startDateTime) {
                 alert("End date/time cannot be earlier than start date/time.");
                 return;
             }
-
+    
             const updatedTask = {
                 title,
                 dateStart: startDateTime.toISOString(),
                 dateEnd: endDateTime.toISOString(),
-                timeStart,
-                timeEnd,
+                timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
+                timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
                 priority
             };
-
+    
             const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedTask),
             });
-
+    
             if (res.ok) {
                 await fetchTasks();
                 setSelectedTask(null);
             } else {
-                console.error("Error updating task:", await res.json());
+                const error = await res.json();
+                console.error("Error updating task:", error);
             }
         } catch (error) {
-            console.error('Error updating task:', error);
+            console.error("Error updating task:", error.message);
         }
     };
 
@@ -186,8 +187,8 @@ const Schedulestable = () => {
         setSelectedTask({
             id,
             title,
-            dateStart: start,
-            dateEnd: end,
+            dateStart: new Date(start).toISOString().split('T')[0], 
+            dateEnd: new Date(end).toISOString().split('T')[0], 
             timeStart,
             timeEnd,
             priority
@@ -260,6 +261,18 @@ const Schedulestable = () => {
         setSelectedTask(null);
     };
 
+    const handleOpenAddTaskSection = () => {
+        setInputs({
+            title: '',
+            dateStart: '',
+            dateEnd: '',
+            timeStart: '',
+            timeEnd: '',
+            priority: ''
+        });
+        setOpenAddTaskSection(true);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
             <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Dynamic Schedule System</h1>
@@ -270,6 +283,7 @@ const Schedulestable = () => {
                 inputs={inputs}
                 handleInputChange={handleInputChange}
                 addTask={addTask}
+                handleOpenAddTaskSection={handleOpenAddTaskSection}
             />
 
             <div className="mt-8 w-full ">

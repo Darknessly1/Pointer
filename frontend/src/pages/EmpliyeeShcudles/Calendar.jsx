@@ -13,12 +13,15 @@ const Calendar = ({
     setOpenAddTaskSection, 
 }) => {
     const handleEventClick = (clickInfo) => {
-        const { id, title, start, end } = clickInfo.event;
+        const { id, title, start, end, extendedProps } = clickInfo.event;
         onEventClick({
             id,
             title,
-            start: start ? start.toISOString().slice(0, 10) : null,
-            end: end ? end.toISOString().slice(0, 10) : null,
+            start: start ? start.toISOString() : null,
+            end: end ? end.toISOString() : null,
+            timeStart: start ? start.toISOString().split('T')[1].substring(0, 5) : '',
+            timeEnd: end ? end.toISOString().split('T')[1].substring(0, 5) : '',
+            priority: extendedProps.priority,
         });
     };
 
@@ -56,8 +59,7 @@ const Calendar = ({
     };
 
     const handleDateSelect = (selectInfo) => {
-        // Convert the selected date to a local date string
-        const localStartDate = new Date(selectInfo.start).toLocaleDateString('en-CA'); // 'en-CA' gives YYYY-MM-DD format
+        const localStartDate = new Date(selectInfo.start).toLocaleDateString('en-CA');
         setInputs({
             title: '', 
             dateStart: localStartDate,
@@ -67,12 +69,11 @@ const Calendar = ({
         setOpenAddTaskSection(true); 
     };
 
-
     return (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 z-0">
             <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-                initialView="timeGridWeek"
+                initialView="dayGridMonth"
                 events={events}
                 editable={true}
                 selectable={true}
