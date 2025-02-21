@@ -41,22 +41,31 @@ const Schedulestable = () => {
             return;
         }
 
-        const startDate = new Date(dateStart);
-        const endDate = new Date(dateEnd);
+        const startDate = new Date(`${dateStart}T${timeStart}`);
+        const endDate = new Date(`${dateEnd}T${timeEnd}`);
 
-        endDate.setHours(23, 59, 59, 999);
+        const [startHours, startMinutes] = timeStart.split(":").map(Number);
+        startDate.setUTCHours(startHours, startMinutes, 0, 0);
+
+        const [hours, minutes] = timeEnd.split(":").map(Number);
+        endDate.setUTCHours(hours, minutes, 0, 0);
 
         if (endDate < startDate) {
             alert("End date cannot be earlier than start date.");
             return;
         }
 
+        const formatTime = (time) => {
+            if (!time.includes(":")) return "00:00";
+            return time.length === 5 ? time : `${time}:00`;
+        };
+
         const newTask = {
             title,
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
-            timeStart,
-            timeEnd,
+            timeStart: formatTime(timeStart),
+            timeEnd: formatTime(timeEnd),
             priority,
             backgroundColor: getBackgroundColor(priority),
         };
@@ -101,7 +110,7 @@ const Schedulestable = () => {
                 title,
                 dateStart: startDateTime.toISOString(),
                 dateEnd: endDateTime.toISOString(),
-                timeStart, 
+                timeStart,
                 timeEnd,
                 priority
             };
@@ -123,7 +132,6 @@ const Schedulestable = () => {
             console.error("Error updating task:", error.message);
         }
     };
-
 
     const removeTask = async (taskId) => {
         try {

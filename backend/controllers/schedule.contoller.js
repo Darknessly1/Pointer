@@ -6,7 +6,7 @@ export const showSchedule = async (req, res) => {
             return res.status(401).json({ message: "User  not authenticated" });
         }
 
-        const schedules = await Schedule.find({ user: req.user.id }); 
+        const schedules = await Schedule.find({ user: req.user.id });
         res.status(200).json(schedules);
     } catch (error) {
         console.error("Error fetching schedules:", error.message);
@@ -26,11 +26,11 @@ export const addSchedule = async (req, res) => {
             title,
             dateStart,
             dateEnd,
-            timeStart, 
-            timeEnd, 
+            timeStart,
+            timeEnd,
             priority,
             user: req.user.id,
-        });
+        }); 
 
         await newTask.save();
         res.status(201).json(newTask);
@@ -46,7 +46,7 @@ export const updateSchedule = async (req, res) => {
         const updatedTask = await Schedule.findByIdAndUpdate(
             req.params.id,
             { title, dateStart, dateEnd, timeStart, timeEnd, priority, },
-            { new: true } 
+            { new: true }
         );
         if (!updatedTask) {
             return res.status(404).json({ message: "Task not found" });
