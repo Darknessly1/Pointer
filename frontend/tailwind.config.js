@@ -48,7 +48,7 @@ export default withMT({
           'accent-100': '#ff8a80',
           'accent-200': '#ff5252',
           'accent-400': '#ff1744',
-          'accent-700': '#d50000',
+          'accent-700': '#d90000',
         },
         purple: {
           50: '#f3e5f5',

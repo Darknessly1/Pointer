@@ -165,7 +165,7 @@ const Test = () => {
         setResult(resultText);
     };
 
-    const clearMessageAfterDelay = (message, type, delay = 5000) => {
+    const clearMessageAfterDelay = (message, type, delay = 9000) => {
         setMessage1(message);
         setAlertType(type);  // Set alert type (success, delete, update, error)
         setOpen(true);
@@ -177,7 +177,7 @@ const Test = () => {
         }, delay);
     };
 
-    const clearMessageAfterDelay1 = (delay = 5000) => {
+    const clearMessageAfterDelay1 = (delay = 9000) => {
         setTimeout(() => {
             setMessage('');
         }, delay);
@@ -200,7 +200,7 @@ const Test = () => {
         const newRecord = { workerName, workerDetails, birthDate, address, idCard, gender, email };
 
         try {
-            const response = await fetch('http://localhost:5000/api/workers/add-worker', {
+            const response = await fetch('http://localhost:9000/api/workers/add-worker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRecord),
@@ -265,7 +265,7 @@ const Test = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:5000/api/workers/add-record/${selectedWorker._id}`, {
+            const response = await fetch(`http://localhost:9000/api/workers/add-record/${selectedWorker._id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRecord),
@@ -343,7 +343,7 @@ const Test = () => {
 
     const removeWorker = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/workers/delete-worker/${selectedWorker._id}`, {
+            const response = await fetch(`http://localhost:9000/api/workers/delete-worker/${selectedWorker._id}`, {
                 method: 'DELETE',
             });
 
@@ -368,7 +368,7 @@ const Test = () => {
     const deleteHoursRecord = async (workerId, year, month, date) => {
         try {
             const response = await fetch(
-                `http://localhost:5000/api/workers/delete-record/${workerId}/${year}/${month}/${date}`,
+                `http://localhost:9000/api/workers/delete-record/${workerId}/${year}/${month}/${date}`,
                 {
                     method: 'DELETE',
                 }
@@ -426,7 +426,7 @@ const Test = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/workers/update-worker/${selectedWorker._id}`,
+                `http://localhost:9000/api/workers/update-worker/${selectedWorker._id}`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -493,7 +493,7 @@ const Test = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/workers/update-hours/${selectedWorker._id}/${year}/${month}/${date}`,
+                `http://localhost:9000/api/workers/update-hours/${selectedWorker._id}/${year}/${month}/${date}`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -534,7 +534,7 @@ const Test = () => {
     };
 
     const fetchWorkers = () => {
-        fetch('http://localhost:5000/api/workers/all-workers')
+        fetch('http://localhost:9000/api/workers/all-workers')
             .then((res) => res.json())
             .then((data) => {
                 setWorkers(data);
@@ -548,7 +548,7 @@ const Test = () => {
 
     const handleWorkerSelection = async (workerId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/workers/worker/${workerId}`);
+            const response = await fetch(`http://localhost:9000/api/workers/worker/${workerId}`);
             if (response.ok) {
                 const workerData = await response.json();
                 setSelectedWorker(workerData);

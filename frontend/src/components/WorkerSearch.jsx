@@ -8,7 +8,7 @@ export default function WorkerSearch({ onSearchResult }) {
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:5000/api/workers/search-worker?name=${searchTerm}`);
+            const response = await fetch(`http://localhost:9000/api/workers/search-worker?name=${searchTerm}`);
             const data = await response.json();
 
             if (response.ok) {

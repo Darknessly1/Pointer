@@ -1,9 +1,9 @@
 
-const Addtasks = ({ 
-    setOpenAddTaskSection, 
-    openAddTaskSection, 
+const Addtasks = ({
+    setOpenAddTaskSection,
+    openAddTaskSection,
     inputs,
-    handleInputChange, 
+    handleInputChange,
     addTask,
     handleOpenAddTaskSection
 }) => {
@@ -19,7 +19,16 @@ const Addtasks = ({
 
             {openAddTaskSection && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl bg-white shadow-lg rounded-3xl p-6">
+                    <div className="relative max-w-2xl bg-white shadow-lg rounded-3xl p-6"
+                        style={{ width: '500px' }}
+                    >
+                        <h1
+                            className="text-2xl font-bold text-gray-800 mb-4 text-center"
+                        >
+                            <span className="border-2 border-black p-2 rounded-lg">
+                                Add Task
+                            </span>
+                        </h1>
                         <div className="mb-4">
                             <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
                             <input
@@ -85,22 +94,24 @@ const Addtasks = ({
                                 <option value="low">Low</option>
                             </select>
                         </div>
-                        <button
-                            onClick={() => {
-                                addTask();
-                                setOpenAddTaskSection(false);
-                            }}
-                            className="w-full bg-blue-500 text-white font-semibold px-4 py- 2 rounded-lg hover:bg-blue-600 transition"
-                        >
-                            Add Task
-                        </button>
+                        <div className="flex justify-center ">
+                            <button
+                                onClick={() => {
+                                    addTask();
+                                    setOpenAddTaskSection(false);
+                                }}
+                                className="border-2 border-black mr-2 w-1/3 bg-gray-200 hover:bg-gray-600 text-black hover:text-white font-semibold py-2 rounded-3xl transition mt-2"
+                            >
+                                Add Task
+                            </button>
 
-                        <button
-                            onClick={() => setOpenAddTaskSection(false)}
-                            className="w-full bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-400 transition mt-2"
-                        >
-                            Cancel
-                        </button>
+                            <button
+                                onClick={() => setOpenAddTaskSection(false)}
+                                className="border-2 border-black w-1/3 bg-gray-600 text-white hover:text-black font-semibold py-2 rounded-3xl hover:bg-gray-200 transition mt-2"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

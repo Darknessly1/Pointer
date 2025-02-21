@@ -43,6 +43,7 @@ const Schedulestable = () => {
 
         const startDate = new Date(dateStart);
         const endDate = new Date(dateEnd);
+
         endDate.setHours(23, 59, 59, 999);
 
         if (endDate < startDate) {
@@ -54,14 +55,14 @@ const Schedulestable = () => {
             title,
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
-            timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
-            timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
+            timeStart,
+            timeEnd,
             priority,
             backgroundColor: getBackgroundColor(priority),
         };
 
         try {
-            const res = await fetch("http://localhost:5000/api/schedule/addSchedule", {
+            const res = await fetch("http://localhost:9000/api/schedule/addSchedule", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,32 +86,32 @@ const Schedulestable = () => {
     const updateTask = async () => {
         try {
             const { id, title, dateStart, dateEnd, priority, timeStart, timeEnd } = selectedTask;
-    
+
             const startDateTime = new Date(`${dateStart}T${timeStart}:00`);
             const endDateTime = new Date(`${dateEnd}T${timeEnd}:00`);
-    
+
             endDateTime.setHours(23, 59, 59, 999);
-    
+
             if (endDateTime < startDateTime) {
                 alert("End date/time cannot be earlier than start date/time.");
                 return;
             }
-    
+
             const updatedTask = {
                 title,
                 dateStart: startDateTime.toISOString(),
                 dateEnd: endDateTime.toISOString(),
-                timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
-                timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
+                timeStart, 
+                timeEnd,
                 priority
             };
-    
-            const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
+
+            const res = await fetch(`http://localhost:9000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedTask),
             });
-    
+
             if (res.ok) {
                 await fetchTasks();
                 setSelectedTask(null);
@@ -123,9 +124,10 @@ const Schedulestable = () => {
         }
     };
 
+
     const removeTask = async (taskId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/schedule/deleteSchedule/${taskId}`, {
+            const response = await fetch(`http://localhost:9000/api/schedule/deleteSchedule/${taskId}`, {
                 method: 'DELETE',
             });
 
@@ -149,7 +151,7 @@ const Schedulestable = () => {
         }
 
         try {
-            const res = await fetch('http://localhost:5000/api/schedule/showSchedule', {
+            const res = await fetch('http://localhost:9000/api/schedule/showSchedule', {
                 headers: {
                     Authorization: `Bearer ${authUser.token}`,
                 },
@@ -187,8 +189,8 @@ const Schedulestable = () => {
         setSelectedTask({
             id,
             title,
-            dateStart: new Date(start).toISOString().split('T')[0], 
-            dateEnd: new Date(end).toISOString().split('T')[0], 
+            dateStart: new Date(start).toISOString().split('T')[0],
+            dateEnd: new Date(end).toISOString().split('T')[0],
             timeStart,
             timeEnd,
             priority
@@ -227,7 +229,7 @@ const Schedulestable = () => {
         const newDateEnd = end.toISOString();
 
         try {
-            const res = await fetch(`http://localhost:5000/api/schedule/updateSchedule/${id}`, {
+            const res = await fetch(`http://localhost:9000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
