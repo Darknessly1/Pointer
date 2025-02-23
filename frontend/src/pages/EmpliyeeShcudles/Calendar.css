@@ -1,0 +1,6 @@
+.fc-header-toolbar .fc-center .fc-center-title {
+    max-width: 200px; /* Adjust as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

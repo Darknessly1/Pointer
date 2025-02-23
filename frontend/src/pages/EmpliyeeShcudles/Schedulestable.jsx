@@ -41,31 +41,21 @@ const Schedulestable = () => {
             return;
         }
 
-        const startDate = new Date(`${dateStart}T${timeStart}`);
-        const endDate = new Date(`${dateEnd}T${timeEnd}`);
-
-        const [startHours, startMinutes] = timeStart.split(":").map(Number);
-        startDate.setUTCHours(startHours, startMinutes, 0, 0);
-
-        const [hours, minutes] = timeEnd.split(":").map(Number);
-        endDate.setUTCHours(hours, minutes, 0, 0);
+        const startDate = new Date(dateStart);
+        const endDate = new Date(dateEnd);
+        endDate.setHours(23, 59, 59, 999);
 
         if (endDate < startDate) {
             alert("End date cannot be earlier than start date.");
             return;
         }
 
-        const formatTime = (time) => {
-            if (!time.includes(":")) return "00:00";
-            return time.length === 5 ? time : `${time}:00`;
-        };
-
         const newTask = {
             title,
             dateStart: startDate.toISOString(),
             dateEnd: endDate.toISOString(),
-            timeStart: formatTime(timeStart),
-            timeEnd: formatTime(timeEnd),
+            timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
+            timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
             priority,
             backgroundColor: getBackgroundColor(priority),
         };
@@ -95,32 +85,32 @@ const Schedulestable = () => {
     const updateTask = async () => {
         try {
             const { id, title, dateStart, dateEnd, priority, timeStart, timeEnd } = selectedTask;
-
+    
             const startDateTime = new Date(`${dateStart}T${timeStart}:00`);
             const endDateTime = new Date(`${dateEnd}T${timeEnd}:00`);
-
+    
             endDateTime.setHours(23, 59, 59, 999);
-
+    
             if (endDateTime < startDateTime) {
                 alert("End date/time cannot be earlier than start date/time.");
                 return;
             }
-
+    
             const updatedTask = {
                 title,
                 dateStart: startDateTime.toISOString(),
                 dateEnd: endDateTime.toISOString(),
-                timeStart,
-                timeEnd,
+                timeStart: timeStart.length === 5 ? timeStart : `${timeStart}:00`,
+                timeEnd: timeEnd.length === 5 ? timeEnd : `${timeEnd}:00`,
                 priority
             };
-
+    
             const res = await fetch(`http://localhost:9000/api/schedule/updateSchedule/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedTask),
             });
-
+    
             if (res.ok) {
                 await fetchTasks();
                 setSelectedTask(null);
@@ -197,8 +187,8 @@ const Schedulestable = () => {
         setSelectedTask({
             id,
             title,
-            dateStart: new Date(start).toISOString().split('T')[0],
-            dateEnd: new Date(end).toISOString().split('T')[0],
+            dateStart: new Date(start).toISOString().split('T')[0], 
+            dateEnd: new Date(end).toISOString().split('T')[0], 
             timeStart,
             timeEnd,
             priority

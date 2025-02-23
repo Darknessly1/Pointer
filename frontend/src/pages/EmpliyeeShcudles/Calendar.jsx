@@ -71,49 +71,98 @@ const Calendar = ({
     };
 
     return (
-        <div className="bg-white shadow-lg overflow-hidden p-4 z-0 border-2 border-black rounded-3xl">
-            <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                editable={true}
-                selectable={true}
-                selectMirror={true}
-                dayMaxEvents="true"
-                eventResizableFromStart={true}
-                select={handleDateSelect}
-                eventClick={handleEventClick}
-                eventDrop={onEventDrop}
-                timeZone="UTC"
-                height="auto"
-                contentHeight="auto"
-                dayMaxEventRows={true}
-                slotDuration="01:00:00"
-                nowIndicator={true}
-                weekNumbers={true}
-                allDaySlot={false}
-                displayEventTime={true}
-                dayHeaderFormat={{ weekday: 'long' }}
-                slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
-                eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
-                businessHours={{
-                    startTime: '00:00',
-                    endTime: '24:00',
-                }}
-                views={{
-                    listDay: { buttonText: 'List Day', listDayFormat: { weekday: "long", month: "short", day: "numeric" } },
-                    listWeek: { buttonText: 'List Week' },
-                    listMonth: { buttonText: 'List Month' },
-                    timeGridWeek: { buttonText: 'Week' },
-                    timeGridDay: { buttonText: 'Day' }
-                }}
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay listDay,listWeek,listMonth',
-                }}
-            />
+        <div className="flex gap-4 items-start">
+            {/* Main Calendar (Independent Height) */}
+            <div className="bg-white shadow-lg overflow-hidden p-4 z-0 border-2 border-black rounded-3xl w-[70%]">
+                <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    editable={true}
+                    selectable={true}
+                    selectMirror={true}
+                    dayMaxEvents={true}
+                    eventResizableFromStart={true}
+                    select={handleDateSelect}
+                    eventClick={handleEventClick}
+                    eventDrop={onEventDrop}
+                    timeZone="UTC"
+                    contentHeight="auto"
+                    dayMaxEventRows={true}
+                    slotDuration="01:00:00"
+                    nowIndicator={true}
+                    weekNumbers={true}
+                    allDaySlot={false}
+                    displayEventTime={true}
+                    dayHeaderFormat={{ weekday: 'long' }}
+                    slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                    eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
+                    businessHours={{
+                        startTime: '00:00',
+                        endTime: '24:00',
+                    }}
+                    views={{
+                        listDay: { buttonText: 'List Day', listDayFormat: { weekday: "long", month: "short", day: "numeric" } },
+                        listWeek: { buttonText: 'List Week' },
+                        listMonth: { buttonText: 'List Month' },
+                        timeGridWeek: { buttonText: 'Week' },
+                        timeGridDay: { buttonText: 'Day' }
+                    }}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    }}
+                    customButtons={{
+                        title: {
+                            text: 'title',
+                            click: () => { },
+                            classNames: ['fc-center-title']
+                        }
+                    }}
+                />
+            </div>
+                    
+            {/* List Calendar (Independent Height) */}
+            <div className="bg-white shadow-lg overflow-hidden p-4 z-0 border-2 border-black rounded-3xl w-[30%]">
+                <h1
+                    className='text-center font-bold text-2xl text-gray-800 mb-4'
+                >
+                    List of Small tasks
+                </h1>
+                <FullCalendar
+                    plugins={[listPlugin]}
+                    initialView="listDay"
+                    events={events}
+                    editable={true}
+                    eventClick={handleEventClick}
+                    eventDrop={onEventDrop}
+                    timeZone="UTC"
+                    contentHeight="auto"
+                    slotDuration="01:00:00"
+                    nowIndicator={true}
+                    displayEventTime={true}
+                    slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                    eventTimeFormat={{ hour: '2-digit', minute: '2-digit', meridiem: 'short' }}
+                    businessHours={{
+                        startTime: '00:00',
+                        endTime: '24:00',
+                    }}
+                    views={{
+                        listDay: { buttonText: 'Day', listDayFormat: { weekday: "long", month: "short", day: "numeric" } },
+                        listWeek: { buttonText: 'Week' },
+                        listMonth: { buttonText: 'Month' },
+                    }}
+                    headerToolbar={{
+                        left: 'title prev next today',
+                        center: '',
+                        right: 'listDay,listWeek,listMonth',
+                    }}
+                />
+            </div>
         </div>
+
+
     );
 };
 
