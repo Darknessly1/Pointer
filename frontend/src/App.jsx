@@ -11,12 +11,12 @@ function App() {
     >
       <Router>
         <div className="flex flex-col flex-grow">
-          <TopNavbar className="h-18" />
-          <main className="flex-grow overflow-y-auto p-4">
+          <TopNavbar className="absolute h-18" />
+          <main className="flex-grow p-4">
             <AppRoutes />
           </main>
         </div>
-        <div>
+        <div className="">
           <Footer />
         </div>
       </Router>

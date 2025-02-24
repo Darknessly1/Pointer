@@ -3,7 +3,7 @@
 
 const Footer = () => {
     return (
-        <div className="mt-8 bg-violet-900 pt-9 bg-white/40 text-black border-2 m-8 border-black rounded-3xl ">
+        <div className="mt-8 pt-9 bg-white/40 text-black border-2 m-8 border-black rounded-3xl ">
             <div className="mx-auto w-full max-w-[1166px] px-4 xl:px-0">
                 <div className="flex flex-col justify-between sm:px-[18px] md:flex-row md:px-10">
                     <div className="md:w-[316px]">

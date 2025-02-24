@@ -1,12 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faComments, faEnvelope, faXTwitter  } from '@fortawesome/free-solid-svg-icons';
-
-
+import { faComments, faEnvelope, faPhoneVolume, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 
 const Contactus = () => {
     return (
         <div>
-            <div className="max-w-screen-xl mx-auto p-5">
+            <div className="max-w-screen-2xl mx-auto p-5">
                 <div
                     className="mb-8"
                 >
@@ -14,64 +13,77 @@ const Contactus = () => {
                     <p className="text-center font-bold text-black">We are here to help you. If you have any questions or need assistance, please contact us.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 border-2 bg-gray-800/30 border-black p-2 rounded-3xl">
+                <div className="grid grid-cols-1 md:grid-cols-12 border-2 bg-gray-800/20 border-black p-2 rounded-3xl">
                     <div className=" md:col-span-4 p-10 text-white rounded-3xl">
-                        <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
-                            Chat <span className="text-blue-gray-800">with us</span>
-                        </h3>
+                        <div>
+                            <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
+                                Chat <span className="text-blue-gray-800">with us</span>
+                            </h3>
 
-                        <p className="mt-4 leading-7 text-gray-200">
-                            Speak to our friendly team via live chat.
-                        </p>
+                            <p className=" mb-4 text-sm leading-7 text-black font-bold">
+                                Speak to our friendly team via live chat.
+                            </p>
 
-                        <div className="mb-4 flex items-center mt-5">
-                            <span className="mr-2 text-lg text-white">
-                                <FontAwesomeIcon icon={faComments} />
-                            </span>
-                            <span className=" font-bold underline">Start a live chat</span>
+                            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-4">
+                                <div className="text-lg text-black ">
+                                    <FontAwesomeIcon icon={faComments} />
+                                </div>
+                                <a href="#" className="font-bold text-black hover:underline transition-colors cursor-pointer w-fit">
+                                    Start a live chat
+                                </a>
+
+                                <div className="text-lg text-black">
+                                    <FontAwesomeIcon icon={faEnvelope} />
+                                </div>
+                                <a href="#" className="font-bold text-black hover:underline transition-colors cursor-pointer w-fit">
+                                    Reach us via email
+                                </a>
+
+                                <div className="text-lg text-black">
+                                    <FontAwesomeIcon icon={faXTwitter} size="lg" />
+                                </div>
+                                <a href="#" className="font-bold text-black hover:underline transition-colors cursor-pointer w-fit">
+                                    Reach us via X (Twitter)
+                                </a>
+                            </div>
                         </div>
 
-                        <div className="mb-4 flex items-center mt-5">
-                            <span className="mr-2 text-lg text-white">
-                                <FontAwesomeIcon icon={faEnvelope} />
-                            </span>
-                            <span className=" font-bold underline">Reach us via email</span>
+                        <div className='mt-8'>
+                            <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
+                                Call <span className="text-blue-gray-800">us</span>
+                            </h3>
+
+                            <p className=" mb-4 text-sm leading-7 text-black font-bold">
+                                Call our team from Monday to Friday, 9am to 5pm.
+                            </p>
+
+                            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-4">
+                                <div className="text-lg text-black ">
+                                    <FontAwesomeIcon icon={faPhoneVolume} />
+                                </div>
+                                <a href="#" className="font-bold text-black hover:underline transition-colors cursor-pointer w-fit">
+                                    +211 123 456 789
+                                </a>
+                            </div>
                         </div>
 
-                        <div className="mb-4 flex items-center mt-5">
-                            <span className="mr-2 text-lg text-white">
-                                <FontAwesomeIcon icon={faXTwitter} />
-                            </span>
-                            <span className=" font-bold underline">Reach us via email</span>
-                        </div>
+                        <div className='mt-8'>
+                            <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
+                                Visit <span className="text-blue-gray-800">us</span>
+                            </h3>
 
-                        <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
-                            Get In <span className="text-blue-gray-800">Touch</span>
-                        </h3>
+                            <p className=" mb-4 text-sm leading-7 text-black font-bold">
+                                Visit our office for consulting and more info.
+                            </p>
 
-                        <div className="flex items-center mt-5">
-                            <svg className="h-6 mr-2 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                            </svg>
-                            <span className="text-sm">+93 749 99 65 50</span>
-                        </div>
-
-                        <h3 className="text-lg sm:text-2xl leading-normal font-extrabold tracking-tight">
-                            Get In <span className="text-blue-gray-800">Touch</span>
-                        </h3>
-
-                        <div className="flex items-center mt-5">
-                            <svg className="h-6 mr-2 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
-                            </svg>
-                            <span className="text-sm">24/7</span>
-                        </div>
-
-                        <div className="flex items-center mt-5">
-                            <svg className="h-14     mr-2 text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                            </svg>
-                            <span className="text-sm">House #14, Street #12, Darulaman Road, Kabul, Afghanistan.</span>
+                            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-4">
+                                <div className="text-lg text-black ">
+                                    <FontAwesomeIcon icon={faLocationDot} />
+                                </div>
+                                <a href="#" className="font-bold text-black hover:underline transition-colors cursor-pointer w-fit">
+                                    1234 Street Name, City Name, Country Name
+                                </a>
+                            </div>
                         </div>
                     </div>
 
