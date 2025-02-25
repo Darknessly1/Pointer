@@ -8,7 +8,6 @@ const Calendar = ({
     events,
     onEventClick,
     onEventDrop,
-    // userId,
     setInputs,
     setOpenAddTaskSection,
 }) => {

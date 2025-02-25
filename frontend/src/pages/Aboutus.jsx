@@ -10,9 +10,9 @@ export const Aboutus = () => {
 
                     <div className="grid gap-3 row-gap-10 sm:grid-cols-2 lg:grid-cols-2">
                         <div>
-                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full">
                                 <svg
-                                    className="w-7 h text-blue-gray-500"
+                                    className="w-7 h text-black"
                                     strokeLinecap="round"
                                     strokeWidth="2"
                                     viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -69,7 +69,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -87,7 +87,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -112,9 +112,9 @@ export const Aboutus = () => {
                             </a>
                         </div>
                         <div>
-                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full ">
                                 <svg
-                                    className="w-7 h-7 text-blue-gray-500"
+                                    className="w-7 h-7 text-black"
                                     strokeLinecap="round"
                                     strokeWidth="2"
                                     viewBox="0 0 24 24"
@@ -146,7 +146,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -164,7 +164,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -182,7 +182,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            className="w-5 h-5 mt-px text-black"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >

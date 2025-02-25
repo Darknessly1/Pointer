@@ -13,6 +13,10 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/SignUp";
 import { Aboutus } from "./pages/Aboutus";
 import Contactus from "./pages/Contactus";
+import Teamschedule from "./pages/EmpliyeeShcudles/teamschedule/Teamschedule";
+import TeamsDashboard from "./pages/EmpliyeeShcudles/teamschedule/TeamsDashboard";
+import Mainmenu from "./pages/EmpliyeeShcudles/teamschedule/Mainmenu";
+
 
 
 const AppRoutes = () => (
@@ -31,6 +35,10 @@ const AppRoutes = () => (
         <Route path="/login" element={<Login />} />
         <Route path="/aboutus" element={<Aboutus />} />
         <Route path="/contactus" element={<Contactus />} />
+        <Route path="/teamschedule" element={<Teamschedule />} />
+        <Route path="/teamsDashboard" element={<TeamsDashboard />} />
+        <Route path="/mainmenu" element={<Mainmenu />} />
+        
     </Routes>
 );
 
