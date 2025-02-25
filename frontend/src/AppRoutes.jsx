@@ -17,8 +17,6 @@ import Teamschedule from "./pages/EmpliyeeShcudles/teamschedule/Teamschedule";
 import TeamsDashboard from "./pages/EmpliyeeShcudles/teamschedule/TeamsDashboard";
 import Mainmenu from "./pages/EmpliyeeShcudles/teamschedule/Mainmenu";
 
-
-
 const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<Home />} />

@@ -2,7 +2,6 @@ import { useState, useEffect, useContext } from 'react';
 import Calendar from './Calendar';
 import { AuthContext } from '../../context/AuthContext';
 import Addtasks from '../../components/Addtasks';
-import TeamsDashboard from './teamschedule/TeamsDashboard';
 
 const Schedulestable = () => {
     const [tasks, setTasks] = useState([]);
@@ -17,12 +16,6 @@ const Schedulestable = () => {
         timeEnd: '',
         priority: ''
     });
-
-    const [showFirstDiv, setShowFirstDiv] = useState(true);
-
-    const toggleContent = () => {
-        setShowFirstDiv(!showFirstDiv);
-    };
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -301,135 +294,142 @@ const Schedulestable = () => {
 
     return (
         <>
-            <button
-                onClick={toggleContent}
-                className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-                 {showFirstDiv ? 'Try The Team Schudle' : 'Back To The Individual Schudle'} 
-            </button>
+            <div className="flex justify-center">
+                <a
+                    href='/teamsDashboard'
+                    className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-700 text-white font-medium text-lg rounded-lg hover:rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 ease-in-out hover:from-blue-gray-300 hover:to-blue-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50"
+                >
+                    <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        ></path>
+                    </svg>
+                    Try The Team Schedule
+                </a>
+            </div >
+            <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
+                <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Personal Schedule</h1>
 
-            {showFirstDiv ? (
-                <>
-                    <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
-                        <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Personal Schedule</h1>
+                <Addtasks
+                    setOpenAddTaskSection={setOpenAddTaskSection}
+                    openAddTaskSection={openAddTaskSection}
+                    inputs={inputs}
+                    handleInputChange={handleInputChange}
+                    addTask={addTask}
+                    handleOpenAddTaskSection={handleOpenAddTaskSection}
+                />
 
-                        <Addtasks
-                            setOpenAddTaskSection={setOpenAddTaskSection}
-                            openAddTaskSection={openAddTaskSection}
-                            inputs={inputs}
-                            handleInputChange={handleInputChange}
-                            addTask={addTask}
-                            handleOpenAddTaskSection={handleOpenAddTaskSection}
-                        />
+                <div className="mt-8 w-full ">
+                    <Calendar
+                        events={tasks}
+                        onEventClick={handleEventClick}
+                        onEventDrop={handleEventDrop}
+                        userId={authUser.id}
+                        setInputs={setInputs}
+                        setOpenAddTaskSection={setOpenAddTaskSection}
+                        openAddTaskSection={openAddTaskSection}
+                        inputs={inputs}
+                        handleInputChange={handleInputChange}
+                        addTask={addTask}
+                    />
+                </div>
 
-
-
-                        <div className="mt-8 w-full ">
-                            <Calendar
-                                events={tasks}
-                                onEventClick={handleEventClick}
-                                onEventDrop={handleEventDrop}
-                                userId={authUser.id}
-                                setInputs={setInputs}
-                                setOpenAddTaskSection={setOpenAddTaskSection}
-                                openAddTaskSection={openAddTaskSection}
-                                inputs={inputs}
-                                handleInputChange={handleInputChange}
-                                addTask={addTask}
-                            />
-                        </div>
-
-                        {selectedTask && (
-                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Edit Task</h2>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
-                                        <input
-                                            type="text"
-                                            value={selectedTask.title}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Task Start</label>
-                                        <input
-                                            type="date"
-                                            value={selectedTask.dateStart}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, dateStart: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Task End</label>
-                                        <input
-                                            type="date"
-                                            value={selectedTask.dateEnd}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, dateEnd: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Task Start Time</label>
-                                        <input
-                                            type="time"
-                                            value={selectedTask.timeStart}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, timeStart: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Task End Time</label>
-                                        <input
-                                            type="time"
-                                            value={selectedTask.timeEnd}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, timeEnd: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 font-semibold mb-2">Priority</label>
-                                        <select
-                                            value={selectedTask.priority}
-                                            onChange={(e) => setSelectedTask({ ...selectedTask, priority: e.target.value })}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            <option value="">--</option>
-                                            <option value="high">High</option>
-                                            <option value="normal">Normal</option>
-                                            <option value="low">Low</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <button
-                                            onClick={updateTask}
-                                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            onClick={() => removeTask(selectedTask.id)}
-                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                                        >
-                                            Delete
-                                        </button>
-                                        <button
-                                            onClick={handleModalClose}
-                                            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
+                {selectedTask && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+                            <h2 className="text-xl font-semibold text-gray-800 mb-4">Edit Task</h2>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Task Name</label>
+                                <input
+                                    type="text"
+                                    value={selectedTask.title}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
                             </div>
-                        )}
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Task Start</label>
+                                <input
+                                    type="date"
+                                    value={selectedTask.dateStart}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, dateStart: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Task End</label>
+                                <input
+                                    type="date"
+                                    value={selectedTask.dateEnd}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, dateEnd: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Task Start Time</label>
+                                <input
+                                    type="time"
+                                    value={selectedTask.timeStart}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, timeStart: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Task End Time</label>
+                                <input
+                                    type="time"
+                                    value={selectedTask.timeEnd}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, timeEnd: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">Priority</label>
+                                <select
+                                    value={selectedTask.priority}
+                                    onChange={(e) => setSelectedTask({ ...selectedTask, priority: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">--</option>
+                                    <option value="high">High</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <button
+                                    onClick={updateTask}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    onClick={() => removeTask(selectedTask.id)}
+                                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                >
+                                    Delete
+                                </button>
+                                <button
+                                    onClick={handleModalClose}
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </>
-            ) : (
-                <TeamsDashboard />
-            )}
+                )}
+            </div>
         </>
     );
 };

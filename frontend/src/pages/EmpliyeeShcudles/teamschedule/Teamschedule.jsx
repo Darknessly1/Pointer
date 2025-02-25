@@ -294,9 +294,11 @@ const Teamschedule = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br flex flex-col items-center p-5">
-            <button>
-                <a href="/teamsDashboard" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Back To Dashboard</a>
-            </button>
+            <a
+                href="/teamsDashboard" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+                Back To Dashboard
+            </a>
 
             <h1 className="text-4xl font-extrabold text-gray-800 mb-8">Team Schedule</h1>
 
