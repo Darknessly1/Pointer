@@ -1,4 +1,4 @@
-import Teamschedule from '../models/teamschedule.model.js';
+import TeamSchedule from '../models/team.model.js';
 
 export const getTeam = async (req, res) => {
     try {

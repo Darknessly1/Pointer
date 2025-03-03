@@ -15,12 +15,12 @@ const Mainmenu = ({ setPopupVisible }) => {
         const fetchUsers = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('http://localhost:5000/api/users');
-
+                const response = await fetch('http://localhost:9000/api/auth/fetchingUsers');
+    
                 if (!response.ok) {
                     throw new Error('Failed to fetch users');
                 }
-
+    
                 const data = await response.json();
                 setUsers(data);
                 setLoading(false);
@@ -29,7 +29,7 @@ const Mainmenu = ({ setPopupVisible }) => {
                 setLoading(false);
             }
         };
-
+    
         fetchUsers();
     }, []);
 
@@ -52,7 +52,7 @@ const Mainmenu = ({ setPopupVisible }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/teams', {
+            const response = await fetch('http://localhost:9000/api/teams', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

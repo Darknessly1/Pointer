@@ -6,5 +6,5 @@ const tesmscheduleSchema = new mongoose.Schema({
     members: { type: String, required: true },
 });
 
-const TeamSchedule = mongoose.model("Schedule", tesmscheduleSchema);
+const TeamSchedule = mongoose.model("TeamSchedule", tesmscheduleSchema);
 export default TeamSchedule;
