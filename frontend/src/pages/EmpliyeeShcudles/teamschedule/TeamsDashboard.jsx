@@ -1,13 +1,39 @@
-import { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from 'react';
 import Mainmenu from './Mainmenu';
-// import UserTeamsPage from './UserTeamsPage';
-// import TeamManagement from './TeamManagement';
+
 
 const TeamsDashboard = () => {
   const [activeTab, setActiveTab] = useState('myTeams');
-  // const currentUserId = 'user123';
 
   const [isPopupVisible, setPopupVisible] = useState(false);
+
+  const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:9000/api/team/getTeams');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+
+        const data = await response.json();
+        setTeams(data);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
 
   return (
@@ -72,22 +98,37 @@ const TeamsDashboard = () => {
               </nav>
             </div>
 
-            {/* Placeholder for content */}
-            <div className="bg-white p-6 rounded-lg shadow">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
               {activeTab === 'myTeams' ? (
                 <>
-                  <p className='mb-8'>My Teams content will go here Create one </p>
-                  <a
+                  {loading ? (
+                    <p className="text-gray-500 text-center">Loading teams...</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px] max-h-[400px] overflow-y-auto">
+                      {teams.length > 0 ? (
+                        teams.map((team) => (
+                          <div key={team._id} className="bg-blue-100 p-4 rounded-lg shadow-md">
+                            <h3 className="text-xl font-bold text-blue-800">{team.teamsName}</h3>
+                            <p className="text-gray-600">Leader: {team.teamsLeadersName}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-400 col-span-3 text-center">No teams found</p>
+                      )}
+                    </div>
+                  )}
+                  <button
                     onClick={() => setPopupVisible(true)}
-                    className="cursor-pointer rounded-lg inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-gray-900 text-white font-medium text-lg hover:rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 ease-in-out hover:from-blue-gray-300 hover:to-blue-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50"
+                    className="mt-4 w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all duration-200"
                   >
-                    Create Team
-                  </a>
+                    + Create Team
+                  </button>
                 </>
               ) : (
-                <p>Create Team content will go here</p>
+                <p className="text-gray-500">Create Team content will go here</p>
               )}
             </div>
+
           </main>
         </div>
       </div>

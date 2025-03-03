@@ -8,12 +8,15 @@ import teamschedule from './routes/team.router.js';
 
 import cors from 'cors';
 import  connectToMongoDB  from './db/connectToMongoDB.js';
+import TeamSchedule from "./models/team.model.js";
+
 
 dotenv.config({ path: '../.env' });
 
 
 const PORT = process.env.PORT || 2000;
 const app = express();
+app.use(cors());
 
 // Middleware
 app.use(express.json());
@@ -38,6 +41,7 @@ app.use('/api/team', teamschedule);
 
 
 // console.log("MongoDB URL:", process.env.MONGO_DB_URL); 
+
 
 app.listen(PORT, () => {
     connectToMongoDB();

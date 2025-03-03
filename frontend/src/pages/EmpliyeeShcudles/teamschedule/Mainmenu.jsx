@@ -15,12 +15,12 @@ const Mainmenu = ({ setPopupVisible }) => {
         const fetchUsers = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('http://localhost:9000/api/auth/fetchingUsers');
-    
+                const response = await fetch('http://localhost:9000/api/auth/fetchUsers');
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch users');
                 }
-    
+
                 const data = await response.json();
                 setUsers(data);
                 setLoading(false);
@@ -29,11 +29,10 @@ const Mainmenu = ({ setPopupVisible }) => {
                 setLoading(false);
             }
         };
-    
+
         fetchUsers();
     }, []);
 
-    // Handle member selection
     const toggleMemberSelection = (userId) => {
         if (selectedMembers.includes(userId)) {
             setSelectedMembers(selectedMembers.filter(id => id !== userId));
@@ -42,7 +41,6 @@ const Mainmenu = ({ setPopupVisible }) => {
         }
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -52,7 +50,7 @@ const Mainmenu = ({ setPopupVisible }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:9000/api/teams', {
+            const response = await fetch('http://localhost:9000/api/team/createTeam', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +58,7 @@ const Mainmenu = ({ setPopupVisible }) => {
                 body: JSON.stringify({
                     teamsName: teamName,
                     teamsLeadersName: teamLeader,
-                    members: JSON.stringify(selectedMembers)
+                    members: selectedMembers
                 }),
             });
 
@@ -74,7 +72,6 @@ const Mainmenu = ({ setPopupVisible }) => {
             setTeamLeader('');
             setSelectedMembers([]);
 
-            // Clear success message after 3 seconds
             setTimeout(() => {
                 setSuccess(null);
             }, 3000);
@@ -83,9 +80,9 @@ const Mainmenu = ({ setPopupVisible }) => {
         }
     };
 
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-50">
-            {/* Pop-up content */}
             <div className="z-10 bg-white  shadow-2xl p-6 max-w-4xl mx-auto w-full  border-2 border-black rounded-3xl">
                 <div className='grid grid-cols-2'>
                     <h1 className="text-2xl font-bold mb-6">Create New Team</h1>
@@ -98,7 +95,6 @@ const Mainmenu = ({ setPopupVisible }) => {
                         </button>
                     </div>
                 </div>
-                {/* Error and success messages */}
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                         {error}
@@ -111,7 +107,6 @@ const Mainmenu = ({ setPopupVisible }) => {
                     </div>
                 )}
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-gray-700 font-bold mb-2">Team Name</label>
@@ -133,7 +128,7 @@ const Mainmenu = ({ setPopupVisible }) => {
                         >
                             <option value="">Select a team leader</option>
                             {users.map((user) => (
-                                <option key={user._id} value={user._id}>
+                                <option key={user._id} value={user.fullName}>
                                     {user.fullName}
                                 </option>
                             ))}
@@ -145,7 +140,7 @@ const Mainmenu = ({ setPopupVisible }) => {
                         {loading ? (
                             <p>Loading users...</p>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[100px] max-h-[200px] overflow-y-auto">
                                 {users.map((user) => (
                                     <div
                                         key={user._id}
@@ -203,7 +198,6 @@ const Mainmenu = ({ setPopupVisible }) => {
                     </div>
                 </form>
 
-                {/* Close button */}
 
             </div>
         </div>
