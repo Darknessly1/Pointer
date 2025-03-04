@@ -12,19 +12,24 @@ export const fetchingUsers = async (req, res) => {
     }
 };
 
-
 export const signup = async (req, res) => {
     try {
-        const { fullName, userName, password, confirmPassword, gender } = req.body;
+        const { fullName, userName, email, phoneNumber, password, confirmPassword, gender } = req.body;
 
         if (password !== confirmPassword) {
             return res.status(400).json({ message: "Passwords don't match" });
         }
 
-        const user = await User.findOne({ userName });
+        const user = await User.findOne({ $or: [{ userName }, { email }, { phoneNumber }] });
 
         if (user) {
-            return res.status(400).json({ message: "User already exists" });
+            if (userExists.email === email) {
+                return res.status(400).json({ message: "Email already in use" });
+            } else if (userExists.phoneNumber === phoneNumber) {
+                return res.status(400).json({ message: "Phone number already in use" });
+            } else {
+                return res.status(400).json({ message: "Username already exists" });
+            }
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -36,6 +41,8 @@ export const signup = async (req, res) => {
         const newUser = new User({
             fullName,
             userName,
+            email,
+            phoneNumber,
             password: hashedPassword,
             gender,
             profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
@@ -49,10 +56,12 @@ export const signup = async (req, res) => {
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 userName: newUser.userName,
+                email: newUser.email,
+                phoneNumber: newUser.phoneNumber,
                 profulePic: newUser.profilePic
             });
         } else {
-            res.status(401).json({message: "Invalid user data"});
+            res.status(401).json({ message: "Invalid user data" });
         }
 
     } catch (err) {
@@ -77,6 +86,8 @@ export const login = async (req, res) => {
             _id: user._id,
             fullName: user.fullName,
             userName: user.userName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
             profilePic: user.profilePic,
             token
         });
@@ -87,11 +98,13 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    try{
-        res.cookie("jwt", "", {maxAge: 0});
-        res.status(200).json({message: "Logout Successfully"});
+    try {
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.status(200).json({ message: "Logout Successfully" });
     } catch (err) {
         console.log("Error Logout Controller ", err.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+

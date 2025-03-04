@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -19,6 +19,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: true,
         enum: ["male", "female"]
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        validate: {
+            validator: function(v) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            },
+            message: props => `${props.value} is not a valid email address!`
+        }
+    },
+    phoneNumber: {
+        type: String,
+        validate: {
+            validator: function(v) {
+                return /^\+?[1-9]\d{1,14}$/.test(v); 
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
     },
     profilePic: {
         type: String,

@@ -7,7 +7,9 @@ const SignUp = () => {
     const [inputs, setInputs] = useState({
         fullName: '',
         userName: '',
-        password: '',
+        email: '',
+        phoneNumber: '',
+        password: '',   
         confirmPassword: '',
         gender: '',
     });
@@ -34,20 +36,40 @@ const SignUp = () => {
                         <label className="block text-sm text-black mb-1 font-bold">Full Name</label>
                         <input
                             type="text"
-                            placeholder="John Doe"
+                            placeholder="Full Name"
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
                             value={inputs.fullName}
                             onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm text-black mb-1 font-bold">Username</label>
+                        <label className="block text-sm text-black mb-1 font-bold">User Name</label>
                         <input
                             type="text"
-                            placeholder="johndoe"
+                            placeholder="User Name"
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
                             value={inputs.userName}
                             onChange={(e) => setInputs({ ...inputs, userName: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-black mb-1 font-bold">Email</label>
+                        <input
+                            type="text"
+                            placeholder="Email"
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                            value={inputs.email}
+                            onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-black mb-1 font-bold">Phone Number</label>
+                        <input
+                            type="text"
+                            placeholder="Phone Number"
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                            value={inputs.phoneNumber}
+                            onChange={(e) => setInputs({ ...inputs, phoneNumber: e.target.value })}
                         />
                     </div>
                     <div>

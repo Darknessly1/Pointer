@@ -1,39 +1,62 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Mainmenu from './Mainmenu';
+import { AuthContext } from '../../../context/AuthContext';
+
 
 
 const TeamsDashboard = () => {
   const [activeTab, setActiveTab] = useState('myTeams');
-
+  const { authUser } = useContext(AuthContext);
   const [isPopupVisible, setPopupVisible] = useState(false);
-
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchTeams = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9000/api/team/getTeams');
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          console.error("Token is missing or invalid");
+          return;
+        }
+
+        if (!authUser) {
+          console.error("authUser  is missing");
+          return;
+        }
+
+        const response = await fetch('http://localhost:9000/api/team/getTeams', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch users');
+          const errorMessage = await response.text();
+          throw new Error(`Failed to fetch teams: ${errorMessage}`);
         }
 
         const data = await response.json();
         setTeams(data);
         setLoading(false);
       } catch (error) {
+        console.error("Error fetching teams:", error);
         setError(error.message);
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchTeams();
   }, []);
+
+
 
 
   return (
@@ -57,7 +80,7 @@ const TeamsDashboard = () => {
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             ></path>
           </svg>
-          Try The Individual Schedule
+          Switch To Individual Schedule
         </a>
       </div >
       <div className="flex justify-center items-center p-4">
@@ -93,7 +116,7 @@ const TeamsDashboard = () => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                 >
-                  Test
+                  Schedule
                 </button>
               </nav>
             </div>
@@ -107,9 +130,31 @@ const TeamsDashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px] max-h-[400px] overflow-y-auto">
                       {teams.length > 0 ? (
                         teams.map((team) => (
-                          <div key={team._id} className="bg-blue-100 p-4 rounded-lg shadow-md">
+                          <div key={team._id} className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col h-full">
                             <h3 className="text-xl font-bold text-blue-800">{team.teamsName}</h3>
                             <p className="text-gray-600">Leader: {team.teamsLeadersName}</p>
+
+                            <div className="mt-4">
+                              <h4 className="text-gray-700 font-semibold mb-2">Members:</h4>
+                              <ul className="space-y-1 grid grid-cols-3 gap-0">
+                                {team.members.map((member) => (
+                                  <li
+                                    key={member._id}
+                                    className=" bg-blue-gray-200/30 w-fit text-black px-3 py-1 rounded-lg text-sm font-medium shadow-sm"
+                                  >
+                                    {member.fullName}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div className="mt-auto pt-4">
+                              <a
+                                href="/teamschedule"
+                                className="inline-flex items-center justify-center px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-gray-700 text-white font-normal text-sm rounded-lg hover:rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 ease-in-out hover:from-blue-gray-300 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50"
+                              >
+                                Create Schedule
+                              </a>
+                            </div>
                           </div>
                         ))
                       ) : (
@@ -119,7 +164,7 @@ const TeamsDashboard = () => {
                   )}
                   <button
                     onClick={() => setPopupVisible(true)}
-                    className="mt-4 w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all duration-200"
+                    className="m-2 inline-flex items-center justify-center px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-gray-700 text-white font-normal text-base rounded-lg hover:rounded-3xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 ease-in-out hover:from-blue-gray-300 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50"
                   >
                     + Create Team
                   </button>
@@ -137,6 +182,9 @@ const TeamsDashboard = () => {
           setPopupVisible={setPopupVisible}
         />
       )}
+
+      { }
+
     </>
 
   );

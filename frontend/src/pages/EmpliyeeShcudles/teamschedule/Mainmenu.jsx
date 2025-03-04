@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
 
 const Mainmenu = ({ setPopupVisible }) => {
     const [users, setUsers] = useState([]);
@@ -9,8 +10,9 @@ const Mainmenu = ({ setPopupVisible }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const { authUser } = useContext(AuthContext);
 
-    // Fetch all users on component mount
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -49,11 +51,23 @@ const Mainmenu = ({ setPopupVisible }) => {
             return;
         }
 
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.error("Token is missing or invalid");
+            return;
+        }
+
+        if (!authUser) {
+            console.error("authUser  is missing");
+            return;
+        }
+
         try {
             const response = await fetch('http://localhost:9000/api/team/createTeam', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
                 },
                 body: JSON.stringify({
                     teamsName: teamName,
@@ -71,14 +85,11 @@ const Mainmenu = ({ setPopupVisible }) => {
             setTeamName('');
             setTeamLeader('');
             setSelectedMembers([]);
-
-            setTimeout(() => {
-                setSuccess(null);
-            }, 3000);
         } catch (error) {
             setError(error.message);
         }
     };
+
 
 
     return (

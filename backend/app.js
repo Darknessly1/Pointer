@@ -8,7 +8,7 @@ import teamschedule from './routes/team.router.js';
 
 import cors from 'cors';
 import  connectToMongoDB  from './db/connectToMongoDB.js';
-import TeamSchedule from "./models/team.model.js";
+import fetchUser from './routes/user.router.js';
 
 
 dotenv.config({ path: '../.env' });
@@ -38,6 +38,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/workers', workerRoutes);
 app.use('/api/schedule', scheduleRouter);
 app.use('/api/team', teamschedule);
+app.use('/api/user', fetchUser);
 
 
 // console.log("MongoDB URL:", process.env.MONGO_DB_URL); 
