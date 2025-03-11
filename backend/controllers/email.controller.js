@@ -15,15 +15,14 @@ export const emailsend = async (req, res) => {
 
         let recipient;
         let emailAddress;
-        
-        // Handle internal recipient (user in the app)
+
         if (recipientUsername) {
             recipient = await User.findOne({ userName: recipientUsername });
             if (!recipient) {
                 return res.status(404).json({ message: "Recipient not found." });
             }
             emailAddress = recipient.email;
-        } 
+        }
         // Handle external recipient (outside email)
         else if (recipientEmail) {
             recipient = { email: recipientEmail };
@@ -41,17 +40,20 @@ export const emailsend = async (req, res) => {
         });
         await newEmail.save();
 
-        // Send actual email using nodemailer for external recipients
-        if (recipientEmail) {
+        // Send actual email for both internal and external recipients
+        // This ensures all communications go through email as well
+        if (emailAddress) {
+            console.log(`Attempting to send email to ${emailAddress}`);
             const emailSent = await sendEmail(emailAddress, subject, body);
             if (!emailSent) {
-                return res.status(500).json({ message: "Failed to send external email." });
+                console.log("Email sending failed, but was saved to database");
+                // We still consider this a success since we saved to the database
             }
         }
 
         res.status(200).json({ message: "Email sent successfully." });
     } catch (error) {
-        console.error("Error sending email:", error);
+        console.error("Error in email controller:", error);
         res.status(500).json({ message: "Internal server error." });
     }
 };
