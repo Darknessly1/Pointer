@@ -1,4 +1,5 @@
 import User from '../models/user.model.js';
+import bcrypt from "bcrypt";
 
 export const fetchCurrentUser = async (req, res) => {
     try {
@@ -62,6 +63,44 @@ export const updateCurrentUser = async (req, res) => {
         res.status(500).json({ message: "Failed to update user data." });
     }
 };
+
+export const updatePassword = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized. User not logged in." });
+        }
+
+        const { currentPassword, newPassword } = req.body;
+
+        // Find the user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Verify the current password
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Current password is incorrect." });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update the user's password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully." });
+    } catch (error) {
+        console.error("Error updating password:", error.message);
+        res.status(500).json({ message: "Failed to update password." });
+    }
+};
+
 
 export const uploadProfilePicture = async (req, res) => {
     try {
