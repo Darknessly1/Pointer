@@ -199,15 +199,16 @@ export default function TopNavbar() {
                     </div>
                 </Navbar>
             </div >
+
             {authUser && (
                 <div>
                     {isDrawerOpen && (
-                        <div className="">
-
+                        <div>
                             <Drawer
                                 open={isDrawerOpen}
                                 onClose={closeDrawer}
                                 hideBackdrop={true}
+                                className="bg-blue-gray-50"
                             >
                                 <Card
                                     color="transparent"
@@ -325,7 +326,7 @@ export default function TopNavbar() {
                                             </AccordionBody>
                                         </Accordion>
 
-                                        <hr className="my-2 border-blue-gray-50" />
+                                        <hr className="my-2 border-blue-gray-900" />
 
                                         <Link to="/inbox">
                                             <ListItem>

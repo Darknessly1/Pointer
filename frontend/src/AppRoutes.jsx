@@ -6,7 +6,7 @@ import Reporting from "./pages/Dashboard/Reporting";
 import Settings from "./pages/Settings";
 import Schedulestable from "./pages/EmpliyeeShcudles/Schedulestable";
 import Projects from "./pages/Dashboard/Projects";
-import Allemp from "./pages/EmpliyeeShcudles/Allemp";
+import Chat from "./pages/EmpliyeeShcudles/Chat";
 import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
@@ -16,6 +16,7 @@ import Contactus from "./pages/Contactus";
 import Teamschedule from "./pages/EmpliyeeShcudles/teamschedule/Teamschedule";
 import TeamsDashboard from "./pages/EmpliyeeShcudles/teamschedule/TeamsDashboard";
 import Mainmenu from "./pages/EmpliyeeShcudles/teamschedule/Mainmenu";
+import DiscussionPage from "./pages/EmpliyeeShcudles/DiscussionPage";
 
 const AppRoutes = () => (
     <Routes>
@@ -26,7 +27,8 @@ const AppRoutes = () => (
         <Route path="/settings" element={<Settings />} />
         <Route path="/schedulestable" element={<Schedulestable />} />
         <Route path="/projects" element={<Projects />} />
-        <Route path="/allemp" element={<Allemp />} />
+        <Route path="/allemp" element={<Chat />} />
+        <Route path="/discussion" element={<DiscussionPage />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />

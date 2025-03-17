@@ -18,7 +18,7 @@ const Inbox = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-10">
+        <div className="min-h-screen py-10">
             <div className="space-y-10">
                 <ComposeEmail />
                 <EmailList />

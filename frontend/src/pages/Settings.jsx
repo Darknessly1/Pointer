@@ -75,7 +75,7 @@ const SettingsPage = () => {
 
     const menuItems = [
         { icon: <User size={18} />, label: "Account" },
-        { icon: <Bell size={18} />, label: "Notifications" },
+        { icon: <Bell size={18} />, label: "Inbox" },
         { icon: <Shield size={18} />, label: "Privacy & Security" },
         { icon: <CreditCard size={18} />, label: "Billing" },
         { icon: <Monitor size={18} />, label: "Appearance" },
@@ -240,7 +240,7 @@ const SettingsPage = () => {
                                 isSaving={isSaving}
                             />
                         }
-                        {selectedSection === "Notifications" && <Inbox />}
+                        {selectedSection === "Inbox" && <Inbox />}
                         {selectedSection === "Privacy & Security" &&
                             <Privacy
                                 onUpdatePassword={handlePasswordUpdate}

@@ -4,7 +4,6 @@ import WorkerSearch from '../components/WorkerSearch';
 import WorkerTable from '../components/WorkerTable';
 import ProfessionOptions from '../components/ProfessionOptions';
 import MainTable from '../components/MainTable';
-
 import {
     Card,
     Input,
