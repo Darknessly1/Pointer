@@ -1,21 +1,36 @@
 import { io } from "socket.io-client";
 
-const username = localStorage.getItem("authToken");
+const authToken = localStorage.getItem("authToken");
+let userId = null;
 
-const socket = io("ws://localhost:9000", {
-    query: { username } 
+if (authToken) {
+    try {
+        const decodedToken = JSON.parse(atob(authToken.split(".")[1]));
+        userId = decodedToken.id || null;
+    } catch (error) {
+        console.error("❌ Error decoding authToken:", error);
+    }
+}
+
+const socket = io("http://localhost:9000", {
+    query: userId ? { userId } : {},
+    transports: ["websocket"],
+    withCredentials: true,
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 3000,
 });
 
 socket.on("connect", () => {
-    console.log(` Connected to WebSocket as: ${username}`);
+    console.log(`Connected to WebSocket as User ID: ${userId || "Unknown"}`);
 });
 
-export const joinRoom = (user1, user2) => {
-    socket.emit("joinRoom", { user1, user2 });
-};
+socket.on("disconnect", (reason) => {
+    console.warn(`Disconnected: ${reason}`);
+});
 
-export const sendMessage = (receiver, message) => {
-    socket.emit("sendMessage", { sender: username, receiver, message });
+export const sendMessage = (receiverId, message) => {
+    socket.emit("sendMessage", { senderId: userId, receiverId, message });
 };
 
 socket.on("receiveMessage", ({ sender, message }) => {

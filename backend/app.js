@@ -13,6 +13,7 @@ import connectToMongoDB from './db/connectToMongoDB.js';
 import fetchUser from './routes/user.router.js';
 import http from 'http'; 
 import { setupSocket } from './socket/socket.js';
+import cookieParser from "cookie-parser"; 
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,11 +24,18 @@ dotenv.config({ path: '../.env' });
 
 const PORT = process.env.PORT || 2000;
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173", 
+    methods: ["GET", "POST"],
+    credentials: true, 
+}));
 app.use(express.json());
-const server = http.createServer(app); 
+app.use(cookieParser());
 
-setupSocket(server); 
+const server = http.createServer(app);
+
+const io = setupSocket(server);
+app.set("io", io);
 
 // Middleware
 app.use((req, res, next) => {
@@ -53,8 +61,6 @@ app.use('/api/team', teamschedule);
 app.use('/api/user', fetchUser);
 app.use('/api/email', fetchEmails);
 app.use('/api/chat', chatRouter);
-
-
 
 server.listen(PORT, () => {
     connectToMongoDB();

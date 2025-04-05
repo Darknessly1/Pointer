@@ -314,7 +314,7 @@ export default function TopNavbar() {
                                                             Schedule
                                                         </ListItem>
                                                     </Link>
-                                                    <Link to="/allemp">
+                                                    <Link to="/discussion">
                                                         <ListItem>
                                                             <ListItemPrefix>
                                                                 <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />

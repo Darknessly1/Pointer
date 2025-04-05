@@ -1,22 +1,37 @@
 import Chat from "../models/chat.model.js";
+import mongoose from "mongoose";
 
 export const sendMessage = async (req, res) => {
     try {
         const { senderId, receiverId, message } = req.body;
 
-        const chatMessage = new Chat({ senderId, receiverId, message });
-        await chatMessage.save();
+        if (!senderId || !receiverId || !message.trim()) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
 
-        res.status(201).json(chatMessage);
+        const newMessage = new Chat({ senderId, receiverId, message, timestamp: new Date() });
+        await newMessage.save();
+
+        req.app.get("io").to(receiverId).emit("receiveMessage", newMessage);
+
+        res.status(200).json(newMessage);
     } catch (error) {
         console.error("Error sending message:", error);
-        res.status(500).json({ message: "Failed to send message" });
+        res.status(500).json({ message: "Server error" });
     }
 };
 
 export const getMessages = async (req, res) => {
     try {
         const { senderId, receiverId } = req.query;
+
+        if (!senderId || !receiverId) {
+            return res.status(400).json({ message: "Missing senderId or receiverId" });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(senderId) || !mongoose.Types.ObjectId.isValid(receiverId)) {
+            return res.status(400).json({ message: "Invalid user ID format" });
+        }
 
         const messages = await Chat.find({
             $or: [

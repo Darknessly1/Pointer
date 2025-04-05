@@ -1,18 +1,209 @@
 export const Aboutus = () => {
     return (
         <>
-            <h1 className="m-5 text-6xl font-bold text-center text-gray-800">About Our Web Site And Services</h1>
+            <h1 className="m-5  text-6xl font-bold text-center text-gray-800 ">Contact Us</h1>
 
-            <div className="border-2 max-w-screen-2xl mx-auto border-black rounded-3xl bg-white/40"
-                style={{ marginTop: "15vh" }}
-            >
-                <div className="grid grid-cols-2  px-4 py-16 mx-auto sm:max-w-xl  md:max-w-full lg:max-w-screen-2xl md:px-24 lg:px-8 lg:py-5">
-
-                    <div className="grid gap-3 row-gap-10 sm:grid-cols-2 lg:grid-cols-2">
+            <div className="border-2 max-w-screen-2xl mx-auto border-black rounded-3xl  bg-white/40">
+                <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
+                    <div className="flex flex-col mb-6 lg:flex-row md:mb-10">
+                        <div className="lg:w-1/2">
+                            <h2 className="max-w-md mb-6 font-sans text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl sm:leading-none xl:max-w-lg">
+                                To conquer the space you must trust.
+                            </h2>
+                        </div>
+                        <div className="lg:w-1/2">
+                            <p className="text-base text-gray-700 md:text-lg">
+                                For those who have seen the Earth from space, and for the hundreds
+                                and perhaps thousands more who will, the experience most certainly
+                                 changes your perspective.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="grid gap-8 row-gap-10 sm:grid-cols-2 lg:grid-cols-4">
                         <div>
-                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full">
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full ">
                                 <svg
-                                    className="w-7 h text-black"
+                                    className="w-7 h-7 text-black"
+                                    strokeLinecap="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle cx="11" cy="13" fill="none" r="9" stroke="currentColor" />
+                                    <path
+                                        d=" M21.955,18.005c1.089,2.145,1.378,3.816,0.622,4.572C20.92,24.234,14.799,20.799,9,15S-0.234,3.08,1.423,1.423 C2.18,0.666,3.853,0.956,6,2.047"
+                                        stroke="currentColor"
+                                        fill="none"
+                                    />
+                                </svg>
+                            </div>
+                            <h6 className="mb-2 font-semibold leading-5">Our planet</h6>
+                            <p className="mb-3 text-sm text-gray-900">
+                                We choose to go to the moon, not because {"it's"} easy, but because {"it's"}
+                                hard.
+                            </p>
+                            <ul className="mb-4 -ml-1 space-y-2">
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Earth
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Space
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Humans
+                                </li>
+                            </ul>
+                            <a
+                                href="/"
+                                aria-label=""
+                                className="inline-flex items-center font-semibold transition-colors duration-200 text-blue-gray-500 hover:text-deep-purple-800"
+                            >
+                                Learn more
+                            </a>
+                        </div>
+                        <div>
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
+                                <svg
+                                    className="w-7 h-7 text-blue-gray-500"
+                                    viewBox="0 0 24 24"
+                                    strokeLinecap="round"
+                                >
+                                    <path
+                                        d="M2,10C2,5.029,6.47,1,12,1c5.379,0,10,4.029,10,9S15.712,23,12,23C8.212,23,2,14.971,2,10Z"
+                                        fill="none"
+                                        strokeWidth="2"
+                                        stroke="currentColor"
+                                    />
+                                    <path
+                                        d="M5,9a6.529,6.529,0,0,1,4.393,1.607C10.705,11.92,10,15,10,15a6.59,6.59,0,0,1-3.436-1.564C5.022,11.894,5,9,5,9Z"
+                                        fill="none"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                    />
+                                    <path
+                                        d="M19,9a6.523,6.523,0,0,0-4.392,1.608C13.3,11.92,14,15,14,15a6.59,6.59,0,0,0,3.436-1.564C18.978,11.894,19,9,19,9Z"
+                                        fill="none"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                    />
+                                </svg>
+                            </div>
+                            <h6 className="mb-2 font-semibold leading-5">Another life</h6>
+                            <p className="mb-3 text-sm text-gray-900">
+                                There can be no thought of finishing for {"aiming for the stars"}.
+                            </p>
+                            <ul className="mb-4 -ml-1 space-y-2">
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Life
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Aliens
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="mr-1">
+                                        <svg
+                                            className="w-5 h-5 mt text-blue-gray-500"
+                                            stroke="currentColor"
+                                            viewBox="0 0 52 52"
+                                        >
+                                            <polygon
+                                                strokeWidth="4"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                fill="none"
+                                                points="29 13 14 29 25 29 23 39 38 23 27 23"
+                                            />
+                                        </svg>
+                                    </span>
+                                    Shrek
+                                </li>
+                            </ul>
+                            <a
+                                href="/"
+                                aria-label=""
+                                className="inline-flex items-center font-semibold transition-colors durationtext-blue-gray-500 hover:text-deep-purple-800"
+                            >
+                                Learn more
+                            </a>
+                        </div>
+                        <div>
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
+                                <svg
+                                    className="w-7 h text-blue-gray-500"
                                     strokeLinecap="round"
                                     strokeWidth="2"
                                     viewBox="0 0 24 24"
@@ -51,7 +242,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -69,7 +260,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -87,7 +278,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -112,9 +303,9 @@ export const Aboutus = () => {
                             </a>
                         </div>
                         <div>
-                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full ">
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
                                 <svg
-                                    className="w-7 h-7 text-black"
+                                    className="w-7 h-7 text-blue-gray-500"
                                     strokeLinecap="round"
                                     strokeWidth="2"
                                     viewBox="0 0 24 24"
@@ -146,7 +337,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -164,7 +355,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -182,7 +373,7 @@ export const Aboutus = () => {
                                 <li className="flex items-start">
                                     <span className="mr-1">
                                         <svg
-                                            className="w-5 h-5 mt-px text-black"
+                                            className="w-5 h-5 mt-px text-blue-gray-500"
                                             stroke="currentColor"
                                             viewBox="0 0 52 52"
                                         >
@@ -207,46 +398,15 @@ export const Aboutus = () => {
                             </a>
                         </div>
                     </div>
-
-                    <div className="shadow-lg shadow-black absolute bg-gray-300 border-2 max-w-screen-sm z-10 border-black m-2 rounded-3xl p-6 flex flex-col mb-6 lg:flex-row md:mb-10"
-                        style={{
-                            height: "60vh",
-                            paddingTop: "10vh",
-                            top: "-10vh",
-                            left: "95vh",
-                        }}
-                    >
-                        <div>
-                            <h2 className="max-w-md mb-6 font-sans text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl sm:leading-none xl:max-w-lg">
-                                To conquer the space you must trust.
-                            </h2>
-                            <p className="text-base text-gray-700 md:text-lg">
-                                For those who have seen the Earth from space, and for the hundreds
-                                and perhaps thousands more who will, the experience most certainly
-                                changes your perspective.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div>
-
-                    </div>
-
-
                 </div>
             </div>
 
-            <div className="relative grid grid-cols-2 overflow-hidden"
-                style={{ height: "130vh" }}
-            >
+            <div className="relative grid grid-cols-2 overflow-hidden">
                 {/* first one */}
-                <div className="absolute px-4 py-16 mt-20 z-10"
-                    style={{
-                        marginRight: "30%",
-                        left: "30%",
-                    }}
+                <div className="relative px-4 py-16 mt-20"
+                    style={{ marginRight: "30%", left: "30%" }}
                 >
-                    <div className="w-full border-2 border-black rounded-3xl bg-gray-300 px-4 py-16 mx-auto shadow-xl shadow-black">
+                    <div className="w-full border-2 border-black rounded-3xl bg-white/40 px-4 py-16 mx-auto">
                         <div className="max-w-xl mb-10 md:mx-auto sm:text-center lg:max-w-2xl md:mb-12">
                             <div>
                                 <p className="inline-block px-3 py-px mb-4 text-xs font-semibold tracking-wider text-teal-900 uppercase rounded-full bg-teal-accent-400">
@@ -287,7 +447,7 @@ export const Aboutus = () => {
                             </p>
                         </div>
                         <div className="max-w-lg space-y-3 sm:mx-auto lg:max-w-xl">
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -307,7 +467,7 @@ export const Aboutus = () => {
                                     Change the world by being yourself.
                                 </span>
                             </div>
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -325,7 +485,7 @@ export const Aboutus = () => {
                                 </div>
                                 <span className="text-gray-800">Die with memories, not dreams.</span>
                             </div>
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -343,7 +503,7 @@ export const Aboutus = () => {
                                 </div>
                                 <span className="text-gray-800">What we think, we become.</span>
                             </div>
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -363,7 +523,7 @@ export const Aboutus = () => {
                                     Be so good they can’t ignore you.
                                 </span>
                             </div>
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -383,7 +543,7 @@ export const Aboutus = () => {
                                     Simplicity is the ultimate sophistication.
                                 </span>
                             </div>
-                            <div className="border-2 border-black bg-gray-300 cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
+                            <div className="border-2 border-black cursor-pointer flex items-center p-2 duration-300 transform  rounded shadow hover:scale-105 sm:hover:scale-110">
                                 <div className="mr-2">
                                     <svg
                                         className="w-6 h-6 text-blue-gray-500 sm:w-8 sm:h-8"
@@ -408,16 +568,19 @@ export const Aboutus = () => {
                 </div>
 
                 <div>
+
                 </div>
 
                 {/* second one */}
-                <div className="absolute px-4 py-20 ml-20"
-                    style={{ marginLeft: "10%" }}
-                >
+                <div className="px-4 py-16">
                     <div className="w-full border-2 border-black rounded-3xl p-3 bg-white/40 py-5">
                         <div className="max-w-xl pr-16 mx-auto mb-10">
                             <div className="grid gap-5 row-gap-5 sm:grid-cols-2">
-                                <div className="max-w-md ml-12">
+                                <div className="max-w-md">
+                                    
+                                </div>
+
+                                <div className="max-w-md">
                                     <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
                                         <svg
                                             className="w-12 h-12 text-blue-gray-500"
@@ -440,12 +603,11 @@ export const Aboutus = () => {
                                         triplefin.
                                     </p>
                                 </div>
-
+                                
                                 <div className="max-w-md">
-
+                                    
                                 </div>
-
-                                <div className="max-w-md ml-12">
+                                <div className="max-w-md">
                                     <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
                                         <svg
                                             className="w-12 h-12 text-blue-gray-500"
@@ -468,80 +630,9 @@ export const Aboutus = () => {
                                         synergy capacity.
                                     </p>
                                 </div>
-                                <div className="max-w-md">
-
-                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div>
-                    <div className="absolute px-4 py-16"
-                        style={{ marginTop: "50vh" }}
-                    >
-                        <div className="w-full border-2 border-black rounded-3xl p-3 bg-white/40 py-5">
-                            <div className="max-w-xl pr-16 mx-auto mb-10">
-                                <div className="grid gap-5 row-gap-5 sm:grid-cols-2">
-                                    <div className="max-w-md">
-
-                                    </div>
-
-                                    <div className="max-w-md ml-14">
-                                        <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
-                                            <svg
-                                                className="w-12 h-12 text-blue-gray-500"
-                                                stroke="currentColor"
-                                                viewBox="0 0 52 52"
-                                            >
-                                                <polygon
-                                                    strokeWidth="3"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    fill="none"
-                                                    points="29 13 14 29 25 29 23 39 38 23 27 23"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <h6 className="mb-2 font-semibold leading-5">When has justice</h6>
-                                        <p className="text-sm text-gray-700">
-                                            Rough pomfret lemon shark plownose chimaera southern sandfish
-                                            kokanee northern sea robin Antarctic cod. Yellow-and-black
-                                            triplefin.
-                                        </p>
-                                    </div>
-
-                                    <div className="max-w-md">
-
-                                    </div>
-                                    <div className="max-w-md ml-14">
-                                        <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
-                                            <svg
-                                                className="w-12 h-12 text-blue-gray-500"
-                                                stroke="currentColor"
-                                                viewBox="0 0 52 52"
-                                            >
-                                                <polygon
-                                                    strokeWidth="3"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    fill="none"
-                                                    points="29 13 14 29 25 29 23 39 38 23 27 23"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <h6 className="mb-2 font-semibold leading-5">A slice of heaven</h6>
-                                        <p className="text-sm text-gray-700">
-                                            Disrupt inspire and think tank, social entrepreneur but
-                                            preliminary thinking think tank compelling. Inspiring, invest
-                                            synergy capacity.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </>

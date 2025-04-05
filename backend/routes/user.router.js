@@ -1,5 +1,5 @@
 import express from "express";
-import { fetchCurrentUser, updateCurrentUser, uploadProfilePicture, updatePassword } from "../controllers/users.controller.js";
+import { fetchCurrentUser, updateCurrentUser, uploadProfilePicture, updatePassword, getAllUsers } from "../controllers/users.controller.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 import multer from "multer";
 
@@ -20,5 +20,6 @@ router.get("/fetchCurrentUser", authenticateUser , fetchCurrentUser);
 router.put("/updateCurrentUser", authenticateUser , updateCurrentUser); 
 router.put("/uploadProfilePicture", authenticateUser, upload.single("profilePic"), uploadProfilePicture);
 router.put("/update-password", authenticateUser, updatePassword);
+router.get("/users", authenticateUser, getAllUsers);
 
 export default router;

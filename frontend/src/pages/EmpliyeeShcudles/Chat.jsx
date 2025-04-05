@@ -8,6 +8,7 @@ const Chat = ({ user, receiverId }) => {
 
     useEffect(() => {
         fetchMessages();
+
         socket.on("receiveMessage", (newMessage) => {
             setMessages((prev) => [...prev, newMessage]);
         });
@@ -15,7 +16,7 @@ const Chat = ({ user, receiverId }) => {
         return () => {
             socket.off("receiveMessage");
         };
-    }, []);
+    }, [receiverId]);
 
     const fetchMessages = async () => {
         try {
@@ -30,11 +31,11 @@ const Chat = ({ user, receiverId }) => {
 
     const sendMessage = async () => {
         if (!message.trim()) return;
-        
+
         const newMessage = { senderId: user._id, receiverId, message };
-        
+
         socket.emit("sendMessage", newMessage);
-        
+
         try {
             await axios.post("http://localhost:9000/api/chat/send", newMessage);
             setMessages((prev) => [...prev, newMessage]);
@@ -53,7 +54,7 @@ const Chat = ({ user, receiverId }) => {
                     </p>
                 ))}
             </div>
-            <input
+            <input  
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
