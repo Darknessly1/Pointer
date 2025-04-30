@@ -11,7 +11,7 @@ let loggedInUserId = null;
 if (authToken) {
     try {
         const decoded = jwtDecode(authToken);
-        console.log(decoded); 
+        console.log(decoded);
         loggedInUserId = decoded.userId || decoded.id || decoded._id;
     } catch (err) {
         console.error("Failed to decode token:", err);
@@ -55,13 +55,13 @@ const DiscussionPage = () => {
                 setMessages((prevMessages) => [...prevMessages, newMessage]);
             }
         };
-
+    
         socket.on("receiveMessage", handleMessageReceive);
-
+    
         return () => {
             socket.off("receiveMessage", handleMessageReceive);
         };
-    }, [selectedUser, messages]);
+    }, [selectedUser]); 
 
     const fetchMessages = async (user) => {
         if (!user?._id || !loggedInUserId) {
@@ -91,8 +91,10 @@ const DiscussionPage = () => {
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
+        setMessages([]); 
         fetchMessages(user);
     };
+    
 
     const sendMessage = async () => {
         if (!message.trim() || !selectedUser?._id || !loggedInUserId) {
@@ -107,7 +109,7 @@ const DiscussionPage = () => {
         const newMessage = {
             senderId: loggedInUserId,
             receiverId: selectedUser._id,
-            message: message.trim(), 
+            content: message.trim(),
             timestamp: new Date(),
         };
 
@@ -117,8 +119,11 @@ const DiscussionPage = () => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                socket.emit("sendMessage", newMessage);
-                setMessages([...messages, newMessage]);
+                const savedMessage = response.data;
+                
+                socket.emit("sendMessage", savedMessage);
+            
+                setMessages((prevMessages) => [...prevMessages, savedMessage]);
                 setMessage("");
             } else {
                 console.error("Unexpected response:", response);
@@ -160,7 +165,7 @@ const DiscussionPage = () => {
                                     className={`text-sm ${msg.senderId === loggedInUserId ? "text-right" : "text-left"} text-gray-600`}
                                 >
                                     <p className={msg.senderId === loggedInUserId ? "font-semibold text-blue-600" : "font-semibold text-green-600"}>
-                                        {msg.senderId === loggedInUserId ? "You" : selectedUser.username}:
+                                        {msg.senderId === loggedInUserId ? "You" : selectedUser.fullName}:
                                     </p>
                                     <p>{msg.content}</p>
                                 </div>

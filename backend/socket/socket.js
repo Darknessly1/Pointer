@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import Chat from "../models/chat.model.js";
 import User from "../models/user.model.js";
 
+
 const onlineUsers = new Map();
 
 const setupSocket = (server) => {
@@ -11,57 +12,49 @@ const setupSocket = (server) => {
             methods: ["GET", "POST"],
             credentials: true,
         },
-        transports: ["websocket", "polling"],
     });
 
-    io.on("connection", async (socket) => {
-        const userId = socket.handshake.query.userId;
-        if (!userId || userId === "null" || !userId.match(/^[0-9a-fA-F]{24}$/)) {
-            console.log("❌ Invalid user ID, disconnecting...");
-            return socket.disconnect();
+    io.on("connection", (socket) => {
+        const token = socket.handshake.query.authToken;
+        let userId = null;
+
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                userId = decoded.userId || decoded.id || decoded._id;
+                if (userId) {
+                    socket.join(userId); 
+                    onlineUsers.set(userId, socket.id);
+                    console.log(`🔌 User connected: ${userId}`);
+                }
+            } catch (err) {
+                console.error("Socket auth failed:", err.message);
+            }
         }
 
-        const user = await User.findById(userId);
-        if (!user) return socket.disconnect();
+        socket.on("sendMessage", async (data) => {
+            const { senderId, receiverId, content } = data;
 
-        if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
-        onlineUsers.get(userId).add(socket.id);
+            if (!senderId || !receiverId || !content?.trim()) return;
 
-        console.log(`User connected: ${user.userName} (Socket ID: ${socket.id})`);
-
-        io.emit("userOnline", userId);
-
-        socket.on("sendMessage", async ({ senderId, receiverId, message }) => {
-            if (!senderId || !receiverId || !message.trim()) return;
-
-            const chatMessage = new Chat({ senderId, receiverId, message });
+            const chatMessage = new Chat({ senderId, receiverId, content });
             await chatMessage.save();
 
             const messageData = {
                 _id: chatMessage._id,
                 senderId,
                 receiverId,
-                message,
+                content,
                 timestamp: chatMessage.createdAt,
             };
 
-            if (onlineUsers.has(receiverId)) {
-                onlineUsers.get(receiverId).forEach(socketId => {
-                    io.to(socketId).emit("receiveMessage", messageData);
-                });
-            }
-
-            // Send message back to sender too
-            socket.emit("receiveMessage", messageData);
+            io.to(senderId).emit("receiveMessage", messageData);
+            io.to(receiverId).emit("receiveMessage", messageData);
         });
 
         socket.on("disconnect", () => {
-            onlineUsers.get(userId)?.delete(socket.id);
-            if (onlineUsers.get(userId)?.size === 0) {
-                onlineUsers.delete(userId);
-                io.emit("userOffline", userId);
-            }
-            console.log(`User disconnected: ${user.userName}`);
+            console.log("User disconnected:", socket.id);
+            if (userId) onlineUsers.delete(userId);
         });
     });
 

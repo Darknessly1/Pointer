@@ -3,13 +3,15 @@ import mongoose from "mongoose";
 
 export const sendMessage = async (req, res) => {
     try {
-        const { senderId, receiverId, message } = req.body;
+        const { senderId, receiverId, content } = req.body;
 
-        if (!senderId || !receiverId || !message.trim()) {
+        if (!senderId || !receiverId || !content || !content.trim()) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        const newMessage = new Chat({ senderId, receiverId, message, timestamp: new Date() });
+        const newMessage = new Chat({ senderId, receiverId, content: content.trim(), timestamp: new Date() });
+
+
         await newMessage.save();
 
         req.app.get("io").to(receiverId).emit("receiveMessage", newMessage);
