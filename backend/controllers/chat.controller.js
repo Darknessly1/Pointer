@@ -1,27 +1,27 @@
 import Chat from "../models/chat.model.js";
 import mongoose from "mongoose";
 
-export const sendMessage = async (req, res) => {
-    try {
-        const { senderId, receiverId, content } = req.body;
+// export const sendMessage = async (req, res) => {
+//     try {
+//         const { senderId, receiverId, content } = req.body;
 
-        if (!senderId || !receiverId || !content || !content.trim()) {
-            return res.status(400).json({ message: "Missing required fields" });
-        }
+//         if (!senderId || !receiverId || !content || !content.trim()) {
+//             return res.status(400).json({ message: "Missing required fields" });
+//         }
 
-        const newMessage = new Chat({ senderId, receiverId, content: content.trim(), timestamp: new Date() });
+//         const newMessage = new Chat({ senderId, receiverId, content: content.trim(), timestamp: new Date() });
 
 
-        await newMessage.save();
+//         await newMessage.save();
 
-        req.app.get("io").to(receiverId).emit("receiveMessage", newMessage);
+//         req.app.get("io").to(receiverId).emit("receiveMessage", newMessage);
 
-        res.status(200).json(newMessage);
-    } catch (error) {
-        console.error("Error sending message:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
+//         res.status(200).json(newMessage);
+//     } catch (error) {
+//         console.error("Error sending message:", error);
+//         res.status(500).json({ message: "Server error" });
+//     }
+// };
 
 export const getMessages = async (req, res) => {
     try {

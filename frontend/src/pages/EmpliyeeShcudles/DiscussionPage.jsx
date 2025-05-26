@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -28,6 +28,13 @@ const DiscussionPage = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
+    // const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
+
+
+    useEffect(() => {
+        scrollToBottomIfNeeded();
+    }, [messages]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -55,13 +62,13 @@ const DiscussionPage = () => {
                 setMessages((prevMessages) => [...prevMessages, newMessage]);
             }
         };
-    
+
         socket.on("receiveMessage", handleMessageReceive);
-    
+
         return () => {
             socket.off("receiveMessage", handleMessageReceive);
         };
-    }, [selectedUser]); 
+    }, [selectedUser]);
 
     const fetchMessages = async (user) => {
         if (!user?._id || !loggedInUserId) {
@@ -91,10 +98,12 @@ const DiscussionPage = () => {
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
-        setMessages([]); 
-        fetchMessages(user);
+        setMessages([]);
+        fetchMessages(user).then(() => {
+            scrollToBottomIfNeeded();
+        });
     };
-    
+
 
     const sendMessage = async () => {
         if (!message.trim() || !selectedUser?._id || !loggedInUserId) {
@@ -113,27 +122,39 @@ const DiscussionPage = () => {
             timestamp: new Date(),
         };
 
-        try {
-            const response = await axios.post("http://localhost:9000/api/chat/send", newMessage, {
-                headers: { Authorization: `Bearer ${authToken}` },
-            });
+        socket.emit("sendMessage", newMessage);
+        setMessage("");
 
-            if (response.status === 200 || response.status === 201) {
-                const savedMessage = response.data;
-                
-                socket.emit("sendMessage", savedMessage);
-            
-                setMessages((prevMessages) => [...prevMessages, savedMessage]);
-                setMessage("");
-            } else {
-                console.error("Unexpected response:", response);
-            }
-        } catch (error) {
-            console.error("Error sending message:", error.response?.data || error.message);
-        }
+        // try {
+        //     const response = await axios.post("http://localhost:9000/api/chat/send", newMessage, {
+        //         headers: { Authorization: `Bearer ${authToken}` },
+        //     });
+
+        //     if (response.status === 200 || response.status === 201) {
+        //         const savedMessage = response.data;
+
+        //         socket.emit("sendMessage", savedMessage);
+
+        //         // setMessages((prevMessages) => [...prevMessages, savedMessage]);
+        //         // setMessages();
+        //         setMessage("");
+        //     } else {
+        //         console.error("Unexpected response:", response);
+        //     }
+        // } catch (error) {
+        //     console.error("Error sending message:", error.response?.data || error.message);
+        // }
     };
 
-
+    const scrollToBottomIfNeeded = () => {
+        const container = messagesContainerRef.current;
+        if (container) {
+            const isOverflowing = container.scrollHeight > container.clientHeight;
+            if (isOverflowing) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    };
 
     return (
         <div className="flex">
@@ -154,23 +175,37 @@ const DiscussionPage = () => {
                 )}
             </div>
 
-            <div className="w-3/4 p-4">
+
+            <div
+                className="w-3/4 p-4 flex flex-col h-[calc(100vh-2rem)]"
+            >
                 {selectedUser ? (
                     <>
-                        <h3 className="text-xl font-semibold mb-4">Chat with {selectedUser.fullName || selectedUser.username}</h3>
-                        <div className="bg-white p-4 border rounded-md h-[400px] overflow-auto">
+                        <h3 className="text-xl font-semibold mb-4">
+                            Chat with {selectedUser.fullName || selectedUser.username}
+                        </h3>
+
+                        <div
+                            className="flex-1 overflow-y-auto bg-white p-4 border rounded-md"
+                            ref={messagesContainerRef}
+                        >
                             {messages.map((msg, index) => (
                                 <div
                                     key={index}
-                                    className={`text-sm ${msg.senderId === loggedInUserId ? "text-right" : "text-left"} text-gray-600`}
+                                    className={`text-sm mb-2 ${msg.senderId === loggedInUserId ? "text-right" : "text-left"
+                                        } text-gray-600`}
                                 >
-                                    <p className={msg.senderId === loggedInUserId ? "font-semibold text-blue-600" : "font-semibold text-green-600"}>
+                                    <p
+                                        className={`font-semibold ${msg.senderId === loggedInUserId ? "text-blue-600" : "text-green-600"
+                                            }`}
+                                    >
                                         {msg.senderId === loggedInUserId ? "You" : selectedUser.fullName}:
                                     </p>
                                     <p>{msg.content}</p>
                                 </div>
                             ))}
                         </div>
+
                         <div className="mt-4">
                             <input
                                 type="text"

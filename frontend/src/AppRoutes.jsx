@@ -6,7 +6,7 @@ import Reporting from "./pages/Dashboard/Reporting";
 import Settings from "./pages/Settings";
 import Schedulestable from "./pages/EmpliyeeShcudles/Schedulestable";
 import Projects from "./pages/Dashboard/Projects";
-import Chat from "./pages/EmpliyeeShcudles/Chat";
+// import Chat from "./pages/EmpliyeeShcudles/Chat";
 import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
@@ -27,7 +27,7 @@ const AppRoutes = () => (
         <Route path="/settings" element={<Settings />} />
         <Route path="/schedulestable" element={<Schedulestable />} />
         <Route path="/projects" element={<Projects />} />
-        <Route path="/allemp" element={<Chat />} />
+        {/* <Route path="/allemp" element={<Chat />} /> */}
         <Route path="/discussion" element={<DiscussionPage />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/profile" element={<Profile />} />
