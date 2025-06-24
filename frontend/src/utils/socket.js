@@ -1,40 +1,23 @@
-import { io } from "socket.io-client";
+/* eslint-disable no-unused-vars */
+// Client-side (e.g., in your React component)
+import { useEffect } from "react";
+import io from "socket.io-client";
+import { jwtDecode } from "jwt-decode";
 
 const authToken = localStorage.getItem("authToken");
-let userId = null;
+let loggedInUserId = null;
 
 if (authToken) {
     try {
-        const decodedToken = JSON.parse(atob(authToken.split(".")[1]));
-        userId = decodedToken.id || null;
-    } catch (error) {
-        console.error("❌ Error decoding authToken:", error);
+        const decoded = jwtDecode(authToken);
+        loggedInUserId = decoded.userId || decoded.id || decoded._id;
+    } catch (err) {
+        console.error("Failed to decode token:", err);
     }
 }
 
 const socket = io("http://localhost:9000", {
-    query: userId ? { userId } : {},
-    transports: ["websocket"],
     withCredentials: true,
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 3000,
+    transports: ["websocket", "polling"],
+    query: authToken ? { authToken } : {},
 });
-
-socket.on("connect", () => {
-    console.log(`Connected to WebSocket as User ID: ${userId || "Unknown"}`);
-});
-
-socket.on("disconnect", (reason) => {
-    console.warn(`Disconnected: ${reason}`);
-});
-
-export const sendMessage = (receiverId, message) => {
-    socket.emit("sendMessage", { senderId: userId, receiverId, message });
-};
-
-socket.on("receiveMessage", ({ sender, message }) => {
-    console.log(`Message from ${sender}: ${message}`);
-});
-
-export default socket;

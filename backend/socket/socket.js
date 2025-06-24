@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import Chat from "../models/chat.model.js";
-import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 
 const onlineUsers = new Map();
@@ -23,7 +23,7 @@ const setupSocket = (server) => {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
                 userId = decoded.userId || decoded.id || decoded._id;
                 if (userId) {
-                    socket.join(userId); 
+                    socket.join(userId);
                     onlineUsers.set(userId, socket.id);
                     console.log(`🔌 User connected: ${userId}`);
                 }
@@ -52,11 +52,37 @@ const setupSocket = (server) => {
             io.to(receiverId).emit("receiveMessage", messageData);
         });
 
+        // socket.on("typing", ({ senderId, receiverId }) => {
+        //     const receiverSocketId = onlineUsers.get(receiverId);
+        //     if (receiverSocketId) {
+        //         io.to(receiverSocketId).emit("typing", {
+        //             senderId,
+        //             receiverId
+        //         });
+        //     }
+        // });
+
+        socket.on("typing", ({ senderId, receiverId }) => {
+            const receiverSocketId = onlineUsers.get(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("typing", { senderId });
+            }
+        });
+
+        socket.on("stopTyping", ({ senderId, receiverId }) => {
+            const receiverSocketId = onlineUsers.get(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("stopTyping", { senderId });
+            }
+        });
+
+
         socket.on("disconnect", () => {
             console.log("User disconnected:", socket.id);
             if (userId) onlineUsers.delete(userId);
         });
     });
+
 
     return io;
 };

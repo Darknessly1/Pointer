@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -28,8 +28,13 @@ const DiscussionPage = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
-    // const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
+    const [unreadCounts, setUnreadCounts] = useState({});
+    const [isTyping, setIsTyping] = useState(false);
+    const [typingUsers, setTypingUsers] = useState({});
+    const typingTimeoutRef = useRef(null);
+    const [typingStatus, setTypingStatus] = useState(false);
+
 
 
     useEffect(() => {
@@ -52,23 +57,6 @@ const DiscussionPage = () => {
 
         fetchUsers();
     }, [loggedInUserId]);
-
-    useEffect(() => {
-        const handleMessageReceive = (newMessage) => {
-            if (
-                (newMessage.senderId === loggedInUserId && newMessage.receiverId === selectedUser?._id) ||
-                (newMessage.receiverId === loggedInUserId && newMessage.senderId === selectedUser?._id)
-            ) {
-                setMessages((prevMessages) => [...prevMessages, newMessage]);
-            }
-        };
-
-        socket.on("receiveMessage", handleMessageReceive);
-
-        return () => {
-            socket.off("receiveMessage", handleMessageReceive);
-        };
-    }, [selectedUser]);
 
     const fetchMessages = async (user) => {
         if (!user?._id || !loggedInUserId) {
@@ -95,15 +83,14 @@ const DiscussionPage = () => {
         }
     };
 
-
     const handleUserSelect = (user) => {
         setSelectedUser(user);
         setMessages([]);
+        setUnreadCounts(prev => ({ ...prev, [user._id]: 0 }));
         fetchMessages(user).then(() => {
             scrollToBottomIfNeeded();
         });
     };
-
 
     const sendMessage = async () => {
         if (!message.trim() || !selectedUser?._id || !loggedInUserId) {
@@ -122,28 +109,12 @@ const DiscussionPage = () => {
             timestamp: new Date(),
         };
 
+        // setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setTimeout(scrollToBottomIfNeeded, 100);
+
         socket.emit("sendMessage", newMessage);
+
         setMessage("");
-
-        // try {
-        //     const response = await axios.post("http://localhost:9000/api/chat/send", newMessage, {
-        //         headers: { Authorization: `Bearer ${authToken}` },
-        //     });
-
-        //     if (response.status === 200 || response.status === 201) {
-        //         const savedMessage = response.data;
-
-        //         socket.emit("sendMessage", savedMessage);
-
-        //         // setMessages((prevMessages) => [...prevMessages, savedMessage]);
-        //         // setMessages();
-        //         setMessage("");
-        //     } else {
-        //         console.error("Unexpected response:", response);
-        //     }
-        // } catch (error) {
-        //     console.error("Error sending message:", error.response?.data || error.message);
-        // }
     };
 
     const scrollToBottomIfNeeded = () => {
@@ -155,6 +126,92 @@ const DiscussionPage = () => {
             }
         }
     };
+
+    useEffect(() => {
+        const handleMessageReceive = (newMessage) => {
+            const isCurrentChatOpen =
+                (newMessage.senderId === selectedUser?._id || newMessage.receiverId === selectedUser?._id);
+
+            if (isCurrentChatOpen) {
+                setMessages(prev => [...prev, newMessage]);
+            } else {
+                setUnreadCounts(prev => ({
+                    ...prev,
+                    [newMessage.senderId]: (prev[newMessage.senderId] || 0) + 1,
+                }));
+            }
+        };
+
+        socket.on("receiveMessage", handleMessageReceive);
+        return () => socket.off("receiveMessage", handleMessageReceive);
+    }, [selectedUser]);
+
+    // const handleTyping = () => {
+    //     socket.emit('typing', { senderId: loggedInUserId, receiverId: selectedUser._id });
+    // };
+
+    const handleTyping = () => {
+        if (!selectedUser || !loggedInUserId) return;
+
+        if (!isTyping) {
+            socket.emit("typing", {
+                senderId: loggedInUserId,
+                receiverId: selectedUser._id,
+            });
+            setIsTyping(true);
+        }
+
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit("stopTyping", {
+                senderId: loggedInUserId,
+                receiverId: selectedUser._id,
+            });
+            setIsTyping(false);
+        }, 1500); // stays active while you're typing, resets 1.5s after stop
+    };
+
+    useEffect(() => {
+        socket.on("typing", ({ senderId }) => {
+            if (selectedUser && selectedUser._id === senderId) {
+                setTypingStatus(true);
+            }
+        });
+
+        socket.on("stopTyping", ({ senderId }) => {
+            if (selectedUser && selectedUser._id === senderId) {
+                setTypingStatus(false);
+            }
+        });
+
+        return () => {
+            socket.off("typing");
+            socket.off("stopTyping");
+        };
+    }, [selectedUser]);
+
+
+    useEffect(() => {
+        const handleTyping = ({ senderId, receiverId }) => {
+            if (receiverId === loggedInUserId) {
+                setTypingUsers(prev => ({
+                    ...prev,
+                    [senderId]: true
+                }));
+
+                setTimeout(() => {
+                    setTypingUsers(prev => ({
+                        ...prev,
+                        [senderId]: false
+                    }));
+                }, 3000);
+            }
+        };
+
+        socket.on("typing", handleTyping);
+        return () => socket.off("typing", handleTyping);
+    }, []);
+
 
     return (
         <div className="flex">
@@ -169,10 +226,13 @@ const DiscussionPage = () => {
                             className="py-2 px-4 hover:bg-gray-100 cursor-pointer"
                             onClick={() => handleUserSelect(user)}
                         >
-                            {user.fullName || user.username || "Unnamed User"}
+                            <div key={user._id}>
+                                {user.fullName} {unreadCounts[user._id] > 0 && <span>({unreadCounts[user._id]})</span>}
+                            </div>
                         </div>
                     ))
                 )}
+
             </div>
 
 
@@ -183,6 +243,7 @@ const DiscussionPage = () => {
                     <>
                         <h3 className="text-xl font-semibold mb-4">
                             Chat with {selectedUser.fullName || selectedUser.username}
+
                         </h3>
 
                         <div
@@ -211,9 +272,27 @@ const DiscussionPage = () => {
                                 type="text"
                                 placeholder="Type a message..."
                                 value={message}
-                                onChange={(e) => setMessage(e.target.value)}
+                                onChange={(e) => {
+                                    setMessage(e.target.value);
+                                    handleTyping();
+                                    if (selectedUser?._id && loggedInUserId) {
+                                        socket.emit("typing", {
+                                            senderId: loggedInUserId,
+                                            receiverId: selectedUser._id,
+                                        });
+                                    }
+                                }}
                                 className="w-full py-2 px-4 border rounded-md"
                             />
+                            {/* {selectedUser && typingUsers[selectedUser._id] && (
+                                <div className="text-sm italic text-gray-500 mb-2">
+                                    {selectedUser.fullName || selectedUser.username} is typing...
+                                </div>
+                            )} */}
+
+                            {typingStatus && (
+                                <p className="text-sm text-gray-400 italic mt-1">{selectedUser.fullName || "User"} is typing...</p>
+                            )}
                             <button
                                 onClick={sendMessage}
                                 className="bg-blue-500 text-white py-2 px-4 rounded-md mt-2 w-full"
