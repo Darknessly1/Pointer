@@ -34,6 +34,7 @@ const DiscussionPage = () => {
     const [typingUsers, setTypingUsers] = useState({});
     const typingTimeoutRef = useRef(null);
     const [typingStatus, setTypingStatus] = useState(false);
+    const [onlineUserIds, setOnlineUserIds] = useState([]);
 
 
 
@@ -146,10 +147,6 @@ const DiscussionPage = () => {
         return () => socket.off("receiveMessage", handleMessageReceive);
     }, [selectedUser]);
 
-    // const handleTyping = () => {
-    //     socket.emit('typing', { senderId: loggedInUserId, receiverId: selectedUser._id });
-    // };
-
     const handleTyping = () => {
         if (!selectedUser || !loggedInUserId) return;
 
@@ -168,7 +165,7 @@ const DiscussionPage = () => {
                 receiverId: selectedUser._id,
             });
             setIsTyping(false);
-        }, 1500); // stays active while you're typing, resets 1.5s after stop
+        }, 1500);
     };
 
     useEffect(() => {
@@ -189,7 +186,6 @@ const DiscussionPage = () => {
             socket.off("stopTyping");
         };
     }, [selectedUser]);
-
 
     useEffect(() => {
         const handleTyping = ({ senderId, receiverId }) => {
@@ -213,35 +209,61 @@ const DiscussionPage = () => {
     }, []);
 
 
+    useEffect(() => {
+        socket.on("onlineUsers", (onlineIds) => {
+            setOnlineUserIds(onlineIds);
+        });
+
+        return () => socket.off("onlineUsers");
+    }, []);
+
     return (
         <div className="flex">
-            <div className="w-1/4 p-4 border-r bg-gray-50">
-                <h3 className="text-xl font-semibold mb-4">Users</h3>
-                {users.length === 0 ? (
-                    <p>No users found.</p>
-                ) : (
-                    users.map(user => (
-                        <div
-                            key={user._id}
-                            className="py-2 px-4 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => handleUserSelect(user)}
-                        >
-                            <div key={user._id}>
-                                {user.fullName} {unreadCounts[user._id] > 0 && <span>({unreadCounts[user._id]})</span>}
+            <div className="w-1/4 p-4 border-r bg-gray-50 rounded-3xl h-[calc(100vh-2rem)] flex flex-col">
+                {/* Sticky Header */}
+                <h3 className="text-xl font-semibold mb-4 sticky top-0 bg-gray-50 z-10">Users:</h3>
+
+                {/* Scrollable User List */}
+                <div className="flex-1 overflow-y-auto pr-1">
+                    {users.length === 0 ? (
+                        <p>No users found.</p>
+                    ) : (
+                        users.map((user, index) => (
+                            <div
+                                key={user._id}
+                                className="py-2 px-4 cursor-pointer"
+                                onClick={() => handleUserSelect(user)}
+                            >
+                                <div
+                                    className={`flex items-center gap-2 ${selectedUser?._id === user._id ? "bg-gray-300" : "bg-gray-50"} rounded-md transition-colors duration-200 p-2`}
+                                >
+                                    <div className="relative">
+                                        <img
+                                            src={user.profilePic || "https://via.placeholder.com/40"}
+                                            className="w-10 h-10 rounded-full"
+                                            alt="User"
+                                        />
+                                        {onlineUserIds.includes(user._id) && (
+                                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                                        )}
+                                    </div>
+                                    <div>
+                                        {user.fullName}{" "}
+                                        {unreadCounts[user._id] > 0 && <span>({unreadCounts[user._id]})</span>}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    ))
-                )}
-
+                        ))
+                    )}
+                </div>
             </div>
-
 
             <div
                 className="w-3/4 p-4 flex flex-col h-[calc(100vh-2rem)]"
             >
                 {selectedUser ? (
                     <>
-                        <h3 className="text-xl font-semibold mb-4">
+                        <h3 className="text-xl font-semibold mb-4 rounded-md p-2 bg-gray-200">
                             Chat with {selectedUser.fullName || selectedUser.username}
 
                         </h3>
@@ -262,43 +284,47 @@ const DiscussionPage = () => {
                                     >
                                         {msg.senderId === loggedInUserId ? "You" : selectedUser.fullName}:
                                     </p>
-                                    <p>{msg.content}</p>
+                                    <p
+                                        className="bg-blue-400/30 text-black inline-block px-3 py-2 rounded-md shadow-sm"
+                                    >
+                                        {msg.content}
+                                    </p>
                                 </div>
                             ))}
                         </div>
 
                         <div className="mt-4">
-                            <input
-                                type="text"
-                                placeholder="Type a message..."
-                                value={message}
-                                onChange={(e) => {
-                                    setMessage(e.target.value);
-                                    handleTyping();
-                                    if (selectedUser?._id && loggedInUserId) {
-                                        socket.emit("typing", {
-                                            senderId: loggedInUserId,
-                                            receiverId: selectedUser._id,
-                                        });
-                                    }
-                                }}
-                                className="w-full py-2 px-4 border rounded-md"
-                            />
-                            {/* {selectedUser && typingUsers[selectedUser._id] && (
-                                <div className="text-sm italic text-gray-500 mb-2">
-                                    {selectedUser.fullName || selectedUser.username} is typing...
-                                </div>
-                            )} */}
+                            {/* Flex container for input and button */}
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    value={message}
+                                    onChange={(e) => {
+                                        setMessage(e.target.value);
+                                        handleTyping();
+                                        if (selectedUser?._id && loggedInUserId) {
+                                            socket.emit("typing", {
+                                                senderId: loggedInUserId,
+                                                receiverId: selectedUser._id,
+                                            });
+                                        }
+                                    }}
+                                    className="w-full py-2 px-4 border rounded-md"
+                                />
+                                <button
+                                    onClick={sendMessage}
+                                    className="w-1/5 bg-blue-500 text-white py-2 px-4 rounded-md"
+                                >
+                                    Send
+                                </button>
+                            </div>
 
                             {typingStatus && (
-                                <p className="text-sm text-gray-400 italic mt-1">{selectedUser.fullName || "User"} is typing...</p>
+                                <p className="text-sm text-gray-400 italic mt-1">
+                                    {selectedUser.fullName || "User"} is typing...
+                                </p>
                             )}
-                            <button
-                                onClick={sendMessage}
-                                className="bg-blue-500 text-white py-2 px-4 rounded-md mt-2 w-full"
-                            >
-                                Send
-                            </button>
                         </div>
                     </>
                 ) : (

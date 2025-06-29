@@ -26,6 +26,7 @@ const setupSocket = (server) => {
                     socket.join(userId);
                     onlineUsers.set(userId, socket.id);
                     console.log(`🔌 User connected: ${userId}`);
+                    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
                 }
             } catch (err) {
                 console.error("Socket auth failed:", err.message);
@@ -52,16 +53,6 @@ const setupSocket = (server) => {
             io.to(receiverId).emit("receiveMessage", messageData);
         });
 
-        // socket.on("typing", ({ senderId, receiverId }) => {
-        //     const receiverSocketId = onlineUsers.get(receiverId);
-        //     if (receiverSocketId) {
-        //         io.to(receiverSocketId).emit("typing", {
-        //             senderId,
-        //             receiverId
-        //         });
-        //     }
-        // });
-
         socket.on("typing", ({ senderId, receiverId }) => {
             const receiverSocketId = onlineUsers.get(receiverId);
             if (receiverSocketId) {
@@ -79,7 +70,10 @@ const setupSocket = (server) => {
 
         socket.on("disconnect", () => {
             console.log("User disconnected:", socket.id);
-            if (userId) onlineUsers.delete(userId);
+            if (userId) {
+                onlineUsers.delete(userId);
+                io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+            }
         });
     });
 
